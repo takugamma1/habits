@@ -17,6 +17,7 @@
     --ib-arch-color: {{ section.settings.arch_color | default: '#4a8f6d' }};
     --ib-arch-radius: {{ section.settings.arch_radius | default: 50 }}%;
     --ib-logo-size: {{ section.settings.logo_size | default: 60 }}px;
+    --ib-section-spacing: {{ section.settings.section_spacing | default: 20 }}px;
   "
 >
   <div
@@ -88,6 +89,10 @@
 </div>
 
 {% stylesheet %}
+  .image-banner-section {
+    margin-block: var(--ib-section-spacing, 20px);
+  }
+
   .image-banner__grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -348,6 +353,16 @@
         { "value": "scheme-6", "label": "Scheme 6" }
       ],
       "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "section_spacing",
+      "label": "Space above & below section",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 20
     },
     {
       "type": "header",

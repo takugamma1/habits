@@ -17,6 +17,7 @@
     --cg-columns: {{ section.blocks.size | at_most: 6 }};
     --cg-card-gap: {{ section.settings.card_gap | default: 20 }}px;
     --cg-heading-size: {{ section.settings.heading_image_size | default: 160 }}px;
+    --cg-section-spacing: {{ section.settings.section_spacing | default: 20 }}px;
   "
 >
   <div class="categories-grid__container spacing-style" style="{% render 'spacing-style', settings: section.settings %}">
@@ -78,6 +79,10 @@
 
 {% stylesheet %}
   /* Outer frame — matches hero rounded container pattern */
+  .categories-grid-section {
+    margin-block: var(--cg-section-spacing, 20px);
+  }
+
   .categories-grid {
     margin-inline: var(--cg-margin, 12px);
   }
@@ -310,6 +315,16 @@
       "step": 2,
       "unit": "px",
       "default": 12
+    },
+    {
+      "type": "range",
+      "id": "section_spacing",
+      "label": "Space above & below section",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 20
     },
     {
       "type": "header",

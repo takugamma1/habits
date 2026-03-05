@@ -19,6 +19,7 @@
     --pb-margin: {{ section.settings.section_margin | default: 12 }}px;
     --pb-image-overflow: {{ section.settings.image_overflow | default: 30 }}%;
     --pb-heading-size: {{ section.settings.heading_image_size | default: 200 }}px;
+    --pb-section-spacing: {{ section.settings.section_spacing | default: 20 }}px;
   "
 >
   {%- comment -%} Background shape — rounded, sits behind everything {%- endcomment -%}
@@ -81,6 +82,10 @@
 
 {% stylesheet %}
   /* Wrapper — overflow visible so the image can break out */
+  .promo-banner-section {
+    margin-block: var(--pb-section-spacing, 20px);
+  }
+
   .promo-banner {
     position: relative;
     margin-inline: var(--pb-margin, 12px);
@@ -327,6 +332,16 @@
       "step": 2,
       "unit": "px",
       "default": 12
+    },
+    {
+      "type": "range",
+      "id": "section_spacing",
+      "label": "Space above & below section",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 20
     },
     {
       "type": "header",
