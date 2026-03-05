@@ -185,7 +185,7 @@
       "type": "image-banner",
       "settings": {
         "arch_color": "#4a8f6d",
-        "arch_radius": 50,
+        "arch_radius": 40,
         "logo_image": "shopify://shop_images/Group_3.png",
         "logo_size": 60,
         "title": "Your heading",
