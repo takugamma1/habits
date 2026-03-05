@@ -458,6 +458,8 @@
     --hero-border-width: {{ section.settings.border_width }}px;
     --hero-border-opacity: {{ section.settings.border_opacity }}%;
     --blur-opacity: {{ section.settings.reflection_opacity | divided_by: 100.0 }};
+    --hero-border-radius: {{ section.settings.border_radius | default: 0 }}px;
+    --hero-section-margin: {{ section.settings.section_margin | default: 0 }}px;
     {% if section.settings.section_height == 'custom' %}
       --hero-min-height: {{ section.settings.section_height_custom }}svh;
     {% elsif section.settings.section_height == "full-screen" %}
@@ -568,10 +570,17 @@
     align-items: var(--vertical-alignment-mobile);
     justify-content: var(--horizontal-alignment);
     z-index: var(--layer-base);
+    border-radius: var(--hero-border-radius, 0);
 
     @media screen and (min-width: 750px) {
       align-items: var(--vertical-alignment);
     }
+  }
+
+  /* Habits: Rounded hero with outer spacing */
+  .hero {
+    margin-inline: var(--hero-section-margin, 0);
+    margin-block-start: var(--hero-section-margin, 0);
   }
 
   .hero__content-wrapper.page-width {
@@ -1214,6 +1223,30 @@
       "unit": "%",
       "default": 75,
       "visible_if": "{{ section.settings.blurred_reflection and section.settings.media_type_1 != 'video' or section.settings.media_type_2 != 'video' }}"
+    },
+    {
+      "type": "header",
+      "content": "Rounded container"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_margin",
+      "label": "Outer spacing",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 0
     },
     {
       "type": "header",

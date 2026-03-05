@@ -292,6 +292,7 @@
 <header-component
   id="header-component"
   class="{{ class }}"
+  {% if template.name == 'index' %}data-habits-homepage{% endif %}
   data-theme-color="rgb({{ section.settings.color_scheme_top.settings.background.rgb }})"
   {% if transparent %}
     transparent="{{ transparent }}"
@@ -884,6 +885,23 @@
   .header-actions__action:not(.account-button) svg {
     width: var(--icon-size-md);
     height: var(--icon-size-md);
+  }
+
+  /* Habits: Hide cart & account icons on homepage.
+   * Uses data-attribute targeting (safe, doesn't touch existing selectors/ARIA).
+   * Elements remain in DOM so JS bindings stay intact; only visually hidden.
+   */
+  #header-component[data-habits-homepage] header-actions {
+    visibility: hidden;
+    pointer-events: none;
+    width: 0;
+    overflow: hidden;
+  }
+
+  /* On mobile/drawer mode, keep the grid balanced when actions are hidden on homepage */
+  #header-component[data-habits-homepage] .header__columns header-actions {
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .header:has(#Details-menu-drawer-container[open]) {
