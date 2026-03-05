@@ -56,7 +56,14 @@
     </div>
 
     {%- comment -%} Right: Content {%- endcomment -%}
-    <div class="image-banner__content">
+    <div
+      class="image-banner__content"
+      style="
+        --ib-heading-align: {{ section.settings.heading_alignment | default: 'center' }};
+        --ib-text-align: {{ section.settings.text_alignment | default: 'center' }};
+        --ib-button-align: {{ section.settings.button_alignment | default: 'flex-end' }};
+      "
+    >
       {% if section.settings.title != blank %}
         <h2 class="image-banner__title">{{ section.settings.title }}</h2>
       {% endif %}
@@ -135,8 +142,6 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    align-items: center;
-    text-align: center;
   }
 
   .image-banner__title {
@@ -144,6 +149,7 @@
     color: var(--color-foreground);
     font-size: clamp(1.75rem, 3.5vw, 3rem);
     line-height: 1.15;
+    text-align: var(--ib-heading-align, center);
   }
 
   .image-banner__text {
@@ -151,11 +157,13 @@
     font-size: clamp(0.875rem, 1.2vw, 1.0625rem);
     line-height: 1.7;
     max-width: 520px;
+    text-align: var(--ib-text-align, center);
+    align-self: var(--ib-text-align, center);
   }
 
   .image-banner__cta {
     display: flex;
-    justify-content: flex-end;
+    justify-content: var(--ib-button-align, flex-end);
     width: 100%;
     margin-block-start: 8px;
   }
@@ -177,11 +185,13 @@
     }
 
     .image-banner__content {
-      text-align: center;
+      --ib-heading-align: center !important;
+      --ib-text-align: center !important;
+      --ib-button-align: center !important;
     }
 
-    .image-banner__cta {
-      justify-content: center;
+    .image-banner__text {
+      align-self: center;
     }
   }
 {% endstylesheet %}
@@ -282,6 +292,44 @@
       "id": "button_open_new_tab",
       "label": "Open in new tab",
       "default": false
+    },
+    {
+      "type": "header",
+      "content": "Desktop alignment",
+      "info": "On mobile everything is centered automatically"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "button_alignment",
+      "label": "Button alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "flex-end"
     },
     {
       "type": "header",
