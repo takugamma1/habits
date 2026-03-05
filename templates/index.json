@@ -181,6 +181,52 @@
         "padding-block-end": 48
       }
     },
+    "categories_grid_Rk3m7P": {
+      "type": "categories-grid",
+      "blocks": {
+        "cat_hookah": {
+          "type": "category",
+          "settings": {
+            "title": "Hookah"
+          }
+        },
+        "cat_food": {
+          "type": "category",
+          "settings": {
+            "title": "Food"
+          }
+        },
+        "cat_drinks": {
+          "type": "category",
+          "settings": {
+            "title": "Drinks"
+          }
+        },
+        "cat_delivery": {
+          "type": "category",
+          "settings": {
+            "title": "Delivery"
+          }
+        }
+      },
+      "block_order": [
+        "cat_hookah",
+        "cat_food",
+        "cat_drinks",
+        "cat_delivery"
+      ],
+      "settings": {
+        "background_color": "#4a8f6d",
+        "card_color": "#2d5e45",
+        "card_radius": 50,
+        "card_gap": 20,
+        "heading_image_size": 160,
+        "border_radius": 24,
+        "section_margin": 12,
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    },
     "image_banner_hB4x7K": {
       "type": "image-banner",
       "settings": {
@@ -206,6 +252,7 @@
   "order": [
     "hero_jVaWmY",
     "section_bCdnwB",
+    "categories_grid_Rk3m7P",
     "image_banner_hB4x7K"
   ]
 }

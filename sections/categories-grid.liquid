@@ -1,0 +1,376 @@
+{% liquid
+  assign has_heading_image = false
+  if section.settings.heading_image != blank
+    assign has_heading_image = true
+  endif
+%}
+
+<div
+  id="CategoriesGrid-{{ section.id }}"
+  class="categories-grid"
+  style="
+    --cg-radius: {{ section.settings.border_radius | default: 24 }}px;
+    --cg-margin: {{ section.settings.section_margin | default: 12 }}px;
+    --cg-bg: {{ section.settings.background_color | default: '#4a8f6d' }};
+    --cg-card-bg: {{ section.settings.card_color | default: '#2d5e45' }};
+    --cg-card-radius: {{ section.settings.card_radius | default: 50 }}%;
+    --cg-columns: {{ section.blocks.size | at_most: 6 }};
+    --cg-card-gap: {{ section.settings.card_gap | default: 20 }}px;
+    --cg-heading-size: {{ section.settings.heading_image_size | default: 160 }}px;
+  "
+>
+  <div class="categories-grid__container spacing-style" style="{% render 'spacing-style', settings: section.settings %}">
+
+    {%- comment -%} Heading image (e.g. logo) {%- endcomment -%}
+    {% if has_heading_image %}
+      <div class="categories-grid__heading">
+        {{
+          section.settings.heading_image
+          | image_url: width: 600
+          | image_tag:
+            loading: 'lazy',
+            widths: '120, 160, 240, 320, 480, 600',
+            sizes: '(max-width: 749px) 120px, 160px',
+            class: 'categories-grid__heading-img'
+        }}
+      </div>
+    {% elsif section.settings.title != blank %}
+      <h2 class="categories-grid__title">{{ section.settings.title }}</h2>
+    {% endif %}
+
+    {%- comment -%} Cards {%- endcomment -%}
+    <div class="categories-grid__cards">
+      <div class="categories-grid__track">
+        {% for block in section.blocks %}
+          <div class="categories-grid__card" {{ block.shopify_attributes }}>
+            {% if block.settings.link != blank %}
+              <a href="{{ block.settings.link }}" class="categories-grid__card-link">
+            {% endif %}
+
+            <div class="categories-grid__arch">
+              {% if block.settings.image != blank %}
+                {{
+                  block.settings.image
+                  | image_url: width: 800
+                  | image_tag:
+                    loading: 'lazy',
+                    sizes: '(max-width: 749px) 55vw, 25vw',
+                    widths: '200, 300, 400, 600, 800',
+                    class: 'categories-grid__card-img'
+                }}
+              {% endif %}
+
+              {% if block.settings.title != blank %}
+                <span class="categories-grid__card-title">{{ block.settings.title }}</span>
+              {% endif %}
+            </div>
+
+            {% if block.settings.link != blank %}
+              </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% stylesheet %}
+  /* Outer frame — matches hero rounded container pattern */
+  .categories-grid {
+    margin-inline: var(--cg-margin, 12px);
+  }
+
+  .categories-grid__container {
+    background: var(--cg-bg);
+    border-radius: var(--cg-radius, 24px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+  }
+
+  /* Heading image / text */
+  .categories-grid__heading {
+    display: flex;
+    justify-content: center;
+  }
+
+  .categories-grid__heading-img {
+    width: var(--cg-heading-size, 160px);
+    height: auto;
+    object-fit: contain;
+  }
+
+  .categories-grid__title {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    text-align: center;
+  }
+
+  /* Cards wrapper */
+  .categories-grid__cards {
+    width: 100%;
+    padding-inline: var(--cg-card-gap, 20px);
+    box-sizing: border-box;
+  }
+
+  .categories-grid__track {
+    display: grid;
+    grid-template-columns: repeat(var(--cg-columns, 4), 1fr);
+    gap: var(--cg-card-gap, 20px);
+  }
+
+  /* Individual card */
+  .categories-grid__card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .categories-grid__arch {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background: var(--cg-card-bg);
+    border-radius: var(--cg-card-radius) var(--cg-card-radius) 0 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    transition: transform 0.3s ease;
+  }
+
+  .categories-grid__card-link:hover .categories-grid__arch {
+    transform: scale(1.02);
+  }
+
+  .categories-grid__card-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    padding: 12%;
+  }
+
+  .categories-grid__card-title {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    font-size: clamp(0.8125rem, 1.2vw, 1rem);
+    font-weight: 500;
+    text-align: center;
+    padding-block: 12px;
+    padding-inline: 8px;
+    width: 100%;
+  }
+
+  /* ─── Mobile: horizontal carousel ─── */
+  @media screen and (max-width: 749px) {
+    .categories-grid__cards {
+      overflow: visible;
+    }
+
+    .categories-grid__track {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scroll-padding-inline: 20px;
+      gap: 14px;
+
+      /* hide scrollbar but keep scroll */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .categories-grid__track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .categories-grid__card {
+      flex: 0 0 55%;
+      scroll-snap-align: start;
+      min-width: 0;
+    }
+
+    .categories-grid__arch {
+      aspect-ratio: 2.5 / 4;
+    }
+  }
+
+  /* Small phones */
+  @media screen and (max-width: 390px) {
+    .categories-grid__card {
+      flex: 0 0 62%;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Categories grid",
+  "tag": "section",
+  "class": "categories-grid-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "image_picker",
+      "id": "heading_image",
+      "label": "Heading image",
+      "info": "Logo or decorative heading. Takes priority over text heading."
+    },
+    {
+      "type": "range",
+      "id": "heading_image_size",
+      "label": "Heading image width",
+      "min": 60,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 160
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading text",
+      "default": "Our categories",
+      "info": "Used when no heading image is set"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#4a8f6d"
+    },
+    {
+      "type": "color",
+      "id": "card_color",
+      "label": "Card color",
+      "default": "#2d5e45"
+    },
+    {
+      "type": "header",
+      "content": "Card shape"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card arch roundness",
+      "min": 20,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "info": "50% = full semicircle top"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Gap between cards",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Rounded container"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "section_margin",
+      "label": "Outer spacing",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Category"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Categories grid",
+      "category": "Collection",
+      "blocks": [
+        { "type": "category", "settings": { "title": "Hookah" } },
+        { "type": "category", "settings": { "title": "Food" } },
+        { "type": "category", "settings": { "title": "Drinks" } },
+        { "type": "category", "settings": { "title": "Delivery" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
