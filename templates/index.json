@@ -268,8 +268,8 @@
         "background_color": "#4a8f6d",
         "border_radius": 24,
         "section_margin": 12,
-        "padding-block-start": 60,
-        "padding-block-end": 48,
+        "padding-block-start": 100,
+        "padding-block-end": 100,
         "padding-inline-start": 40,
         "padding-inline-end": 0
       }
