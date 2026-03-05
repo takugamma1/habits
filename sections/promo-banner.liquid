@@ -1,0 +1,383 @@
+{% liquid
+  assign has_image = false
+  if section.settings.image != blank
+    assign has_image = true
+  endif
+
+  assign has_heading_image = false
+  if section.settings.heading_image != blank
+    assign has_heading_image = true
+  endif
+%}
+
+<div
+  id="PromoBanner-{{ section.id }}"
+  class="promo-banner"
+  style="
+    --pb-bg: {{ section.settings.background_color | default: '#4a8f6d' }};
+    --pb-radius: {{ section.settings.border_radius | default: 24 }}px;
+    --pb-margin: {{ section.settings.section_margin | default: 12 }}px;
+    --pb-image-overflow: {{ section.settings.image_overflow | default: 30 }}%;
+    --pb-heading-size: {{ section.settings.heading_image_size | default: 200 }}px;
+  "
+>
+  {%- comment -%} Background shape — rounded, sits behind everything {%- endcomment -%}
+  <div class="promo-banner__bg"></div>
+
+  {%- comment -%} Content grid — sits above background, image can overflow {%- endcomment -%}
+  <div
+    class="promo-banner__grid spacing-style"
+    style="{% render 'spacing-style', settings: section.settings %}"
+  >
+    {%- comment -%} Left: heading + text + CTA {%- endcomment -%}
+    <div class="promo-banner__content">
+      {% if has_heading_image %}
+        <div class="promo-banner__heading-image">
+          {{
+            section.settings.heading_image
+            | image_url: width: 800
+            | image_tag:
+              loading: 'lazy',
+              widths: '150, 200, 300, 400, 600, 800',
+              sizes: '(max-width: 749px) 50vw, 30vw',
+              class: 'promo-banner__heading-img'
+          }}
+        </div>
+      {% elsif section.settings.title != blank %}
+        <h2 class="promo-banner__title">{{ section.settings.title }}</h2>
+      {% endif %}
+
+      {% if section.settings.text != blank %}
+        <div class="promo-banner__text rte">{{ section.settings.text }}</div>
+      {% endif %}
+
+      {% if section.settings.button_label != blank %}
+        <a
+          href="{{ section.settings.button_link }}"
+          class="promo-banner__button button {{ section.settings.button_style }}"
+          {% if section.settings.button_open_new_tab %}target="_blank" rel="noopener"{% endif %}
+        >
+          {{ section.settings.button_label }}
+        </a>
+      {% endif %}
+    </div>
+
+    {%- comment -%} Right: overflowing image {%- endcomment -%}
+    {% if has_image %}
+      <div class="promo-banner__media">
+        {{
+          section.settings.image
+          | image_url: width: 1200
+          | image_tag:
+            loading: 'lazy',
+            sizes: '(max-width: 749px) 80vw, 50vw',
+            widths: '375, 550, 750, 1000, 1200',
+            class: 'promo-banner__img'
+        }}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% stylesheet %}
+  /* Wrapper — overflow visible so the image can break out */
+  .promo-banner {
+    position: relative;
+    margin-inline: var(--pb-margin, 12px);
+  }
+
+  /* Background shape with rounded corners */
+  .promo-banner__bg {
+    position: absolute;
+    inset: 0;
+    background: var(--pb-bg);
+    border-radius: var(--pb-radius, 24px);
+    z-index: 0;
+  }
+
+  /* Grid layout */
+  .promo-banner__grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+
+  /* Left content */
+  .promo-banner__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .promo-banner__heading-image {
+    display: flex;
+  }
+
+  .promo-banner__heading-img {
+    width: var(--pb-heading-size, 200px);
+    height: auto;
+    object-fit: contain;
+  }
+
+  .promo-banner__title {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1.05;
+    font-weight: 800;
+  }
+
+  .promo-banner__text {
+    color: #fff;
+    font-size: clamp(0.8125rem, 1.2vw, 1rem);
+    line-height: 1.65;
+    max-width: 480px;
+  }
+
+  .promo-banner__button {
+    margin-block-start: 4px;
+    border-radius: 8px;
+    padding-block: 10px;
+    padding-inline: 28px;
+    font-size: 0.875rem;
+  }
+
+  /* Right image — overflows the container */
+  .promo-banner__media {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+  }
+
+  .promo-banner__img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    transform: scale(calc(1 + var(--pb-image-overflow, 30) / 100));
+    transform-origin: center center;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ─── Mobile ─── */
+  @media screen and (max-width: 749px) {
+    .promo-banner {
+      /* extra top space for overflowing image */
+      margin-block-start: 60px;
+    }
+
+    .promo-banner__grid {
+      grid-template-columns: 1fr;
+    }
+
+    /* Image on top on mobile */
+    .promo-banner__media {
+      order: -1;
+      margin-block-start: calc(var(--pb-image-overflow, 30) * -1%);
+    }
+
+    .promo-banner__img {
+      max-width: 75%;
+      transform: scale(calc(1 + var(--pb-image-overflow, 30) / 100));
+      transform-origin: center bottom;
+    }
+
+    .promo-banner__content {
+      align-items: flex-start;
+      padding-inline: 4px;
+    }
+
+    .promo-banner__heading-img {
+      width: min(var(--pb-heading-size, 200px), 55vw);
+    }
+
+    .promo-banner__title {
+      font-size: clamp(1.75rem, 8vw, 2.5rem);
+    }
+
+    .promo-banner__text {
+      font-size: 0.875rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Promo banner",
+  "tag": "section",
+  "class": "promo-banner-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "image_picker",
+      "id": "heading_image",
+      "label": "Heading image",
+      "info": "Logo or jumbo heading image. Takes priority over text."
+    },
+    {
+      "type": "range",
+      "id": "heading_image_size",
+      "label": "Heading image width",
+      "min": 80,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "default": 200
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading text",
+      "default": "Promo banner",
+      "info": "Used when no heading image is set"
+    },
+    {
+      "type": "header",
+      "content": "Text & button"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Add a short promotional message here.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "button-primary", "label": "Primary" },
+        { "value": "button-secondary", "label": "Secondary" },
+        { "value": "button-tertiary", "label": "Tertiary" }
+      ],
+      "default": "button-primary"
+    },
+    {
+      "type": "checkbox",
+      "id": "button_open_new_tab",
+      "label": "Open in new tab",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Use a PNG with transparent background for the overflow effect"
+    },
+    {
+      "type": "range",
+      "id": "image_overflow",
+      "label": "Image overflow",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "%",
+      "default": 30,
+      "info": "How much the image extends beyond the frame"
+    },
+    {
+      "type": "header",
+      "content": "Container"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#4a8f6d"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "section_margin",
+      "label": "Outer spacing",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Left",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Right",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Promo banner",
+      "category": "Promotional"
+    }
+  ]
+}
+{% endschema %}

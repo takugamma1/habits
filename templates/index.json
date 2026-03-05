@@ -253,12 +253,33 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "promo_banner_Xt9w2J": {
+      "type": "promo-banner",
+      "settings": {
+        "heading_image_size": 200,
+        "title": "Promo banner",
+        "text": "<p>Add a short promotional message here.</p>",
+        "button_label": "Shop now",
+        "button_link": "",
+        "button_style": "button-primary",
+        "button_open_new_tab": false,
+        "image_overflow": 30,
+        "background_color": "#4a8f6d",
+        "border_radius": 24,
+        "section_margin": 12,
+        "padding-block-start": 48,
+        "padding-block-end": 48,
+        "padding-inline-start": 40,
+        "padding-inline-end": 0
+      }
     }
   },
   "order": [
     "hero_jVaWmY",
     "section_bCdnwB",
     "image_banner_hB4x7K",
-    "categories_grid_Rk3m7P"
+    "categories_grid_Rk3m7P",
+    "promo_banner_Xt9w2J"
   ]
 }
