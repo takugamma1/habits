@@ -194,6 +194,9 @@
         "button_link": "",
         "button_style": "button-primary",
         "button_open_new_tab": false,
+        "heading_alignment": "right",
+        "text_alignment": "right",
+        "button_alignment": "flex-end",
         "color_scheme": "scheme-1",
         "padding-block-start": 48,
         "padding-block-end": 48
