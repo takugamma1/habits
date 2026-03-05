@@ -14,44 +14,49 @@
   id="ImageBanner-{{ section.id }}"
   class="image-banner color-{{ section.settings.color_scheme }}"
   style="
-    --image-banner-radius: {{ section.settings.border_radius | default: 0 }}px;
-    --image-banner-margin: {{ section.settings.section_margin | default: 0 }}px;
-    --image-banner-gradient-color: {{ section.settings.gradient_color | default: '#000000' }};
-    --image-banner-gradient-opacity: {{ section.settings.gradient_opacity | divided_by: 100.0 }};
-    --image-banner-logo-size: {{ section.settings.logo_size | default: 80 }}px;
-    {% if section.settings.section_height == 'custom' %}
-      --image-banner-height: {{ section.settings.section_height_custom }}svh;
-    {% elsif section.settings.section_height == 'full-screen' %}
-      --image-banner-height: 100svh;
-    {% else %}
-      --image-banner-height: var(--section-height-{{ section.settings.section_height }});
-    {% endif %}
+    --ib-arch-color: {{ section.settings.arch_color | default: '#4a8f6d' }};
+    --ib-arch-radius: {{ section.settings.arch_radius | default: 50 }}%;
+    --ib-logo-size: {{ section.settings.logo_size | default: 60 }}px;
   "
 >
   <div
-    class="image-banner__container spacing-style section section--full-width"
+    class="image-banner__grid spacing-style"
     style="{% render 'spacing-style', settings: section.settings %}"
   >
-    {%- comment -%} Background image {%- endcomment -%}
-    {% if has_image %}
-      <div class="image-banner__media">
-        {{
-          section.settings.image
-          | image_url: width: 3840
-          | image_tag:
-            loading: 'lazy',
-            sizes: '100vw',
-            widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
-            class: 'image-banner__img'
-        }}
+    {%- comment -%} Left: Arch-shaped image/color block {%- endcomment -%}
+    <div class="image-banner__arch">
+      <div class="image-banner__arch-inner">
+        {% if has_image %}
+          {{
+            section.settings.image
+            | image_url: width: 1500
+            | image_tag:
+              loading: 'lazy',
+              sizes: '(max-width: 749px) 100vw, 45vw',
+              widths: '375, 550, 750, 1100, 1500',
+              class: 'image-banner__arch-img'
+          }}
+        {% endif %}
+
+        {%- comment -%} Logo mark at bottom of arch {%- endcomment -%}
+        {% if has_logo %}
+          <div class="image-banner__logo">
+            {{
+              section.settings.logo_image
+              | image_url: width: 300
+              | image_tag:
+                loading: 'lazy',
+                widths: '40, 60, 80, 120, 160, 300',
+                sizes: '(max-width: 749px) 50px, 60px',
+                class: 'image-banner__logo-img'
+            }}
+          </div>
+        {% endif %}
       </div>
-    {% endif %}
+    </div>
 
-    {%- comment -%} Gradient overlay from bottom {%- endcomment -%}
-    <div class="image-banner__gradient"></div>
-
-    {%- comment -%} Content layer {%- endcomment -%}
-    <div class="image-banner__content {{ section.settings.content_alignment }}">
+    {%- comment -%} Right: Content {%- endcomment -%}
+    <div class="image-banner__content">
       {% if section.settings.title != blank %}
         <h2 class="image-banner__title">{{ section.settings.title }}</h2>
       {% endif %}
@@ -61,147 +66,122 @@
       {% endif %}
 
       {% if section.settings.button_label != blank %}
-        <a
-          href="{{ section.settings.button_link }}"
-          class="image-banner__button button {{ section.settings.button_style }}"
-          {% if section.settings.button_open_new_tab %}target="_blank" rel="noopener"{% endif %}
-        >
-          {{ section.settings.button_label }}
-        </a>
+        <div class="image-banner__cta">
+          <a
+            href="{{ section.settings.button_link }}"
+            class="image-banner__button button {{ section.settings.button_style }}"
+            {% if section.settings.button_open_new_tab %}target="_blank" rel="noopener"{% endif %}
+          >
+            {{ section.settings.button_label }}
+          </a>
+        </div>
       {% endif %}
     </div>
-
-    {%- comment -%} Logo mark at bottom {%- endcomment -%}
-    {% if has_logo %}
-      <div class="image-banner__logo">
-        {{
-          section.settings.logo_image
-          | image_url: width: 400
-          | image_tag:
-            loading: 'lazy',
-            widths: '50, 80, 120, 160, 200, 400',
-            sizes: '(max-width: 749px) 60px, 80px',
-            class: 'image-banner__logo-img'
-        }}
-      </div>
-    {% endif %}
   </div>
 </div>
 
 {% stylesheet %}
-  .image-banner {
-    margin-inline: var(--image-banner-margin, 0);
-    margin-block-start: var(--image-banner-margin, 0);
-    position: relative;
-  }
-
-  .image-banner__container {
-    position: relative;
-    overflow: hidden;
-    min-height: var(--image-banner-height, 50svh);
-    border-radius: var(--image-banner-radius, 0);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
+  .image-banner__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
     align-items: center;
+    max-width: var(--page-width);
+    margin-inline: auto;
+    padding-inline: var(--spacing-inline, 24px);
   }
 
-  .image-banner__media {
+  /* Arch shape: rounded top, flat bottom */
+  .image-banner__arch {
+    position: relative;
+    width: 100%;
+  }
+
+  .image-banner__arch-inner {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background: var(--ib-arch-color);
+    border-radius: var(--ib-arch-radius) var(--ib-arch-radius) 0 0;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .image-banner__arch-img {
     position: absolute;
     inset: 0;
-    z-index: var(--layer-base, 0);
-  }
-
-  .image-banner__img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
   }
 
-  .image-banner__gradient {
-    position: absolute;
-    inset: 0;
-    z-index: var(--layer-flat, 1);
-    pointer-events: none;
-    background: linear-gradient(
-      to top,
-      rgb(from var(--image-banner-gradient-color) r g b / var(--image-banner-gradient-opacity)),
-      rgb(from var(--image-banner-gradient-color) r g b / 0) 70%
-    );
-    border-radius: var(--image-banner-radius, 0);
+  .image-banner__logo {
+    position: relative;
+    z-index: 2;
+    padding-block-end: 32px;
   }
 
+  .image-banner__logo-img {
+    width: var(--ib-logo-size, 60px);
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Right content column */
   .image-banner__content {
-    position: relative;
-    z-index: var(--layer-raised, 2);
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    width: 100%;
-    max-width: 680px;
-    padding-inline: 24px;
-    box-sizing: border-box;
-  }
-
-  .image-banner__content.align-left {
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .image-banner__content.align-center {
+    gap: 20px;
     align-items: center;
     text-align: center;
-  }
-
-  .image-banner__content.align-right {
-    align-items: flex-end;
-    text-align: right;
   }
 
   .image-banner__title {
     margin: 0;
     color: var(--color-foreground);
-    font: var(--font-heading--style) var(--font-heading--weight) var(--font-heading--family);
-    font-size: clamp(1.5rem, 3vw, 2.5rem);
-    line-height: 1.2;
+    font-size: clamp(1.75rem, 3.5vw, 3rem);
+    line-height: 1.15;
   }
 
   .image-banner__text {
     color: var(--color-foreground);
-    font-size: clamp(0.875rem, 1.5vw, 1.125rem);
-    line-height: 1.6;
-    opacity: 0.85;
+    font-size: clamp(0.875rem, 1.2vw, 1.0625rem);
+    line-height: 1.7;
+    max-width: 520px;
   }
 
-  .image-banner__button {
+  .image-banner__cta {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
     margin-block-start: 8px;
   }
 
-  .image-banner__logo {
-    position: relative;
-    z-index: var(--layer-raised, 2);
-    display: flex;
-    justify-content: center;
-    padding-block-start: 24px;
-    padding-block-end: 8px;
+  .image-banner__button {
+    border-radius: 8px;
   }
 
-  .image-banner__logo-img {
-    width: var(--image-banner-logo-size, 80px);
-    height: auto;
-    object-fit: contain;
-    opacity: 0.9;
-  }
-
+  /* Mobile: stack vertically */
   @media screen and (max-width: 749px) {
-    .image-banner__content {
-      max-width: 100%;
-      padding-inline: 20px;
+    .image-banner__grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
     }
 
-    .image-banner__logo-img {
-      width: calc(var(--image-banner-logo-size, 80px) * 0.75);
+    .image-banner__arch-inner {
+      max-width: 340px;
+      margin-inline: auto;
+    }
+
+    .image-banner__content {
+      text-align: center;
+    }
+
+    .image-banner__cta {
+      justify-content: center;
     }
   }
 {% endstylesheet %}
@@ -213,9 +193,51 @@
   "class": "image-banner-section",
   "settings": [
     {
+      "type": "header",
+      "content": "Arch image"
+    },
+    {
       "type": "image_picker",
       "id": "image",
-      "label": "Background image"
+      "label": "Image",
+      "info": "Optional. Without an image the arch shows a solid color."
+    },
+    {
+      "type": "color",
+      "id": "arch_color",
+      "label": "Arch background color",
+      "default": "#4a8f6d"
+    },
+    {
+      "type": "range",
+      "id": "arch_radius",
+      "label": "Arch roundness",
+      "min": 20,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "info": "50% = full semicircle top"
+    },
+    {
+      "type": "header",
+      "content": "Logo mark"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo image",
+      "info": "Displayed at the bottom of the arch"
+    },
+    {
+      "type": "range",
+      "id": "logo_size",
+      "label": "Logo size",
+      "min": 30,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "default": 60
     },
     {
       "type": "header",
@@ -225,7 +247,7 @@
       "type": "text",
       "id": "title",
       "label": "Heading",
-      "default": "Image banner"
+      "default": "Your heading"
     },
     {
       "type": "richtext",
@@ -253,7 +275,7 @@
         { "value": "button-secondary", "label": "Secondary" },
         { "value": "button-tertiary", "label": "Tertiary" }
       ],
-      "default": "button-secondary"
+      "default": "button-primary"
     },
     {
       "type": "checkbox",
@@ -262,82 +284,8 @@
       "default": false
     },
     {
-      "type": "select",
-      "id": "content_alignment",
-      "label": "Content alignment",
-      "options": [
-        { "value": "align-left", "label": "Left" },
-        { "value": "align-center", "label": "Center" },
-        { "value": "align-right", "label": "Right" }
-      ],
-      "default": "align-center"
-    },
-    {
-      "type": "header",
-      "content": "Logo mark"
-    },
-    {
-      "type": "image_picker",
-      "id": "logo_image",
-      "label": "Logo image"
-    },
-    {
-      "type": "range",
-      "id": "logo_size",
-      "label": "Logo size",
-      "min": 30,
-      "max": 200,
-      "step": 5,
-      "unit": "px",
-      "default": 80
-    },
-    {
-      "type": "header",
-      "content": "Gradient overlay"
-    },
-    {
-      "type": "color",
-      "id": "gradient_color",
-      "label": "Gradient color",
-      "default": "#000000"
-    },
-    {
-      "type": "range",
-      "id": "gradient_opacity",
-      "label": "Gradient intensity",
-      "min": 0,
-      "max": 100,
-      "step": 5,
-      "unit": "%",
-      "default": 60
-    },
-    {
       "type": "header",
       "content": "Layout"
-    },
-    {
-      "type": "select",
-      "id": "section_height",
-      "label": "Section height",
-      "options": [
-        { "value": "small", "label": "Small" },
-        { "value": "medium", "label": "Medium" },
-        { "value": "large", "label": "Large" },
-        { "value": "full-screen", "label": "Full screen" },
-        { "value": "custom", "label": "Custom" }
-      ],
-      "default": "medium"
-    },
-    {
-      "type": "range",
-      "id": "section_height_custom",
-      "label": "Custom height",
-      "min": 20,
-      "max": 100,
-      "step": 1,
-      "unit": "%",
-      "default": 50,
-      "visible_if": "{{ section.settings.section_height == 'custom' }}"
     },
     {
       "type": "select",
@@ -351,31 +299,7 @@
         { "value": "scheme-5", "label": "Scheme 5" },
         { "value": "scheme-6", "label": "Scheme 6" }
       ],
-      "default": "scheme-6"
-    },
-    {
-      "type": "header",
-      "content": "Rounded container"
-    },
-    {
-      "type": "range",
-      "id": "border_radius",
-      "label": "Corner radius",
-      "min": 0,
-      "max": 48,
-      "step": 2,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "section_margin",
-      "label": "Outer spacing",
-      "min": 0,
-      "max": 48,
-      "step": 2,
-      "unit": "px",
-      "default": 0
+      "default": "scheme-1"
     },
     {
       "type": "header",
@@ -389,7 +313,7 @@
       "max": 100,
       "step": 1,
       "unit": "px",
-      "default": 0
+      "default": 48
     },
     {
       "type": "range",
