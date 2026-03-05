@@ -1,0 +1,412 @@
+{% liquid
+  assign has_image = false
+  if section.settings.image != blank
+    assign has_image = true
+  endif
+
+  assign has_logo = false
+  if section.settings.logo_image != blank
+    assign has_logo = true
+  endif
+%}
+
+<div
+  id="ImageBanner-{{ section.id }}"
+  class="image-banner color-{{ section.settings.color_scheme }}"
+  style="
+    --image-banner-radius: {{ section.settings.border_radius | default: 0 }}px;
+    --image-banner-margin: {{ section.settings.section_margin | default: 0 }}px;
+    --image-banner-gradient-color: {{ section.settings.gradient_color | default: '#000000' }};
+    --image-banner-gradient-opacity: {{ section.settings.gradient_opacity | divided_by: 100.0 }};
+    --image-banner-logo-size: {{ section.settings.logo_size | default: 80 }}px;
+    {% if section.settings.section_height == 'custom' %}
+      --image-banner-height: {{ section.settings.section_height_custom }}svh;
+    {% elsif section.settings.section_height == 'full-screen' %}
+      --image-banner-height: 100svh;
+    {% else %}
+      --image-banner-height: var(--section-height-{{ section.settings.section_height }});
+    {% endif %}
+  "
+>
+  <div
+    class="image-banner__container spacing-style section section--full-width"
+    style="{% render 'spacing-style', settings: section.settings %}"
+  >
+    {%- comment -%} Background image {%- endcomment -%}
+    {% if has_image %}
+      <div class="image-banner__media">
+        {{
+          section.settings.image
+          | image_url: width: 3840
+          | image_tag:
+            loading: 'lazy',
+            sizes: '100vw',
+            widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+            class: 'image-banner__img'
+        }}
+      </div>
+    {% endif %}
+
+    {%- comment -%} Gradient overlay from bottom {%- endcomment -%}
+    <div class="image-banner__gradient"></div>
+
+    {%- comment -%} Content layer {%- endcomment -%}
+    <div class="image-banner__content {{ section.settings.content_alignment }}">
+      {% if section.settings.title != blank %}
+        <h2 class="image-banner__title">{{ section.settings.title }}</h2>
+      {% endif %}
+
+      {% if section.settings.text != blank %}
+        <div class="image-banner__text rte">{{ section.settings.text }}</div>
+      {% endif %}
+
+      {% if section.settings.button_label != blank %}
+        <a
+          href="{{ section.settings.button_link }}"
+          class="image-banner__button button {{ section.settings.button_style }}"
+          {% if section.settings.button_open_new_tab %}target="_blank" rel="noopener"{% endif %}
+        >
+          {{ section.settings.button_label }}
+        </a>
+      {% endif %}
+    </div>
+
+    {%- comment -%} Logo mark at bottom {%- endcomment -%}
+    {% if has_logo %}
+      <div class="image-banner__logo">
+        {{
+          section.settings.logo_image
+          | image_url: width: 400
+          | image_tag:
+            loading: 'lazy',
+            widths: '50, 80, 120, 160, 200, 400',
+            sizes: '(max-width: 749px) 60px, 80px',
+            class: 'image-banner__logo-img'
+        }}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .image-banner {
+    margin-inline: var(--image-banner-margin, 0);
+    margin-block-start: var(--image-banner-margin, 0);
+    position: relative;
+  }
+
+  .image-banner__container {
+    position: relative;
+    overflow: hidden;
+    min-height: var(--image-banner-height, 50svh);
+    border-radius: var(--image-banner-radius, 0);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .image-banner__media {
+    position: absolute;
+    inset: 0;
+    z-index: var(--layer-base, 0);
+  }
+
+  .image-banner__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .image-banner__gradient {
+    position: absolute;
+    inset: 0;
+    z-index: var(--layer-flat, 1);
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      rgb(from var(--image-banner-gradient-color) r g b / var(--image-banner-gradient-opacity)),
+      rgb(from var(--image-banner-gradient-color) r g b / 0) 70%
+    );
+    border-radius: var(--image-banner-radius, 0);
+  }
+
+  .image-banner__content {
+    position: relative;
+    z-index: var(--layer-raised, 2);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 680px;
+    padding-inline: 24px;
+    box-sizing: border-box;
+  }
+
+  .image-banner__content.align-left {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .image-banner__content.align-center {
+    align-items: center;
+    text-align: center;
+  }
+
+  .image-banner__content.align-right {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .image-banner__title {
+    margin: 0;
+    color: var(--color-foreground);
+    font: var(--font-heading--style) var(--font-heading--weight) var(--font-heading--family);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    line-height: 1.2;
+  }
+
+  .image-banner__text {
+    color: var(--color-foreground);
+    font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  .image-banner__button {
+    margin-block-start: 8px;
+  }
+
+  .image-banner__logo {
+    position: relative;
+    z-index: var(--layer-raised, 2);
+    display: flex;
+    justify-content: center;
+    padding-block-start: 24px;
+    padding-block-end: 8px;
+  }
+
+  .image-banner__logo-img {
+    width: var(--image-banner-logo-size, 80px);
+    height: auto;
+    object-fit: contain;
+    opacity: 0.9;
+  }
+
+  @media screen and (max-width: 749px) {
+    .image-banner__content {
+      max-width: 100%;
+      padding-inline: 20px;
+    }
+
+    .image-banner__logo-img {
+      width: calc(var(--image-banner-logo-size, 80px) * 0.75);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Image banner",
+  "tag": "section",
+  "class": "image-banner-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background image"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Image banner"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Pair text with an image to focus on your chosen product, collection, or blog post.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "button-primary", "label": "Primary" },
+        { "value": "button-secondary", "label": "Secondary" },
+        { "value": "button-tertiary", "label": "Tertiary" }
+      ],
+      "default": "button-secondary"
+    },
+    {
+      "type": "checkbox",
+      "id": "button_open_new_tab",
+      "label": "Open in new tab",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content alignment",
+      "options": [
+        { "value": "align-left", "label": "Left" },
+        { "value": "align-center", "label": "Center" },
+        { "value": "align-right", "label": "Right" }
+      ],
+      "default": "align-center"
+    },
+    {
+      "type": "header",
+      "content": "Logo mark"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_size",
+      "label": "Logo size",
+      "min": 30,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Gradient overlay"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color",
+      "label": "Gradient color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "gradient_opacity",
+      "label": "Gradient intensity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "section_height",
+      "label": "Section height",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" },
+        { "value": "full-screen", "label": "Full screen" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "range",
+      "id": "section_height_custom",
+      "label": "Custom height",
+      "min": 20,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "visible_if": "{{ section.settings.section_height == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "scheme-1", "label": "Scheme 1" },
+        { "value": "scheme-2", "label": "Scheme 2" },
+        { "value": "scheme-3", "label": "Scheme 3" },
+        { "value": "scheme-4", "label": "Scheme 4" },
+        { "value": "scheme-5", "label": "Scheme 5" },
+        { "value": "scheme-6", "label": "Scheme 6" }
+      ],
+      "default": "scheme-6"
+    },
+    {
+      "type": "header",
+      "content": "Rounded container"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_margin",
+      "label": "Outer spacing",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image banner",
+      "category": "Image"
+    }
+  ]
+}
+{% endschema %}
