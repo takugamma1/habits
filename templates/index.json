@@ -187,7 +187,7 @@
         "arch_color": "#4a8f6d",
         "arch_radius": 45,
         "logo_image": "shopify://shop_images/Group_3.png",
-        "logo_size": 60,
+        "logo_size": 30,
         "title": "Your heading",
         "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post.</p>",
         "button_label": "Shop now",
