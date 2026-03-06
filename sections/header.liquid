@@ -1236,11 +1236,13 @@
     pointer-events: auto;
   }
 
-  /* Desktop layout */
+  /* Desktop layout — CSS Grid guarantees perfect logo centering */
   .hb__desktop {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: 14px 36px;
+    padding: 14px 40px;
+    min-width: 620px;
   }
 
   .hb__mobile {
@@ -1251,16 +1253,14 @@
     display: flex;
     align-items: center;
     gap: 32px;
-    flex: 1;
-    min-width: 0;
   }
 
   .hb__nav--l {
-    justify-content: flex-start;
+    justify-content: flex-end;
   }
 
   .hb__nav--r {
-    justify-content: flex-end;
+    justify-content: flex-start;
   }
 
   .hb__link {
