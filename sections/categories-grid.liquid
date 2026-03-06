@@ -67,8 +67,19 @@
               {%- comment -%} Gradient overlay {%- endcomment -%}
               <div class="categories-grid__card-gradient"></div>
 
-              {%- comment -%} Title {%- endcomment -%}
-              {% if block.settings.title != blank %}
+              {%- comment -%} Title: logo image or text {%- endcomment -%}
+              {% if block.settings.title_image != blank %}
+                <div class="categories-grid__card-logo">
+                  {{
+                    block.settings.title_image
+                    | image_url: width: 400
+                    | image_tag:
+                      loading: 'lazy',
+                      class: 'categories-grid__card-logo-img',
+                      style: 'width: ' | append: block.settings.title_image_width | append: 'px'
+                  }}
+                </div>
+              {% elsif block.settings.title != blank %}
                 <h1 class="categories-grid__card-title">{{ block.settings.title }}</h1>
               {% endif %}
             </div>
@@ -200,6 +211,23 @@
     width: 100%;
     word-break: break-word;
     hyphens: auto;
+  }
+
+  /* Title logo image (instead of text) */
+  .categories-grid__card-logo {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 12px 20px;
+    width: 100%;
+  }
+
+  .categories-grid__card-logo-img {
+    height: auto;
+    object-fit: contain;
+    max-width: 80%;
   }
 
   /* ─── Mobile: horizontal carousel ─── */
@@ -413,6 +441,22 @@
           "id": "title",
           "label": "Title",
           "default": "Category"
+        },
+        {
+          "type": "image_picker",
+          "id": "title_image",
+          "label": "Title logo",
+          "info": "Use a logo/icon instead of text. Takes priority over title text."
+        },
+        {
+          "type": "range",
+          "id": "title_image_width",
+          "label": "Logo width",
+          "min": 40,
+          "max": 200,
+          "step": 5,
+          "unit": "px",
+          "default": 100
         },
         {
           "type": "url",
