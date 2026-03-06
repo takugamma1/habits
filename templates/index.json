@@ -222,7 +222,6 @@
         "cat_hookah": {
           "type": "category",
           "settings": {
-            "image": "shopify://shop_images/Untitled_design_-_2026-03-06T174520.528.png",
             "title": "Hookah",
             "link": ""
           }
@@ -230,7 +229,7 @@
         "cat_food": {
           "type": "category",
           "settings": {
-            "image": "shopify://shop_images/Untitled_design_-_2026-03-06T180037.232.png",
+            "image": "shopify://shop_images/DSC07247.jpg",
             "title": "Food",
             "link": ""
           }
@@ -245,7 +244,8 @@
         "cat_delivery": {
           "type": "category",
           "settings": {
-            "title": "Delivery",
+            "image": "shopify://shop_images/hf_20260227_135214_26d88210-3e53-4a17-841c-59359705f38c.jpg",
+            "title": "FIT MENU",
             "link": ""
           }
         }
@@ -262,6 +262,9 @@
         "title": "НАШИТЕ ПРЕДЛОЖЕНИЯ",
         "background_color": "#4a8f6d",
         "card_color": "#2d5e45",
+        "card_title_color": "#ffffff",
+        "gradient_color": "#000000",
+        "gradient_opacity": 70,
         "card_radius": 50,
         "card_gap": 20,
         "border_radius": 24,
