@@ -115,11 +115,23 @@
     "section_q6L68z": {
       "type": "section",
       "blocks": {
+        "icon_Dd8KAj": {
+          "type": "icon",
+          "name": "t:names.icon",
+          "settings": {
+            "icon": "price_tag",
+            "image_upload": "shopify://shop_images/Group_11.png",
+            "width": 200,
+            "link": "",
+            "open_in_new_tab": false
+          },
+          "blocks": {}
+        },
         "text_myDMcF": {
           "type": "text",
           "name": "t:names.heading",
           "settings": {
-            "text": "<h2>New arrivals</h2>",
+            "text": "",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
@@ -145,7 +157,7 @@
           "type": "text",
           "name": "t:names.text",
           "settings": {
-            "text": "<p>We make things that work better and last longer. Our products solve real problems with clean design and honest materials.</p>",
+            "text": "<p>Ние сме екипът зад HABITS, мястото, което създава уютна и приятна атмосфера за всички наши гости. Вярваме, че доброто хранене, ароматното наргиле, качествените напитки и приятното обслужване са основа за незабравимото ти преживяване при нас</p>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
@@ -169,6 +181,7 @@
         }
       },
       "block_order": [
+        "icon_Dd8KAj",
         "text_myDMcF",
         "text_dDVXmk"
       ],
@@ -199,6 +212,115 @@
         "gradient_direction": "to top",
         "padding-block-start": 48,
         "padding-block-end": 48
+      }
+    },
+    "hero_KYGiBm": {
+      "type": "hero",
+      "blocks": {
+        "marquee_GWgeRJ": {
+          "type": "_marquee",
+          "settings": {
+            "movement_direction": "normal",
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "transparent_background": true,
+            "padding-block-start": 24,
+            "padding-block-end": 24,
+            "gap_between_elements": 24
+          },
+          "blocks": {
+            "icon_kL8zVA": {
+              "type": "icon",
+              "name": "t:names.icon",
+              "settings": {
+                "icon": "price_tag",
+                "image_upload": "shopify://shop_images/DSC07247.jpg",
+                "width": 200,
+                "link": "",
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "icon_JhzTQg": {
+              "type": "icon",
+              "name": "t:names.icon",
+              "settings": {
+                "icon": "price_tag",
+                "image_upload": "shopify://shop_images/hf_20260227_135214_26d88210-3e53-4a17-841c-59359705f38c.jpg",
+                "width": 140,
+                "link": "",
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "icon_eA6VyM": {
+              "type": "icon",
+              "name": "t:names.icon",
+              "settings": {
+                "icon": "price_tag",
+                "image_upload": "shopify://shop_images/DSC00009.jpg",
+                "width": 166,
+                "link": "",
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "icon_dUFqa4": {
+              "type": "icon",
+              "name": "t:names.icon",
+              "settings": {
+                "icon": "price_tag",
+                "image_upload": "shopify://shop_images/DSC07247.jpg",
+                "width": 200,
+                "link": "",
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "icon_kL8zVA",
+            "icon_JhzTQg",
+            "icon_eA6VyM",
+            "icon_dUFqa4"
+          ]
+        }
+      },
+      "block_order": [
+        "marquee_GWgeRJ"
+      ],
+      "name": "t:names.hero_marquee",
+      "settings": {
+        "media_type_1": "image",
+        "media_type_2": "image",
+        "stack_media_on_mobile": false,
+        "custom_mobile_media": false,
+        "media_type_1_mobile": "image",
+        "media_type_2_mobile": "image",
+        "link": "",
+        "open_in_new_tab": false,
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "space-between",
+        "gap": 32,
+        "section_width": "page-width",
+        "section_height": "large",
+        "section_height_custom": 50,
+        "color_scheme": "scheme-5",
+        "toggle_overlay": true,
+        "overlay_color": "#00000026",
+        "overlay_style": "gradient",
+        "gradient_direction": "to top",
+        "blurred_reflection": false,
+        "reflection_opacity": 75,
+        "border_radius": 0,
+        "section_margin": 0,
+        "padding-block-start": 0,
+        "padding-block-end": 40
       }
     },
     "featured_card_37aRig": {
@@ -258,6 +380,7 @@
     "main",
     "hero_zH7mGB",
     "section_q6L68z",
+    "hero_KYGiBm",
     "featured_card_37aRig",
     "promo_banner_gdRN4A"
   ]
