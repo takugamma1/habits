@@ -420,7 +420,7 @@
         "button_alignment": "flex-start",
         "color_scheme": "scheme-1",
         "section_spacing": 20,
-        "padding-block-start": 48,
+        "padding-block-start": 100,
         "padding-block-end": 48
       }
     },
