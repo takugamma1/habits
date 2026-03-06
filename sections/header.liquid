@@ -444,11 +444,14 @@
     </nav>
   </div>
 
-  {%- comment -%} Mobile: burger / logo {%- endcomment -%}
+  {%- comment -%} Mobile: burger / logo + inline dropdown {%- endcomment -%}
   <div class="hb__mobile">
-    <button class="hb__burger" type="button" aria-label="{{ 'accessibility.menu' | t }}" id="hb-burger">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <button class="hb__burger" type="button" aria-label="{{ 'accessibility.menu' | t }}" id="hb-burger" aria-expanded="false">
+      <svg class="hb__burger-open" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <svg class="hb__burger-close" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
       </svg>
     </button>
     <a href="/" class="hb__logo" aria-label="{{ shop.name }}">
@@ -459,6 +462,15 @@
       {%- endif -%}
     </a>
   </div>
+
+  {%- comment -%} Mobile: expandable menu panel {%- endcomment -%}
+  <nav class="hb__mob-menu" id="hb-mob-menu" aria-label="Mobile menu" aria-hidden="true">
+    {%- for link in bubble_links -%}
+      <a href="{{ link.url }}" class="hb__mob-link"{% if link.current %} aria-current="page"{% endif %}>
+        {{- link.title -}}
+      </a>
+    {%- endfor -%}
+  </nav>
 </div>
 
 <script
@@ -1239,6 +1251,16 @@
     display: flex;
     align-items: center;
     gap: 32px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hb__nav--l {
+    justify-content: flex-end;
+  }
+
+  .hb__nav--r {
+    justify-content: flex-start;
   }
 
   .hb__link {
@@ -1282,12 +1304,26 @@
     white-space: nowrap;
   }
 
+  /* Mobile menu panel (hidden by default) */
+  .hb__mob-menu {
+    display: none;
+  }
+
   /* Mobile bubble */
   @media screen and (max-width: 749px) {
     .habits-bubble {
       width: calc(100% - 24px);
       max-width: none;
       top: 10px;
+      border-radius: 24px;
+      transition:
+        transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.2s ease,
+        border-radius 0.3s ease;
+    }
+
+    .habits-bubble.is-menu-open {
+      border-radius: 24px;
     }
 
     .hb__desktop {
@@ -1312,12 +1348,75 @@
       justify-content: center;
     }
 
+    .hb__burger-close {
+      display: none;
+    }
+
+    .habits-bubble.is-menu-open .hb__burger-open {
+      display: none;
+    }
+
+    .habits-bubble.is-menu-open .hb__burger-close {
+      display: block;
+    }
+
     .hb__logo {
       margin-inline: 0;
     }
 
     .hb__logo-img {
       width: var(--hb-logo-w, 40px);
+    }
+
+    /* Inline mobile menu panel */
+    .hb__mob-menu {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition:
+        max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.25s ease,
+        padding 0.35s ease;
+      padding: 0 20px;
+    }
+
+    .habits-bubble.is-menu-open .hb__mob-menu {
+      max-height: 400px;
+      opacity: 1;
+      padding: 4px 20px 20px;
+    }
+
+    .hb__mob-menu::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--hb-text, #fff);
+      opacity: 0.2;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .hb__mob-link {
+      color: var(--hb-text, #fff);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 10px 0;
+      white-space: nowrap;
+      transition: opacity 0.2s ease;
+      width: 100%;
+      text-align: center;
+    }
+
+    .hb__mob-link:hover,
+    .hb__mob-link[aria-current='page'] {
+      opacity: 0.55;
     }
   }
 {% endstylesheet %}
@@ -1329,8 +1428,17 @@
 
     var threshold = 50;
     var ticking = false;
+    var burger = document.getElementById('hb-burger');
+    var mobMenu = document.getElementById('hb-mob-menu');
 
-    function onScroll() {
+    function closeMobileMenu() {
+      if (!bubble.classList.contains('is-menu-open')) return;
+      bubble.classList.remove('is-menu-open');
+      if (burger) burger.setAttribute('aria-expanded', 'false');
+      if (mobMenu) mobMenu.setAttribute('aria-hidden', 'true');
+    }
+
+    document.addEventListener('scroll', function () {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(function () {
@@ -1339,21 +1447,30 @@
           bubble.classList.add('is-visible');
           bubble.setAttribute('aria-hidden', 'false');
         } else {
+          closeMobileMenu();
           bubble.classList.remove('is-visible');
           bubble.setAttribute('aria-hidden', 'true');
         }
         ticking = false;
       });
-    }
+    }, { passive: true });
 
-    document.addEventListener('scroll', onScroll, { passive: true });
-
-    /* Mobile burger → trigger existing drawer */
-    var burger = document.getElementById('hb-burger');
-    if (burger) {
+    /* Mobile burger → toggle inline menu */
+    if (burger && mobMenu) {
       burger.addEventListener('click', function () {
-        var summary = document.querySelector('#Details-menu-drawer-container > summary');
-        if (summary) summary.click();
+        var isOpen = bubble.classList.toggle('is-menu-open');
+        burger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        mobMenu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+      });
+
+      /* Close menu when clicking a link */
+      mobMenu.querySelectorAll('.hb__mob-link').forEach(function (link) {
+        link.addEventListener('click', closeMobileMenu);
+      });
+
+      /* Close menu when tapping outside the bubble */
+      document.addEventListener('click', function (e) {
+        if (!bubble.contains(e.target)) closeMobileMenu();
       });
     }
   })();
