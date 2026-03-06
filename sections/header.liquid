@@ -396,6 +396,71 @@
   {% endif %}
 </header-component>
 
+{%- comment -%} ── Habits: Floating bubble navigation ── {%- endcomment -%}
+{%- liquid
+  assign bubble_links = section.settings.bubble_menu.links
+  assign total_links = bubble_links.size
+  assign half_links = total_links | divided_by: 2
+-%}
+
+<div
+  class="habits-bubble"
+  id="habits-bubble"
+  style="
+    --hb-bg: {{ section.settings.bubble_bg | default: '#ffffff' }};
+    --hb-text: {{ section.settings.bubble_text | default: '#1a1a1a' }};
+    --hb-logo-w: {{ section.settings.bubble_logo_width | default: 40 }}px;
+  "
+  aria-hidden="true"
+>
+  {%- comment -%} Desktop: left-nav / logo / right-nav {%- endcomment -%}
+  <div class="hb__desktop">
+    <nav class="hb__nav hb__nav--l" aria-label="Main left">
+      {%- for link in bubble_links -%}
+        {%- if forloop.index <= half_links -%}
+          <a href="{{ link.url }}" class="hb__link"{% if link.current %} aria-current="page"{% endif %}>
+            {{- link.title -}}
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    </nav>
+
+    <a href="/" class="hb__logo" aria-label="{{ shop.name }}">
+      {%- if settings.logo -%}
+        {{ settings.logo | image_url: width: 200 | image_tag: loading: 'lazy', class: 'hb__logo-img' }}
+      {%- else -%}
+        <span class="hb__logo-text">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    <nav class="hb__nav hb__nav--r" aria-label="Main right">
+      {%- for link in bubble_links -%}
+        {%- if forloop.index > half_links -%}
+          <a href="{{ link.url }}" class="hb__link"{% if link.current %} aria-current="page"{% endif %}>
+            {{- link.title -}}
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    </nav>
+  </div>
+
+  {%- comment -%} Mobile: burger / logo {%- endcomment -%}
+  <div class="hb__mobile">
+    <button class="hb__burger" type="button" aria-label="{{ 'accessibility.menu' | t }}" id="hb-burger">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <a href="/" class="hb__logo" aria-label="{{ shop.name }}">
+      {%- if settings.logo -%}
+        {{ settings.logo | image_url: width: 200 | image_tag: loading: 'lazy', class: 'hb__logo-img' }}
+      {%- else -%}
+        <span class="hb__logo-text">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+  </div>
+</div>
+
 <script
   src="{{ 'header.js' | asset_url }}"
   type="module"
@@ -1124,7 +1189,165 @@
     font-family: var(--menu-localization-font);
     font-size: var(--menu-localization-font-size);
   }
+
+  /* ═══════════════════════════════════════════
+   * Habits: Floating bubble navigation
+   * ═══════════════════════════════════════════ */
+
+  /* Disable native sticky header — bubble replaces it */
+  .header-section:has(> #header-component[sticky]) {
+    position: relative !important;
+    top: auto !important;
+  }
+
+  .habits-bubble {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-120%);
+    z-index: 99999;
+    background: var(--hb-bg, #fff);
+    border-radius: 9999px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08), 0 1px 6px rgba(0, 0, 0, 0.04);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.35s ease;
+    will-change: transform, opacity;
+    max-width: 92vw;
+  }
+
+  .habits-bubble.is-visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Desktop layout */
+  .hb__desktop {
+    display: flex;
+    align-items: center;
+    padding: 14px 36px;
+  }
+
+  .hb__mobile {
+    display: none;
+  }
+
+  .hb__nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .hb__link {
+    color: var(--hb-text, #1a1a1a);
+    text-decoration: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+    font-family: inherit;
+  }
+
+  .hb__link:hover {
+    opacity: 0.55;
+  }
+
+  .hb__link[aria-current='page'] {
+    opacity: 0.55;
+  }
+
+  .hb__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline: 40px;
+    flex-shrink: 0;
+  }
+
+  .hb__logo-img {
+    width: var(--hb-logo-w, 40px);
+    height: auto;
+    object-fit: contain;
+  }
+
+  .hb__logo-text {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--hb-text, #1a1a1a);
+    white-space: nowrap;
+  }
+
+  /* Mobile bubble */
+  @media screen and (max-width: 749px) {
+    .hb__desktop {
+      display: none;
+    }
+
+    .hb__mobile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+    }
+
+    .hb__burger {
+      background: none;
+      border: none;
+      padding: 4px;
+      color: var(--hb-text, #1a1a1a);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hb__logo {
+      margin-inline: 0;
+    }
+  }
 {% endstylesheet %}
+
+<script>
+  (function () {
+    var bubble = document.getElementById('habits-bubble');
+    if (!bubble) return;
+
+    var threshold = 200;
+    var ticking = false;
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        var y = window.scrollY || document.documentElement.scrollTop;
+        if (y > threshold) {
+          bubble.classList.add('is-visible');
+          bubble.setAttribute('aria-hidden', 'false');
+        } else {
+          bubble.classList.remove('is-visible');
+          bubble.setAttribute('aria-hidden', 'true');
+        }
+        ticking = false;
+      });
+    }
+
+    document.addEventListener('scroll', onScroll, { passive: true });
+
+    /* Mobile burger → trigger existing drawer */
+    var burger = document.getElementById('hb-burger');
+    if (burger) {
+      burger.addEventListener('click', function () {
+        var summary = document.querySelector('#Details-menu-drawer-container > summary');
+        if (summary) summary.click();
+      });
+    }
+  })();
+</script>
 
 {% unless request.design_mode %}
   <script type="module">
@@ -1659,6 +1882,38 @@
       ],
       "default": "default",
       "visible_if": "{{ section.settings.enable_transparent_header_collection }}"
+    },
+    {
+      "type": "header",
+      "content": "Floating bubble menu"
+    },
+    {
+      "type": "link_list",
+      "id": "bubble_menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "color",
+      "id": "bubble_bg",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "bubble_text",
+      "label": "Text color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "bubble_logo_width",
+      "label": "Logo width",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 40
     }
   ],
   "presets": []
