@@ -13,7 +13,6 @@
     --cg-margin: {{ section.settings.section_margin | default: 12 }}px;
     --cg-bg: {{ section.settings.background_color | default: '#4a8f6d' }};
     --cg-card-bg: {{ section.settings.card_color | default: '#2d5e45' }};
-    --cg-card-radius: {{ section.settings.card_radius | default: 50 }}%;
     --cg-columns: {{ section.blocks.size | at_most: 6 }};
     --cg-card-gap: {{ section.settings.card_gap | default: 20 }}px;
     --cg-heading-size: {{ section.settings.heading_image_size | default: 160 }}px;
@@ -149,7 +148,7 @@
     width: 100%;
     aspect-ratio: 3 / 4;
     background: var(--cg-card-bg);
-    border-radius: var(--cg-card-radius) var(--cg-card-radius) 0 0;
+    border-radius: 9999px 9999px 0 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -329,17 +328,6 @@
     {
       "type": "header",
       "content": "Card shape"
-    },
-    {
-      "type": "range",
-      "id": "card_radius",
-      "label": "Card arch roundness",
-      "min": 20,
-      "max": 50,
-      "step": 1,
-      "unit": "%",
-      "default": 50,
-      "info": "50% = full semicircle top"
     },
     {
       "type": "range",

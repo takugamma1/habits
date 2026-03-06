@@ -29,7 +29,6 @@
     --fc-badge-top-width: {{ section.settings.badge_top_width | default: 100 }}px;
     --fc-badge-bottom-size: {{ section.settings.badge_bottom_size | default: 100 }}px;
     --fc-badge-bottom-color: {{ section.settings.badge_bottom_color | default: '#2d5e45' }};
-    --fc-badge-bottom-radius: {{ section.settings.badge_bottom_radius | default: 50 }}%;
     --fc-heading-size: {{ section.settings.heading_image_size | default: 200 }}px;
     --fc-section-spacing: {{ section.settings.section_spacing | default: 20 }}px;
     --fc-heading-align: {{ section.settings.heading_alignment | default: 'left' }};
@@ -209,7 +208,7 @@
     width: var(--fc-badge-bottom-size, 100px);
     aspect-ratio: 1 / 1.2;
     background: var(--fc-badge-bottom-color);
-    border-radius: var(--fc-badge-bottom-radius) var(--fc-badge-bottom-radius) 0 0;
+    border-radius: 9999px 9999px 0 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -402,16 +401,6 @@
       "id": "badge_bottom_color",
       "label": "Arch color",
       "default": "#2d5e45"
-    },
-    {
-      "type": "range",
-      "id": "badge_bottom_radius",
-      "label": "Arch roundness",
-      "min": 20,
-      "max": 50,
-      "step": 1,
-      "unit": "%",
-      "default": 50
     },
     {
       "type": "header",
