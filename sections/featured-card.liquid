@@ -1,0 +1,579 @@
+{% liquid
+  assign has_image = false
+  if section.settings.image != blank
+    assign has_image = true
+  endif
+
+  assign has_heading_image = false
+  if section.settings.heading_image != blank
+    assign has_heading_image = true
+  endif
+
+  assign has_badge_top = false
+  if section.settings.badge_top_image != blank
+    assign has_badge_top = true
+  endif
+
+  assign has_badge_bottom = false
+  if section.settings.badge_bottom_image != blank
+    assign has_badge_bottom = true
+  endif
+%}
+
+<div
+  id="FeaturedCard-{{ section.id }}"
+  class="featured-card color-{{ section.settings.color_scheme }}"
+  style="
+    --fc-card-radius: {{ section.settings.card_radius | default: 24 }}px;
+    --fc-card-bg: {{ section.settings.card_color | default: '#4a8f6d' }};
+    --fc-badge-top-width: {{ section.settings.badge_top_width | default: 100 }}px;
+    --fc-badge-bottom-size: {{ section.settings.badge_bottom_size | default: 100 }}px;
+    --fc-badge-bottom-color: {{ section.settings.badge_bottom_color | default: '#2d5e45' }};
+    --fc-badge-bottom-radius: {{ section.settings.badge_bottom_radius | default: 50 }}%;
+    --fc-heading-size: {{ section.settings.heading_image_size | default: 200 }}px;
+    --fc-section-spacing: {{ section.settings.section_spacing | default: 20 }}px;
+    --fc-heading-align: {{ section.settings.heading_alignment | default: 'left' }};
+    --fc-text-align: {{ section.settings.text_alignment | default: 'left' }};
+    --fc-button-align: {{ section.settings.button_alignment | default: 'flex-start' }};
+  "
+>
+  <div
+    class="featured-card__grid spacing-style"
+    style="{% render 'spacing-style', settings: section.settings %}"
+  >
+    {%- comment -%} Left: Image card with badges {%- endcomment -%}
+    <div class="featured-card__media-wrap">
+      <div class="featured-card__card">
+        {% if has_image %}
+          {{
+            section.settings.image
+            | image_url: width: 1200
+            | image_tag:
+              loading: 'lazy',
+              sizes: '(max-width: 749px) 90vw, 45vw',
+              widths: '375, 550, 750, 1000, 1200',
+              class: 'featured-card__img'
+          }}
+        {% endif %}
+
+        {%- comment -%} Badge top-left {%- endcomment -%}
+        {% if has_badge_top %}
+          <div class="featured-card__badge featured-card__badge--top">
+            {{
+              section.settings.badge_top_image
+              | image_url: width: 400
+              | image_tag:
+                loading: 'lazy',
+                widths: '60, 80, 100, 150, 200, 400',
+                sizes: '100px',
+                class: 'featured-card__badge-img'
+            }}
+          </div>
+        {% elsif section.settings.badge_top_text != blank %}
+          <div class="featured-card__badge featured-card__badge--top featured-card__badge--label" style="background: {{ section.settings.badge_top_color | default: '#f5f0e8' }}; color: {{ section.settings.badge_top_text_color | default: '#1a1a1a' }};">
+            {{ section.settings.badge_top_text }}
+          </div>
+        {% endif %}
+
+        {%- comment -%} Badge bottom-center: arch shape {%- endcomment -%}
+        {% if has_badge_bottom %}
+          <div class="featured-card__badge featured-card__badge--bottom">
+            <div class="featured-card__badge-arch">
+              {{
+                section.settings.badge_bottom_image
+                | image_url: width: 300
+                | image_tag:
+                  loading: 'lazy',
+                  widths: '40, 60, 80, 120, 160, 300',
+                  sizes: '80px',
+                  class: 'featured-card__badge-arch-img'
+              }}
+            </div>
+          </div>
+        {% elsif section.settings.show_bottom_arch %}
+          <div class="featured-card__badge featured-card__badge--bottom">
+            <div class="featured-card__badge-arch"></div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {%- comment -%} Right: Content {%- endcomment -%}
+    <div class="featured-card__content">
+      {% if has_heading_image %}
+        <div class="featured-card__heading-image">
+          {{
+            section.settings.heading_image
+            | image_url: width: 800
+            | image_tag:
+              loading: 'lazy',
+              widths: '150, 200, 300, 400, 600, 800',
+              sizes: '(max-width: 749px) 55vw, 30vw',
+              class: 'featured-card__heading-img'
+          }}
+        </div>
+      {% elsif section.settings.title != blank %}
+        <h2 class="featured-card__title">{{ section.settings.title }}</h2>
+      {% endif %}
+
+      {% if section.settings.text != blank %}
+        <div class="featured-card__text rte">{{ section.settings.text }}</div>
+      {% endif %}
+
+      {% if section.settings.button_label != blank %}
+        <div class="featured-card__cta">
+          <a
+            href="{{ section.settings.button_link }}"
+            class="featured-card__button button {{ section.settings.button_style }}"
+            {% if section.settings.button_open_new_tab %}target="_blank" rel="noopener"{% endif %}
+          >
+            {{ section.settings.button_label }}
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .featured-card-section {
+    margin-block: var(--fc-section-spacing, 20px);
+  }
+
+  .featured-card__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    max-width: var(--page-width);
+    margin-inline: auto;
+    padding-inline: var(--spacing-inline, 24px);
+  }
+
+  /* Image card */
+  .featured-card__media-wrap {
+    position: relative;
+  }
+
+  .featured-card__card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3.5;
+    background: var(--fc-card-bg);
+    border-radius: var(--fc-card-radius, 24px);
+    overflow: hidden;
+  }
+
+  .featured-card__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* Badge: top-left */
+  .featured-card__badge--top {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 3;
+  }
+
+  .featured-card__badge--top .featured-card__badge-img {
+    width: var(--fc-badge-top-width, 100px);
+    height: auto;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+
+  .featured-card__badge--label {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Badge: bottom-center arch */
+  .featured-card__badge--bottom {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+  }
+
+  .featured-card__badge-arch {
+    width: var(--fc-badge-bottom-size, 100px);
+    aspect-ratio: 1 / 1.2;
+    background: var(--fc-badge-bottom-color);
+    border-radius: var(--fc-badge-bottom-radius) var(--fc-badge-bottom-radius) 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 15%;
+  }
+
+  .featured-card__badge-arch-img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Right content */
+  .featured-card__content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .featured-card__heading-image {
+    display: flex;
+    justify-content: var(--fc-heading-align, flex-start);
+  }
+
+  .featured-card__heading-img {
+    width: var(--fc-heading-size, 200px);
+    height: auto;
+    object-fit: contain;
+  }
+
+  .featured-card__title {
+    margin: 0;
+    color: var(--color-foreground);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.1;
+    font-weight: 800;
+    text-align: var(--fc-heading-align, left);
+  }
+
+  .featured-card__text {
+    color: var(--color-foreground);
+    font-size: clamp(0.875rem, 1.2vw, 1.0625rem);
+    line-height: 1.7;
+    max-width: 520px;
+    text-align: var(--fc-text-align, left);
+  }
+
+  .featured-card__cta {
+    display: flex;
+    justify-content: var(--fc-button-align, flex-start);
+    width: 100%;
+    margin-block-start: 4px;
+  }
+
+  .featured-card__button {
+    border-radius: 8px;
+    padding-block: 10px;
+    padding-inline: 28px;
+    font-size: 0.875rem;
+  }
+
+  /* ─── Mobile ─── */
+  @media screen and (max-width: 749px) {
+    .featured-card__grid {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+
+    .featured-card__card {
+      max-width: 100%;
+    }
+
+    .featured-card__content {
+      --fc-heading-align: center !important;
+      --fc-text-align: center !important;
+      --fc-button-align: center !important;
+      align-items: center;
+    }
+
+    .featured-card__heading-img {
+      width: min(var(--fc-heading-size, 200px), 60vw);
+    }
+
+    .featured-card__text {
+      align-self: center;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Featured card",
+  "tag": "section",
+  "class": "featured-card-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Card image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "color",
+      "id": "card_color",
+      "label": "Card background color",
+      "default": "#4a8f6d",
+      "info": "Visible when no image is set or as a fallback"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Badge — top left"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_top_image",
+      "label": "Badge image",
+      "info": "Takes priority over text badge"
+    },
+    {
+      "type": "range",
+      "id": "badge_top_width",
+      "label": "Badge width",
+      "min": 40,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "text",
+      "id": "badge_top_text",
+      "label": "Badge text",
+      "info": "Used when no badge image is set"
+    },
+    {
+      "type": "color",
+      "id": "badge_top_color",
+      "label": "Badge background",
+      "default": "#f5f0e8"
+    },
+    {
+      "type": "color",
+      "id": "badge_top_text_color",
+      "label": "Badge text color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "header",
+      "content": "Badge — bottom arch"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_bottom_image",
+      "label": "Arch image",
+      "info": "Logo or icon inside the arch"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bottom_arch",
+      "label": "Show empty arch",
+      "default": true,
+      "info": "Shows the arch shape even without an image"
+    },
+    {
+      "type": "range",
+      "id": "badge_bottom_size",
+      "label": "Arch size",
+      "min": 50,
+      "max": 180,
+      "step": 5,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "color",
+      "id": "badge_bottom_color",
+      "label": "Arch color",
+      "default": "#2d5e45"
+    },
+    {
+      "type": "range",
+      "id": "badge_bottom_radius",
+      "label": "Arch roundness",
+      "min": 20,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "image_picker",
+      "id": "heading_image",
+      "label": "Heading image",
+      "info": "Logo or jumbo heading. Takes priority over text."
+    },
+    {
+      "type": "range",
+      "id": "heading_image_size",
+      "label": "Heading image width",
+      "min": 80,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "default": 200
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading text",
+      "default": "Featured card",
+      "info": "Used when no heading image is set"
+    },
+    {
+      "type": "header",
+      "content": "Text & button"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Describe your product or promotion here.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "button-primary", "label": "Primary" },
+        { "value": "button-secondary", "label": "Secondary" },
+        { "value": "button-tertiary", "label": "Tertiary" }
+      ],
+      "default": "button-primary"
+    },
+    {
+      "type": "checkbox",
+      "id": "button_open_new_tab",
+      "label": "Open in new tab",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Desktop alignment",
+      "info": "On mobile everything centers automatically"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "button_alignment",
+      "label": "Button alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "scheme-1", "label": "Scheme 1" },
+        { "value": "scheme-2", "label": "Scheme 2" },
+        { "value": "scheme-3", "label": "Scheme 3" },
+        { "value": "scheme-4", "label": "Scheme 4" },
+        { "value": "scheme-5", "label": "Scheme 5" },
+        { "value": "scheme-6", "label": "Scheme 6" }
+      ],
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "section_spacing",
+      "label": "Space above & below section",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured card",
+      "category": "Image"
+    }
+  ]
+}
+{% endschema %}
