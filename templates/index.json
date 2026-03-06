@@ -413,7 +413,7 @@
       "type": "reservation-form",
       "settings": {
         "image": "shopify://shop_images/DSC07247.jpg",
-        "card_radius": 16,
+        "card_radius": 48,
         "heading_image_size": 180,
         "title": "Make a reservation",
         "subtitle": "Book your table and enjoy the experience",
