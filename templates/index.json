@@ -295,7 +295,7 @@
         "button_link": "",
         "button_style": "button-primary",
         "button_open_new_tab": false,
-        "image_overflow": 30,
+        "image_overflow": 60,
         "background_color": "#4a8f6d",
         "border_radius": 24,
         "section_margin": 12,
