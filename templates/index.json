@@ -198,7 +198,6 @@
       "type": "image-banner",
       "settings": {
         "arch_color": "#4a8f6d",
-        "arch_radius": 45,
         "logo_image": "shopify://shop_images/Group_3.png",
         "logo_size": 30,
         "title": "Your heading",
@@ -211,9 +210,9 @@
         "text_alignment": "right",
         "button_alignment": "flex-end",
         "color_scheme": "scheme-1",
-        "section_spacing": 20,
+        "section_spacing": 40,
         "padding-block-start": 48,
-        "padding-block-end": 100
+        "padding-block-end": 48
       }
     },
     "categories_grid_Rk3m7P": {
@@ -265,7 +264,6 @@
         "card_title_color": "#ffffff",
         "gradient_color": "#000000",
         "gradient_opacity": 70,
-        "card_radius": 50,
         "card_gap": 20,
         "border_radius": 24,
         "section_margin": 12,
@@ -325,7 +323,6 @@
         "show_bottom_arch": true,
         "badge_bottom_size": 50,
         "badge_bottom_color": "#ffffff",
-        "badge_bottom_radius": 39,
         "heading_image_size": 200,
         "title": "Featured card",
         "text": "<p>Describe your product or promotion here.</p>",
