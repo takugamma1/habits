@@ -272,18 +272,103 @@
         "padding-block-end": 48
       }
     },
-    "divider_Jbhp3t": {
-      "type": "divider",
-      "name": "t:names.divider_section",
+    "section_4YbWNV": {
+      "type": "section",
+      "blocks": {
+        "logo_cK8eHA": {
+          "type": "logo",
+          "name": "t:names.logo",
+          "settings": {
+            "inverse": true,
+            "font": "heading",
+            "unit": "pixel",
+            "percent_width": 100,
+            "pixel_height": 48,
+            "custom_mobile_size": false,
+            "unit_mobile": "percent",
+            "percent_width_mobile": 100,
+            "pixel_height_mobile": 120,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "text_FjYf9i": {
+          "type": "text",
+          "name": "t:names.text",
+          "settings": {
+            "text": "<h4>Вечеря или брънч с приятели в прохладната ни градина, приятно комбинирани с коктейли и наргиле. <br/><br/>Идваш ли?</h4>",
+            "width": "fit-content",
+            "max_width": "narrow",
+            "alignment": "center",
+            "type_preset": "rte",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "button_8t3aam": {
+          "type": "button",
+          "name": "t:names.button",
+          "settings": {
+            "label": "Направи резервация",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false,
+            "style_class": "button",
+            "width": "fit-content",
+            "custom_width": 100,
+            "width_mobile": "fit-content",
+            "custom_width_mobile": 100
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "logo_cK8eHA",
+        "text_FjYf9i",
+        "button_8t3aam"
+      ],
+      "name": "t:names.rich_text_section",
       "settings": {
-        "color_scheme": "scheme-58084d4c-a86e-4d0a-855e-a0966e5043f7",
-        "section_width": "full-width",
-        "thickness": 1,
-        "corner_radius": "square",
-        "width_percent": 5,
-        "alignment_horizontal": "center",
-        "padding-block-start": 60,
-        "padding-block-end": 60
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 25,
+        "section_width": "page-width",
+        "section_height": "medium",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 100,
+        "padding-block-end": 100
       }
     },
     "promo_banner_Xt9w2J": {
@@ -454,7 +539,7 @@
     "section_bCdnwB",
     "image_banner_hB4x7K",
     "categories_grid_Rk3m7P",
-    "divider_Jbhp3t",
+    "section_4YbWNV",
     "promo_banner_Xt9w2J",
     "featured_card_aTgGdf",
     "hero_NQNriT",
