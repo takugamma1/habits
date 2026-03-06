@@ -208,6 +208,7 @@
         "cat_hookah": {
           "type": "category",
           "settings": {
+            "image": "shopify://shop_images/Untitled_design_-_2026-03-06T174520.528.png",
             "title": "Hookah",
             "link": ""
           }
@@ -215,6 +216,7 @@
         "cat_food": {
           "type": "category",
           "settings": {
+            "image": "shopify://shop_images/Untitled_design_-_2026-03-06T180037.232.png",
             "title": "Food",
             "link": ""
           }
@@ -273,35 +275,6 @@
         "padding-inline-start": 40,
         "padding-inline-end": 0
       }
-    },
-    "featured_card_Lw5p3Q": {
-      "type": "featured-card",
-      "settings": {
-        "card_color": "#4a8f6d",
-        "card_radius": 24,
-        "badge_top_text": "New",
-        "badge_top_color": "#f5f0e8",
-        "badge_top_text_color": "#1a1a1a",
-        "badge_top_width": 100,
-        "show_bottom_arch": true,
-        "badge_bottom_size": 100,
-        "badge_bottom_color": "#2d5e45",
-        "badge_bottom_radius": 50,
-        "heading_image_size": 200,
-        "title": "Featured card",
-        "text": "<p>Describe your product or promotion here.</p>",
-        "button_label": "Shop now",
-        "button_link": "",
-        "button_style": "button-primary",
-        "button_open_new_tab": false,
-        "heading_alignment": "flex-start",
-        "text_alignment": "left",
-        "button_alignment": "flex-start",
-        "color_scheme": "scheme-1",
-        "section_spacing": 20,
-        "padding-block-start": 48,
-        "padding-block-end": 48
-      }
     }
   },
   "order": [
@@ -309,7 +282,6 @@
     "section_bCdnwB",
     "image_banner_hB4x7K",
     "categories_grid_Rk3m7P",
-    "promo_banner_Xt9w2J",
-    "featured_card_Lw5p3Q"
+    "promo_banner_Xt9w2J"
   ]
 }
