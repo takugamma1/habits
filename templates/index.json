@@ -339,6 +339,42 @@
         "padding-block-end": 48
       }
     },
+    "reservation_form_Qk7mN3": {
+      "type": "reservation-form",
+      "settings": {
+        "card_radius": 16,
+        "title": "Make a reservation",
+        "subtitle": "Book your table and enjoy the experience",
+        "name_label": "Name",
+        "name_placeholder": "Your name",
+        "phone_label": "Phone",
+        "phone_placeholder": "+359",
+        "guests_label": "Number of guests",
+        "date_label": "Date",
+        "time_label": "Time",
+        "comment_label": "Comment",
+        "comment_placeholder": "Additional notes...",
+        "checkbox_1_label": "I agree to the processing of my personal data",
+        "checkbox_2_label": "I confirm that the phone number provided is correct",
+        "button_label": "Reserve",
+        "background_color": "#4a8f6d",
+        "text_color": "#ffffff",
+        "label_color": "#ffffff",
+        "input_background": "#ffffff",
+        "input_text_color": "#1a1a1a",
+        "input_border_color": "#e0e0e0",
+        "input_radius": 8,
+        "button_color": "#2d5e45",
+        "button_text_color": "#ffffff",
+        "border_radius": 24,
+        "section_margin": 12,
+        "section_spacing": 20,
+        "padding-block-start": 48,
+        "padding-block-end": 48,
+        "padding-inline-start": 32,
+        "padding-inline-end": 32
+      }
+    },
     "hero_NQNriT": {
       "type": "hero",
       "blocks": {
@@ -418,6 +454,7 @@
     "divider_Jbhp3t",
     "promo_banner_Xt9w2J",
     "featured_card_aTgGdf",
+    "reservation_form_Qk7mN3",
     "hero_NQNriT"
   ]
 }

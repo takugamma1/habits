@@ -1,0 +1,734 @@
+{% liquid
+  assign has_image = false
+  if section.settings.image != blank
+    assign has_image = true
+  endif
+
+  assign has_heading_image = false
+  if section.settings.heading_image != blank
+    assign has_heading_image = true
+  endif
+%}
+
+<div
+  id="ReservationForm-{{ section.id }}"
+  class="reservation-form"
+  style="
+    --rf-bg: {{ section.settings.background_color | default: '#4a8f6d' }};
+    --rf-radius: {{ section.settings.border_radius | default: 24 }}px;
+    --rf-margin: {{ section.settings.section_margin | default: 12 }}px;
+    --rf-card-radius: {{ section.settings.card_radius | default: 16 }}px;
+    --rf-heading-size: {{ section.settings.heading_image_size | default: 180 }}px;
+    --rf-section-spacing: {{ section.settings.section_spacing | default: 20 }}px;
+    --rf-input-bg: {{ section.settings.input_background | default: '#ffffff' }};
+    --rf-input-color: {{ section.settings.input_text_color | default: '#1a1a1a' }};
+    --rf-input-border: {{ section.settings.input_border_color | default: '#e0e0e0' }};
+    --rf-input-radius: {{ section.settings.input_radius | default: 8 }}px;
+    --rf-label-color: {{ section.settings.label_color | default: '#ffffff' }};
+    --rf-text-color: {{ section.settings.text_color | default: '#ffffff' }};
+    --rf-button-bg: {{ section.settings.button_color | default: '#2d5e45' }};
+    --rf-button-color: {{ section.settings.button_text_color | default: '#ffffff' }};
+  "
+>
+  <div
+    class="reservation-form__container spacing-style"
+    style="{% render 'spacing-style', settings: section.settings %}"
+  >
+    {%- comment -%} Left: Image {%- endcomment -%}
+    {% if has_image %}
+      <div class="reservation-form__media">
+        <div class="reservation-form__card">
+          {{
+            section.settings.image
+            | image_url: width: 1200
+            | image_tag:
+              loading: 'lazy',
+              sizes: '(max-width: 749px) 90vw, 45vw',
+              widths: '375, 550, 750, 1000, 1200',
+              class: 'reservation-form__img'
+          }}
+        </div>
+      </div>
+    {% endif %}
+
+    {%- comment -%} Right: Form content {%- endcomment -%}
+    <div class="reservation-form__content">
+      {%- comment -%} Heading {%- endcomment -%}
+      {% if has_heading_image %}
+        <div class="reservation-form__heading-image">
+          {{
+            section.settings.heading_image
+            | image_url: width: 600
+            | image_tag:
+              loading: 'lazy',
+              widths: '120, 160, 240, 320, 480, 600',
+              sizes: '(max-width: 749px) 140px, 180px',
+              class: 'reservation-form__heading-img'
+          }}
+        </div>
+      {% elsif section.settings.title != blank %}
+        <h2 class="reservation-form__title">{{ section.settings.title }}</h2>
+      {% endif %}
+
+      {% if section.settings.subtitle != blank %}
+        <p class="reservation-form__subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+
+      {%- comment -%} Form {%- endcomment -%}
+      <form class="reservation-form__form" action="{{ section.settings.form_action }}" method="POST">
+        <div class="reservation-form__fields">
+          {%- comment -%} Row 1: Name + Phone {%- endcomment -%}
+          <div class="reservation-form__row reservation-form__row--half">
+            <div class="reservation-form__field">
+              <label for="rf-name-{{ section.id }}" class="reservation-form__label">
+                {{ section.settings.name_label | default: 'Name' }}
+              </label>
+              <input
+                type="text"
+                id="rf-name-{{ section.id }}"
+                name="name"
+                class="reservation-form__input"
+                placeholder="{{ section.settings.name_placeholder | default: 'Your name' }}"
+                required
+              >
+            </div>
+            <div class="reservation-form__field">
+              <label for="rf-phone-{{ section.id }}" class="reservation-form__label">
+                {{ section.settings.phone_label | default: 'Phone' }}
+              </label>
+              <input
+                type="tel"
+                id="rf-phone-{{ section.id }}"
+                name="phone"
+                class="reservation-form__input"
+                placeholder="{{ section.settings.phone_placeholder | default: '+359' }}"
+                required
+              >
+            </div>
+          </div>
+
+          {%- comment -%} Row 2: Guests + Date {%- endcomment -%}
+          <div class="reservation-form__row reservation-form__row--half">
+            <div class="reservation-form__field">
+              <label for="rf-guests-{{ section.id }}" class="reservation-form__label">
+                {{ section.settings.guests_label | default: 'Number of guests' }}
+              </label>
+              <select
+                id="rf-guests-{{ section.id }}"
+                name="guests"
+                class="reservation-form__input reservation-form__select"
+              >
+                {% for i in (1..20) %}
+                  <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="reservation-form__field">
+              <label for="rf-date-{{ section.id }}" class="reservation-form__label">
+                {{ section.settings.date_label | default: 'Date' }}
+              </label>
+              <input
+                type="date"
+                id="rf-date-{{ section.id }}"
+                name="date"
+                class="reservation-form__input"
+                required
+              >
+            </div>
+          </div>
+
+          {%- comment -%} Row 3: Time {%- endcomment -%}
+          <div class="reservation-form__row">
+            <div class="reservation-form__field">
+              <label for="rf-time-{{ section.id }}" class="reservation-form__label">
+                {{ section.settings.time_label | default: 'Time' }}
+              </label>
+              <input
+                type="time"
+                id="rf-time-{{ section.id }}"
+                name="time"
+                class="reservation-form__input"
+                required
+              >
+            </div>
+          </div>
+
+          {%- comment -%} Row 4: Comment {%- endcomment -%}
+          <div class="reservation-form__row">
+            <div class="reservation-form__field">
+              <label for="rf-comment-{{ section.id }}" class="reservation-form__label">
+                {{ section.settings.comment_label | default: 'Comment' }}
+              </label>
+              <textarea
+                id="rf-comment-{{ section.id }}"
+                name="comment"
+                class="reservation-form__input reservation-form__textarea"
+                rows="3"
+                placeholder="{{ section.settings.comment_placeholder | default: 'Additional notes...' }}"
+              ></textarea>
+            </div>
+          </div>
+
+          {%- comment -%} Checkboxes {%- endcomment -%}
+          <div class="reservation-form__checkboxes">
+            {% if section.settings.checkbox_1_label != blank %}
+              <label class="reservation-form__checkbox-label">
+                <input type="checkbox" name="consent_data" class="reservation-form__checkbox" required>
+                <span class="reservation-form__checkbox-text">{{ section.settings.checkbox_1_label }}</span>
+              </label>
+            {% endif %}
+
+            {% if section.settings.checkbox_2_label != blank %}
+              <label class="reservation-form__checkbox-label">
+                <input type="checkbox" name="consent_phone" class="reservation-form__checkbox">
+                <span class="reservation-form__checkbox-text">{{ section.settings.checkbox_2_label }}</span>
+              </label>
+            {% endif %}
+          </div>
+
+          {%- comment -%} Submit {%- endcomment -%}
+          <button type="submit" class="reservation-form__submit button">
+            {{ section.settings.button_label | default: 'Reserve' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  /* Wrapper */
+  .reservation-form-section {
+    margin-block: var(--rf-section-spacing, 20px);
+  }
+
+  .reservation-form {
+    margin-inline: var(--rf-margin, 12px);
+  }
+
+  .reservation-form__container {
+    background: var(--rf-bg);
+    border-radius: var(--rf-radius, 24px);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* Left: Image card */
+  .reservation-form__media {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .reservation-form__card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: var(--rf-card-radius, 16px);
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  .reservation-form__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* Right: Form content */
+  .reservation-form__content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .reservation-form__heading-image {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .reservation-form__heading-img {
+    width: var(--rf-heading-size, 180px);
+    height: auto;
+    object-fit: contain;
+  }
+
+  .reservation-form__title {
+    margin: 0;
+    color: var(--rf-text-color, #fff);
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    line-height: 1.15;
+    font-weight: 700;
+  }
+
+  .reservation-form__subtitle {
+    margin: 0;
+    color: var(--rf-text-color, #fff);
+    font-size: clamp(0.875rem, 1.1vw, 1rem);
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  /* Form */
+  .reservation-form__form {
+    width: 100%;
+  }
+
+  .reservation-form__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .reservation-form__row {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .reservation-form__row--half {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .reservation-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .reservation-form__label {
+    color: var(--rf-label-color, #fff);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .reservation-form__input {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--rf-input-bg, #fff);
+    color: var(--rf-input-color, #1a1a1a);
+    border: 1px solid var(--rf-input-border, #e0e0e0);
+    border-radius: var(--rf-input-radius, 8px);
+    font-size: 0.875rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .reservation-form__input:focus {
+    border-color: var(--rf-bg, #4a8f6d);
+    box-shadow: 0 0 0 2px rgba(74, 143, 109, 0.15);
+  }
+
+  .reservation-form__select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231a1a1a' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  .reservation-form__textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  /* Checkboxes */
+  .reservation-form__checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-block-start: 4px;
+  }
+
+  .reservation-form__checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    color: var(--rf-label-color, #fff);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  .reservation-form__checkbox {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    accent-color: var(--rf-button-bg, #2d5e45);
+    cursor: pointer;
+  }
+
+  .reservation-form__checkbox-text {
+    opacity: 0.9;
+  }
+
+  /* Submit button */
+  .reservation-form__submit {
+    width: 100%;
+    padding: 12px 28px;
+    background: var(--rf-button-bg, #2d5e45);
+    color: var(--rf-button-color, #fff);
+    border: none;
+    border-radius: var(--rf-input-radius, 8px);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    margin-block-start: 4px;
+    text-align: center;
+  }
+
+  .reservation-form__submit:hover {
+    opacity: 0.9;
+  }
+
+  /* ─── Mobile ─── */
+  @media screen and (max-width: 749px) {
+    .reservation-form__container {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .reservation-form__card {
+      aspect-ratio: 16 / 10;
+      max-width: 100%;
+    }
+
+    .reservation-form__content {
+      align-items: center;
+      text-align: center;
+    }
+
+    .reservation-form__heading-image {
+      justify-content: center;
+    }
+
+    .reservation-form__heading-img {
+      width: min(var(--rf-heading-size, 180px), 50vw);
+    }
+
+    .reservation-form__title {
+      text-align: center;
+    }
+
+    .reservation-form__subtitle {
+      text-align: center;
+    }
+
+    .reservation-form__row--half {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Reservation form",
+  "tag": "section",
+  "class": "reservation-form-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Image corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "image_picker",
+      "id": "heading_image",
+      "label": "Heading image",
+      "info": "Logo or decorative heading. Takes priority over text."
+    },
+    {
+      "type": "range",
+      "id": "heading_image_size",
+      "label": "Heading image width",
+      "min": 80,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 180
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading text",
+      "default": "Make a reservation",
+      "info": "Used when no heading image is set"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Book your table and enjoy the experience"
+    },
+    {
+      "type": "header",
+      "content": "Form labels"
+    },
+    {
+      "type": "text",
+      "id": "name_label",
+      "label": "Name label",
+      "default": "Name"
+    },
+    {
+      "type": "text",
+      "id": "name_placeholder",
+      "label": "Name placeholder",
+      "default": "Your name"
+    },
+    {
+      "type": "text",
+      "id": "phone_label",
+      "label": "Phone label",
+      "default": "Phone"
+    },
+    {
+      "type": "text",
+      "id": "phone_placeholder",
+      "label": "Phone placeholder",
+      "default": "+359"
+    },
+    {
+      "type": "text",
+      "id": "guests_label",
+      "label": "Guests label",
+      "default": "Number of guests"
+    },
+    {
+      "type": "text",
+      "id": "date_label",
+      "label": "Date label",
+      "default": "Date"
+    },
+    {
+      "type": "text",
+      "id": "time_label",
+      "label": "Time label",
+      "default": "Time"
+    },
+    {
+      "type": "text",
+      "id": "comment_label",
+      "label": "Comment label",
+      "default": "Comment"
+    },
+    {
+      "type": "text",
+      "id": "comment_placeholder",
+      "label": "Comment placeholder",
+      "default": "Additional notes..."
+    },
+    {
+      "type": "header",
+      "content": "Consent checkboxes"
+    },
+    {
+      "type": "text",
+      "id": "checkbox_1_label",
+      "label": "Checkbox 1 text",
+      "default": "I agree to the processing of my personal data"
+    },
+    {
+      "type": "text",
+      "id": "checkbox_2_label",
+      "label": "Checkbox 2 text",
+      "default": "I confirm that the phone number provided is correct"
+    },
+    {
+      "type": "header",
+      "content": "Submit button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Reserve"
+    },
+    {
+      "type": "url",
+      "id": "form_action",
+      "label": "Form action URL",
+      "info": "Where the form submits to. Leave blank for default."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#4a8f6d"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "input_background",
+      "label": "Input background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "input_text_color",
+      "label": "Input text color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Input border color",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "range",
+      "id": "input_radius",
+      "label": "Input corner radius",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button background",
+      "default": "#2d5e45"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Container"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "section_margin",
+      "label": "Outer spacing",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "section_spacing",
+      "label": "Space above & below section",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Left",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Right",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 32
+    }
+  ],
+  "presets": [
+    {
+      "name": "Reservation form",
+      "category": "Contact"
+    }
+  ]
+}
+{% endschema %}
