@@ -95,10 +95,10 @@
 
   .image-banner__grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
+    grid-template-columns: 5fr 7fr;
+    gap: 48px;
     align-items: center;
-    max-width: var(--page-width);
+    max-width: 960px;
     margin-inline: auto;
     padding-inline: var(--spacing-inline, 24px);
   }
@@ -107,6 +107,7 @@
   .image-banner__arch {
     position: relative;
     width: 100%;
+    max-width: 340px;
   }
 
   .image-banner__arch-inner {
@@ -146,35 +147,36 @@
   .image-banner__content {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
 
   .image-banner__title {
     margin: 0;
     color: var(--color-foreground);
-    font-size: clamp(1.75rem, 3.5vw, 3rem);
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
     line-height: 1.15;
     text-align: var(--ib-heading-align, center);
   }
 
   .image-banner__text {
     color: var(--color-foreground);
-    font-size: clamp(0.875rem, 1.2vw, 1.0625rem);
+    font-size: clamp(0.875rem, 1.1vw, 1rem);
     line-height: 1.7;
-    max-width: 520px;
     text-align: var(--ib-text-align, center);
-    align-self: var(--ib-text-align, center);
   }
 
   .image-banner__cta {
     display: flex;
     justify-content: var(--ib-button-align, flex-end);
     width: 100%;
-    margin-block-start: 8px;
+    margin-block-start: 4px;
   }
 
   .image-banner__button {
     border-radius: 8px;
+    padding-block: 10px;
+    padding-inline: 28px;
+    font-size: 0.875rem;
   }
 
   /* Mobile: stack vertically */
@@ -193,10 +195,7 @@
       --ib-heading-align: center !important;
       --ib-text-align: center !important;
       --ib-button-align: center !important;
-    }
-
-    .image-banner__text {
-      align-self: center;
+      align-items: center;
     }
   }
 {% endstylesheet %}
