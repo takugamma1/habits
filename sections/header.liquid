@@ -1202,7 +1202,7 @@
 
   .habits-bubble {
     position: fixed;
-    top: 16px;
+    top: 12px;
     left: 50%;
     transform: translateX(-50%) translateY(-120%);
     z-index: 99999;
@@ -1212,8 +1212,8 @@
     opacity: 0;
     pointer-events: none;
     transition:
-      transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-      opacity 0.35s ease;
+      transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.2s ease;
     will-change: transform, opacity;
     max-width: 92vw;
   }
@@ -1284,6 +1284,12 @@
 
   /* Mobile bubble */
   @media screen and (max-width: 749px) {
+    .habits-bubble {
+      width: calc(100% - 24px);
+      max-width: none;
+      top: 10px;
+    }
+
     .hb__desktop {
       display: none;
     }
@@ -1291,14 +1297,14 @@
     .hb__mobile {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
+      justify-content: space-between;
+      padding: 10px 20px;
     }
 
     .hb__burger {
       background: none;
       border: none;
-      padding: 4px;
+      padding: 6px;
       color: var(--hb-text, #1a1a1a);
       cursor: pointer;
       display: flex;
@@ -1309,6 +1315,10 @@
     .hb__logo {
       margin-inline: 0;
     }
+
+    .hb__logo-img {
+      width: var(--hb-logo-w, 40px);
+    }
   }
 {% endstylesheet %}
 
@@ -1317,7 +1327,7 @@
     var bubble = document.getElementById('habits-bubble');
     if (!bubble) return;
 
-    var threshold = 200;
+    var threshold = 50;
     var ticking = false;
 
     function onScroll() {
