@@ -197,19 +197,40 @@
 </div>
 
 {% stylesheet %}
-  /* Wrapper */
+  /*
+   * Page-closer pattern:
+   * — outer wrapper has side margin + rounded-top background
+   * — background extends below into a full-bleed strip
+   *   so the color runs flush to the page bottom
+   */
   .reservation-form-section {
-    margin-block: var(--rf-section-spacing, 20px);
+    margin-block-start: var(--rf-section-spacing, 20px);
+    margin-block-end: 0;
   }
 
   .reservation-form {
+    position: relative;
     margin-inline: var(--rf-margin, 12px);
+    background: var(--rf-bg);
+    border-radius: var(--rf-radius, 24px) var(--rf-radius, 24px) 0 0;
+    overflow: hidden;
+  }
+
+  /* Extend the background color below the rounded box to page edge */
+  .reservation-form::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: calc(var(--rf-margin, 12px) * -1);
+    right: calc(var(--rf-margin, 12px) * -1);
+    height: 60px;
+    background: var(--rf-bg);
+    z-index: 0;
   }
 
   .reservation-form__container {
-    background: var(--rf-bg);
-    border-radius: var(--rf-radius, 24px);
-    overflow: hidden;
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: 5fr 7fr;
     gap: 40px;
@@ -672,12 +693,13 @@
     {
       "type": "range",
       "id": "section_spacing",
-      "label": "Space above & below section",
+      "label": "Space above section",
       "min": 0,
       "max": 80,
       "step": 4,
       "unit": "px",
-      "default": 20
+      "default": 20,
+      "info": "This section sits flush at the bottom of the page"
     },
     {
       "type": "header",
@@ -701,7 +723,7 @@
       "max": 100,
       "step": 1,
       "unit": "px",
-      "default": 48
+      "default": 80
     },
     {
       "type": "range",
