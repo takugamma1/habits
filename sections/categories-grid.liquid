@@ -18,6 +18,9 @@
     --cg-card-gap: {{ section.settings.card_gap | default: 20 }}px;
     --cg-heading-size: {{ section.settings.heading_image_size | default: 160 }}px;
     --cg-section-spacing: {{ section.settings.section_spacing | default: 20 }}px;
+    --cg-gradient-color: {{ section.settings.gradient_color | default: '#000000' }};
+    --cg-gradient-opacity: {{ section.settings.gradient_opacity | divided_by: 100.0 }};
+    --cg-title-color: {{ section.settings.card_title_color | default: '#ffffff' }};
   "
 >
   <div class="categories-grid__container spacing-style" style="{% render 'spacing-style', settings: section.settings %}">
@@ -49,6 +52,7 @@
             {% endif %}
 
             <div class="categories-grid__arch">
+              {%- comment -%} Background image {%- endcomment -%}
               {% if block.settings.image != blank %}
                 {{
                   block.settings.image
@@ -61,8 +65,12 @@
                 }}
               {% endif %}
 
+              {%- comment -%} Gradient overlay {%- endcomment -%}
+              <div class="categories-grid__card-gradient"></div>
+
+              {%- comment -%} Title {%- endcomment -%}
               {% if block.settings.title != blank %}
-                <span class="categories-grid__card-title">{{ block.settings.title }}</span>
+                <h1 class="categories-grid__card-title">{{ block.settings.title }}</h1>
               {% endif %}
             </div>
 
@@ -154,26 +162,45 @@
     transform: scale(1.02);
   }
 
+  /* Image as full background */
   .categories-grid__card-img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     object-position: center;
-    padding: 12%;
   }
 
+  /* Gradient overlay from bottom */
+  .categories-grid__card-gradient {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      rgb(from var(--cg-gradient-color) r g b / var(--cg-gradient-opacity)) 0%,
+      rgb(from var(--cg-gradient-color) r g b / calc(var(--cg-gradient-opacity) * 0.5)) 40%,
+      transparent 70%
+    );
+    border-radius: inherit;
+  }
+
+  /* Title: large heading that fits the arch */
   .categories-grid__card-title {
     position: relative;
     z-index: 2;
-    color: #fff;
-    font-size: clamp(0.8125rem, 1.2vw, 1rem);
-    font-weight: 500;
+    color: var(--cg-title-color, #fff);
+    margin: 0;
+    font-size: clamp(1.25rem, 2vw, 1.75rem);
+    font-weight: 700;
     text-align: center;
-    padding-block: 12px;
-    padding-inline: 8px;
+    line-height: 1.15;
+    padding: 16px 12px 20px;
     width: 100%;
+    word-break: break-word;
+    hyphens: auto;
   }
 
   /* ─── Mobile: horizontal carousel ─── */
@@ -207,6 +234,11 @@
 
     .categories-grid__arch {
       aspect-ratio: 2.5 / 4;
+    }
+
+    .categories-grid__card-title {
+      font-size: clamp(1.125rem, 5vw, 1.5rem);
+      padding: 12px 10px 16px;
     }
   }
 
@@ -266,6 +298,33 @@
       "id": "card_color",
       "label": "Card color",
       "default": "#2d5e45"
+    },
+    {
+      "type": "color",
+      "id": "card_title_color",
+      "label": "Card title color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Card gradient"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color",
+      "label": "Gradient color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "gradient_opacity",
+      "label": "Gradient intensity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 70,
+      "info": "0% = no gradient, 100% = fully opaque"
     },
     {
       "type": "header",
@@ -359,7 +418,7 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Image"
+          "label": "Background image"
         },
         {
           "type": "text",
