@@ -222,6 +222,7 @@
           "type": "category",
           "settings": {
             "title": "Hookah",
+            "title_image_width": 100,
             "link": ""
           }
         },
@@ -230,6 +231,7 @@
           "settings": {
             "image": "shopify://shop_images/DSC07247.jpg",
             "title": "Food",
+            "title_image_width": 100,
             "link": ""
           }
         },
@@ -237,6 +239,7 @@
           "type": "category",
           "settings": {
             "title": "Drinks",
+            "title_image_width": 100,
             "link": ""
           }
         },
@@ -244,7 +247,9 @@
           "type": "category",
           "settings": {
             "image": "shopify://shop_images/hf_20260227_135214_26d88210-3e53-4a17-841c-59359705f38c.jpg",
-            "title": "FIT MENU",
+            "title": "",
+            "title_image": "shopify://shop_images/Untitled_design_-_2026-03-07T004214.784.png",
+            "title_image_width": 40,
             "link": ""
           }
         }
