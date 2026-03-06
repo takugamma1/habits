@@ -374,9 +374,10 @@
     "promo_banner_Xt9w2J": {
       "type": "promo-banner",
       "settings": {
-        "heading_image_size": 200,
+        "heading_image": "shopify://shop_images/Untitled_design_-_2026-03-07T001749.169.png",
+        "heading_image_size": 210,
         "title": "Promo banner",
-        "text": "<p>Add a short promotional message here.</p>",
+        "text": "<h1>Add a short promotional message here.</h1>",
         "button_label": "Shop now",
         "button_link": "",
         "button_style": "button-primary",
