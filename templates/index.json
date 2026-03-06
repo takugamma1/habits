@@ -264,7 +264,7 @@
         "card_title_color": "#ffffff",
         "gradient_color": "#000000",
         "gradient_opacity": 70,
-        "card_gap": 20,
+        "card_gap": 30,
         "border_radius": 24,
         "section_margin": 12,
         "section_spacing": 20,
