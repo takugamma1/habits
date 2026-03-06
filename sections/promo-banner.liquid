@@ -8,6 +8,16 @@
   if section.settings.heading_image != blank
     assign has_heading_image = true
   endif
+
+  assign has_badge_1 = false
+  if section.settings.badge_icon_1 != blank
+    assign has_badge_1 = true
+  endif
+
+  assign has_badge_2 = false
+  if section.settings.badge_icon_2 != blank
+    assign has_badge_2 = true
+  endif
 %}
 
 <div
@@ -17,20 +27,36 @@
     --pb-bg: {{ section.settings.background_color | default: '#4a8f6d' }};
     --pb-radius: {{ section.settings.border_radius | default: 24 }}px;
     --pb-margin: {{ section.settings.section_margin | default: 12 }}px;
-    --pb-image-overflow: {{ section.settings.image_overflow | default: 30 }}%;
     --pb-heading-size: {{ section.settings.heading_image_size | default: 200 }}px;
     --pb-section-spacing: {{ section.settings.section_spacing | default: 20 }}px;
+    --pb-image-radius: {{ section.settings.image_radius | default: 16 }}px;
+    --pb-badge-size: {{ section.settings.badge_size | default: 56 }}px;
   "
 >
   {%- comment -%} Background shape — rounded, sits behind everything {%- endcomment -%}
   <div class="promo-banner__bg"></div>
 
-  {%- comment -%} Content grid — sits above background, image can overflow {%- endcomment -%}
+  {%- comment -%} Content grid {%- endcomment -%}
   <div
     class="promo-banner__grid spacing-style"
     style="{% render 'spacing-style', settings: section.settings %}"
   >
-    {%- comment -%} Left: heading + text + CTA {%- endcomment -%}
+    {%- comment -%} Left: contained rounded image {%- endcomment -%}
+    {% if has_image %}
+      <div class="promo-banner__media">
+        {{
+          section.settings.image
+          | image_url: width: 1200
+          | image_tag:
+            loading: 'lazy',
+            sizes: '(max-width: 749px) 90vw, 45vw',
+            widths: '375, 550, 750, 1000, 1200',
+            class: 'promo-banner__img'
+        }}
+      </div>
+    {% endif %}
+
+    {%- comment -%} Right: heading + text + badges + CTA {%- endcomment -%}
     <div class="promo-banner__content">
       {% if has_heading_image %}
         <div class="promo-banner__heading-image">
@@ -52,6 +78,34 @@
         <div class="promo-banner__text rte">{{ section.settings.text }}</div>
       {% endif %}
 
+      {%- comment -%} Badge icons row {%- endcomment -%}
+      {% if has_badge_1 or has_badge_2 %}
+        <div class="promo-banner__badges">
+          {% if has_badge_1 %}
+            <div class="promo-banner__badge">
+              {{
+                section.settings.badge_icon_1
+                | image_url: width: 200
+                | image_tag:
+                  loading: 'lazy',
+                  class: 'promo-banner__badge-icon'
+              }}
+            </div>
+          {% endif %}
+          {% if has_badge_2 %}
+            <div class="promo-banner__badge">
+              {{
+                section.settings.badge_icon_2
+                | image_url: width: 200
+                | image_tag:
+                  loading: 'lazy',
+                  class: 'promo-banner__badge-icon'
+              }}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
       {% if section.settings.button_label != blank %}
         <a
           href="{{ section.settings.button_link }}"
@@ -62,26 +116,10 @@
         </a>
       {% endif %}
     </div>
-
-    {%- comment -%} Right: overflowing image {%- endcomment -%}
-    {% if has_image %}
-      <div class="promo-banner__media">
-        {{
-          section.settings.image
-          | image_url: width: 1200
-          | image_tag:
-            loading: 'lazy',
-            sizes: '(max-width: 749px) 80vw, 50vw',
-            widths: '375, 550, 750, 1000, 1200',
-            class: 'promo-banner__img'
-        }}
-      </div>
-    {% endif %}
   </div>
 </div>
 
 {% stylesheet %}
-  /* Wrapper — overflow visible so the image can break out */
   .promo-banner-section {
     margin-block: var(--pb-section-spacing, 20px);
   }
@@ -100,16 +138,32 @@
     z-index: 0;
   }
 
-  /* Grid layout */
+  /* Grid layout — image left, content right */
   .promo-banner__grid {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 5fr 7fr;
     align-items: center;
+    gap: 32px;
   }
 
-  /* Left content */
+  /* ─── Left: contained rounded image ─── */
+  .promo-banner__media {
+    position: relative;
+    border-radius: var(--pb-image-radius, 16px);
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+  }
+
+  .promo-banner__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ─── Right: content ─── */
   .promo-banner__content {
     display: flex;
     flex-direction: column;
@@ -150,46 +204,44 @@
     font-size: 0.875rem;
   }
 
-  /* Right image — overflows the container */
-  .promo-banner__media {
-    position: relative;
+  /* ─── Badges ─── */
+  .promo-banner__badges {
     display: flex;
-    justify-content: center;
     align-items: center;
-    overflow: visible;
+    gap: 16px;
+    margin-block: 4px;
   }
 
-  .promo-banner__img {
+  .promo-banner__badge {
+    width: var(--pb-badge-size, 56px);
+    height: var(--pb-badge-size, 56px);
+    background: #fff;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .promo-banner__badge-icon {
     width: 100%;
-    height: auto;
+    height: 100%;
     object-fit: contain;
-    transform: scale(calc(1 + var(--pb-image-overflow, 30) / 100));
-    transform-origin: center center;
-    position: relative;
-    z-index: 2;
+    display: block;
   }
 
   /* ─── Mobile ─── */
   @media screen and (max-width: 749px) {
-    .promo-banner {
-      /* extra top space for overflowing image */
-      margin-block-start: 60px;
-    }
-
     .promo-banner__grid {
       grid-template-columns: 1fr;
+      gap: 24px;
     }
 
     /* Image on top on mobile */
     .promo-banner__media {
-      order: -1;
-      margin-block-start: calc(var(--pb-image-overflow, 30) * -1%);
-    }
-
-    .promo-banner__img {
-      max-width: 75%;
-      transform: scale(calc(1 + var(--pb-image-overflow, 30) / 100));
-      transform-origin: center bottom;
+      aspect-ratio: 4 / 3;
     }
 
     .promo-banner__content {
@@ -207,6 +259,10 @@
 
     .promo-banner__text {
       font-size: 0.875rem;
+    }
+
+    .promo-banner__badges {
+      gap: 12px;
     }
   }
 {% endstylesheet %}
@@ -290,18 +346,45 @@
       "type": "image_picker",
       "id": "image",
       "label": "Image",
-      "info": "Use a PNG with transparent background for the overflow effect"
+      "info": "Fills the rounded frame on the left side (object-fit: cover)"
     },
     {
       "type": "range",
-      "id": "image_overflow",
-      "label": "Image overflow",
+      "id": "image_radius",
+      "label": "Image corner radius",
       "min": 0,
-      "max": 60,
-      "step": 5,
-      "unit": "%",
-      "default": 30,
-      "info": "How much the image extends beyond the frame"
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Badge icons"
+    },
+    {
+      "type": "paragraph",
+      "content": "Two white badges for logos or icons. Fixed size ensures consistent appearance."
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_icon_1",
+      "label": "Badge icon 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_icon_2",
+      "label": "Badge icon 2"
+    },
+    {
+      "type": "range",
+      "id": "badge_size",
+      "label": "Badge size",
+      "min": 40,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 56
     },
     {
       "type": "header",
@@ -385,7 +468,7 @@
       "max": 80,
       "step": 1,
       "unit": "px",
-      "default": 0
+      "default": 40
     }
   ],
   "presets": [
