@@ -1,0 +1,1886 @@
+{%- liquid
+  assign col_day     = section.settings.collection_day
+  assign col_night   = section.settings.collection_night
+  assign col_fit     = section.settings.collection_fit
+  assign col_drinks  = section.settings.collection_drinks
+  assign col_addons  = section.settings.collection_addons
+
+  assign col_upsell   = section.settings.upsell_collection
+  assign col_downsell = section.settings.downsell_collection
+-%}
+
+{%- comment -%} ═══════════════════════════════════
+  LOADING OVERLAY (pulsing logo)
+═══════════════════════════════════ {%- endcomment -%}
+<div class="mp-loader" id="mp-loader" aria-hidden="true">
+  <div class="mp-loader__inner">
+    {% if section.settings.loading_logo %}
+      {{ section.settings.loading_logo | image_url: width: 200 | image_tag: class: 'mp-loader__logo' }}
+    {% else %}
+      {% if settings.logo %}
+        {{ settings.logo | image_url: width: 200 | image_tag: class: 'mp-loader__logo' }}
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+{%- comment -%} ═══════════════════════════════════
+  FLOATING CATEGORY NAV
+═══════════════════════════════════ {%- endcomment -%}
+<nav
+  class="mp-nav"
+  id="mp-nav"
+  style="
+    --mp-nav-bg: {{ section.settings.nav_bg | default: '#024b40' }};
+    --mp-nav-text: {{ section.settings.nav_text_color | default: '#ffffff' }};
+    --mp-badge-active: {{ section.settings.badge_active_color | default: '#ffffff' }};
+  "
+>
+  <div class="mp-nav__inner">
+    {%- comment -%} Logo → home {%- endcomment -%}
+    <a href="/" class="mp-nav__logo" aria-label="{{ shop.name }}">
+      {%- if settings.logo -%}
+        {{ settings.logo | image_url: width: 160 | image_tag: loading: 'lazy', class: 'mp-nav__logo-img' }}
+      {%- else -%}
+        <span class="mp-nav__logo-text">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    {%- comment -%} Category badges (scrollable on mobile) {%- endcomment -%}
+    <div class="mp-nav__badges" id="mp-nav-badges">
+      {% if col_day %}
+        <button
+          type="button"
+          class="mp-badge mp-badge--time"
+          data-collection="day"
+          style="--mp-badge-bg: {{ section.settings.badge_color_day | default: '#2d5e45' }};"
+        >
+          {{ col_day.title | default: 'Day menu' }}
+        </button>
+      {% endif %}
+      {% if col_night %}
+        <button
+          type="button"
+          class="mp-badge mp-badge--time"
+          data-collection="night"
+          style="--mp-badge-bg: {{ section.settings.badge_color_night | default: '#2d5e45' }};"
+        >
+          {{ col_night.title | default: 'Night menu' }}
+        </button>
+      {% endif %}
+      {% if col_fit %}
+        <button
+          type="button"
+          class="mp-badge"
+          data-collection="fit"
+          style="--mp-badge-bg: {{ section.settings.badge_color_fit | default: '#2d5e45' }};"
+        >
+          {% if section.settings.fit_menu_icon %}
+            {{ section.settings.fit_menu_icon | image_url: width: 40 | image_tag: class: 'mp-badge__icon' }}
+          {% endif %}
+          {{ col_fit.title | default: 'Fit menu' }}
+        </button>
+      {% endif %}
+      {% if col_drinks %}
+        <button
+          type="button"
+          class="mp-badge"
+          data-collection="drinks"
+          style="--mp-badge-bg: {{ section.settings.badge_color_drinks | default: '#2d5e45' }};"
+        >
+          {{ col_drinks.title | default: 'Drinks' }}
+        </button>
+      {% endif %}
+      {% if col_addons %}
+        <button
+          type="button"
+          class="mp-badge"
+          data-collection="addons"
+          style="--mp-badge-bg: {{ section.settings.badge_color_addons | default: '#2d5e45' }};"
+        >
+          {{ col_addons.title | default: 'Add-ons' }}
+        </button>
+      {% endif %}
+    </div>
+
+    {%- comment -%} Desktop cart button {%- endcomment -%}
+    {% render 'menu-cart-drawer',
+      cart_icon_bg: section.settings.cart_icon_bg,
+      cart_icon_color: section.settings.cart_icon_color,
+      cart_badge_bg: section.settings.cart_badge_bg,
+      cart_cta_text: section.settings.cart_cta_text,
+      cart_cta_color: section.settings.cart_cta_color
+    %}
+  </div>
+</nav>
+
+{%- comment -%} ═══════════════════════════════════
+  MAIN CONTENT AREA
+═══════════════════════════════════ {%- endcomment -%}
+<div
+  class="mp-content"
+  id="mp-content"
+  style="
+    --mp-page-bg: {{ section.settings.page_bg | default: '#f5f3ef' }};
+    --mp-margin: {{ section.settings.section_margin | default: 12 }}px;
+    --mp-radius: {{ section.settings.border_radius | default: 24 }}px;
+    --mp-columns: {{ section.settings.card_columns_desktop | default: 4 }};
+    --mp-card-gap: {{ section.settings.card_gap | default: 16 }}px;
+  "
+>
+  {%- comment -%} Kitchen closed message {%- endcomment -%}
+  <div class="mp-closed" id="mp-closed" style="display:none;">
+    <div class="mp-closed__card">
+      {% if section.settings.loading_logo %}
+        {{ section.settings.loading_logo | image_url: width: 120 | image_tag: class: 'mp-closed__logo' }}
+      {% elsif settings.logo %}
+        {{ settings.logo | image_url: width: 120 | image_tag: class: 'mp-closed__logo' }}
+      {% endif %}
+      <h2 class="mp-closed__heading">Кухнята е затворена</h2>
+      <p class="mp-closed__text">Отваряме отново в <strong id="mp-closed-time">10:00</strong></p>
+    </div>
+  </div>
+
+  {%- comment -%} Collection grids {%- endcomment -%}
+  {% if col_day and col_day.products.size > 0 %}
+    <div class="mp-collection" data-collection="day" style="display:none;">
+      <h2 class="mp-collection__title">{{ col_day.title }}</h2>
+      <div class="mp-grid">
+        {% for product in col_day.products %}
+          {% render 'menu-product-card',
+            product: product,
+            collection_title: col_day.title,
+            card_bg: section.settings.card_bg,
+            card_radius: section.settings.card_radius,
+            button_color: section.settings.card_button_color,
+            button_text_color: section.settings.card_button_text_color
+          %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if col_night and col_night.products.size > 0 %}
+    <div class="mp-collection" data-collection="night" style="display:none;">
+      <h2 class="mp-collection__title">{{ col_night.title }}</h2>
+      <div class="mp-grid">
+        {% for product in col_night.products %}
+          {% render 'menu-product-card',
+            product: product,
+            collection_title: col_night.title,
+            card_bg: section.settings.card_bg,
+            card_radius: section.settings.card_radius,
+            button_color: section.settings.card_button_color,
+            button_text_color: section.settings.card_button_text_color
+          %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if col_fit and col_fit.products.size > 0 %}
+    <div class="mp-collection" data-collection="fit" style="display:none;">
+      <h2 class="mp-collection__title">{{ col_fit.title }}</h2>
+      <div class="mp-grid">
+        {% for product in col_fit.products %}
+          {% render 'menu-product-card',
+            product: product,
+            collection_title: col_fit.title,
+            card_bg: section.settings.card_bg,
+            card_radius: section.settings.card_radius,
+            button_color: section.settings.card_button_color,
+            button_text_color: section.settings.card_button_text_color
+          %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if col_drinks and col_drinks.products.size > 0 %}
+    <div class="mp-collection" data-collection="drinks" style="display:none;">
+      <h2 class="mp-collection__title">{{ col_drinks.title }}</h2>
+      <div class="mp-grid">
+        {% for product in col_drinks.products %}
+          {% render 'menu-product-card',
+            product: product,
+            collection_title: col_drinks.title,
+            card_bg: section.settings.card_bg,
+            card_radius: section.settings.card_radius,
+            button_color: section.settings.card_button_color,
+            button_text_color: section.settings.card_button_text_color
+          %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if col_addons and col_addons.products.size > 0 %}
+    <div class="mp-collection" data-collection="addons" style="display:none;">
+      <h2 class="mp-collection__title">{{ col_addons.title }}</h2>
+      <div class="mp-grid">
+        {% for product in col_addons.products %}
+          {% render 'menu-product-card',
+            product: product,
+            collection_title: col_addons.title,
+            card_bg: section.settings.card_bg,
+            card_radius: section.settings.card_radius,
+            button_color: section.settings.card_button_color,
+            button_text_color: section.settings.card_button_text_color
+          %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{%- comment -%} ═══════════════════════════════════
+  UPSELL MODAL
+═══════════════════════════════════ {%- endcomment -%}
+{% render 'menu-upsell-modal',
+  upsell_collection: col_upsell,
+  downsell_collection: col_downsell,
+  upsell_title: section.settings.upsell_title,
+  downsell_title: section.settings.downsell_title
+%}
+
+{%- comment -%} ═══════════════════════════════════
+  STYLES
+═══════════════════════════════════ {%- endcomment -%}
+{% stylesheet %}
+
+  /* ─── Hide default header & footer on menu page ─── */
+  .menu-page-section ~ #header-group,
+  .menu-page-section ~ footer,
+  body:has(.menu-page-section) #header-group,
+  body:has(.menu-page-section) footer {
+    display: none !important;
+  }
+
+  body:has(.menu-page-section) {
+    background: var(--mp-page-bg, #f5f3ef);
+  }
+
+  /* ─── Loading overlay ─── */
+  .mp-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: var(--mp-page-bg, #f5f3ef);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+
+  .mp-loader.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .mp-loader__logo {
+    width: 80px;
+    height: auto;
+    animation: mp-pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes mp-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+  }
+
+  /* ─── Floating nav ─── */
+  .mp-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: var(--mp-nav-bg, #024b40);
+    padding: 12px 20px;
+    transition: transform 0.3s ease;
+  }
+
+  .mp-nav__inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .mp-nav__logo {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .mp-nav__logo-img {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .mp-nav__logo-text {
+    color: var(--mp-nav-text);
+    font-weight: 700;
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  .mp-nav__badges {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 4px 0;
+  }
+
+  .mp-nav__badges::-webkit-scrollbar { display: none; }
+
+  /* ─── Category badges ─── */
+  .mp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    background: var(--mp-badge-bg, #2d5e45);
+    color: var(--mp-nav-text, #fff);
+    border: 2px solid transparent;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+    font-family: inherit;
+    text-transform: uppercase;
+  }
+
+  .mp-badge:hover {
+    opacity: 0.85;
+  }
+
+  .mp-badge.is-active {
+    border-color: var(--mp-badge-active, #fff);
+    box-shadow: 0 0 0 1px var(--mp-badge-active, #fff);
+  }
+
+  .mp-badge.is-hidden {
+    display: none;
+  }
+
+  .mp-badge__icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+
+  /* ─── Desktop cart button ─── */
+  .mp-cart-btn {
+    position: relative;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--mp-cart-btn-bg, #024b40);
+    color: var(--mp-cart-btn-color, #fff);
+    border: 2px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    margin-left: auto;
+  }
+
+  .mp-cart-btn:hover { transform: scale(1.06); }
+
+  .mp-cart-btn__count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 9999px;
+    background: #dd5934;
+    color: #fff;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .mp-cart-btn__count[data-count="0"] {
+    transform: scale(0);
+  }
+
+  @keyframes mp-bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+  }
+
+  .mp-cart-btn__count.is-bouncing {
+    animation: mp-bounce 0.4s ease;
+  }
+
+  /* ─── Desktop side drawer ─── */
+  .mp-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99990;
+    background: rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .mp-drawer-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mp-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 400px;
+    max-width: 90vw;
+    z-index: 99991;
+    background: #fff;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    border-radius: 24px 0 0 24px;
+    box-shadow: -4px 0 30px rgba(0,0,0,0.08);
+  }
+
+  .mp-drawer.is-open {
+    transform: translateX(0);
+  }
+
+  .mp-drawer__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .mp-drawer__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+  }
+
+  .mp-drawer__count {
+    font-weight: 400;
+    color: #888;
+    margin-left: 4px;
+  }
+
+  .mp-drawer__close {
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    color: #333;
+    display: flex;
+  }
+
+  .mp-drawer__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px;
+  }
+
+  .mp-drawer__empty {
+    text-align: center;
+    padding: 40px 0;
+    color: #888;
+  }
+
+  .mp-drawer__items {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .mp-drawer__footer {
+    padding: 16px 24px 24px;
+    border-top: 1px solid #eee;
+  }
+
+  .mp-drawer__subtotal {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 16px;
+  }
+
+  .mp-drawer__cta {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 14px;
+    background: var(--mp-cta-bg, #024b40);
+    color: #fff;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .mp-drawer__cta:hover { opacity: 0.9; }
+
+  /* ─── Mobile bottom badge ─── */
+  .mp-mob-badge {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .mp-cart-btn { display: none; }
+    .mp-drawer-overlay, .mp-drawer { display: none; }
+
+    .mp-mob-badge {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9998;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: var(--mp-badge-bg, #024b40);
+      color: #fff;
+      border-radius: 9999px;
+      cursor: pointer;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease;
+    }
+
+    .mp-mob-badge:active {
+      transform: translateX(-50%) scale(0.96);
+    }
+
+    .mp-mob-badge__count {
+      font-weight: 700;
+      font-size: 0.875rem;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .mp-mob-badge__arrow {
+      opacity: 0.6;
+    }
+
+    @keyframes mp-badge-bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-6px); }
+    }
+
+    .mp-mob-badge.is-bouncing {
+      animation: mp-badge-bounce 0.4s ease;
+    }
+  }
+
+  /* ─── Mobile bottom sheet ─── */
+  .mp-sheet-overlay {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .mp-sheet-overlay {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 99990;
+      background: rgba(0,0,0,0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .mp-sheet-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mp-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 99991;
+      background: #fff;
+      border-radius: 24px 24px 0 0;
+      max-height: 55vh;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.1);
+    }
+
+    .mp-sheet.is-open {
+      transform: translateY(0);
+    }
+
+    .mp-sheet__handle {
+      display: flex;
+      justify-content: center;
+      padding: 12px 0 4px;
+    }
+
+    .mp-sheet__handle-bar {
+      width: 36px;
+      height: 4px;
+      border-radius: 9999px;
+      background: #ddd;
+    }
+
+    .mp-sheet__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 20px 12px;
+    }
+
+    .mp-sheet__title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .mp-sheet__close {
+      background: none;
+      border: none;
+      padding: 6px;
+      cursor: pointer;
+      color: #333;
+      display: flex;
+    }
+
+    .mp-sheet__body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 20px 12px;
+    }
+
+    .mp-sheet__empty {
+      text-align: center;
+      padding: 24px 0;
+      color: #888;
+    }
+
+    .mp-sheet__items {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mp-sheet__footer {
+      padding: 12px 20px 24px;
+      border-top: 1px solid #eee;
+    }
+
+    .mp-sheet__subtotal {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 0.9375rem;
+      margin-bottom: 12px;
+    }
+
+    .mp-sheet__cta {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 14px;
+      background: var(--mp-cta-bg, #024b40);
+      color: #fff;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.9375rem;
+      text-decoration: none;
+    }
+  }
+
+  /* ─── Content area ─── */
+  .mp-content {
+    padding-top: 76px;
+    padding-inline: var(--mp-margin, 12px);
+    padding-bottom: 100px;
+    min-height: 100vh;
+    background: var(--mp-page-bg, #f5f3ef);
+  }
+
+  .mp-collection {
+    margin-bottom: 40px;
+  }
+
+  .mp-collection__title {
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 800;
+    color: #1a1a1a;
+    margin: 0 0 20px;
+  }
+
+  /* ─── Product grid ─── */
+  .mp-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--mp-columns, 4), 1fr);
+    gap: var(--mp-card-gap, 16px);
+  }
+
+  @media screen and (max-width: 749px) {
+    .mp-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+  }
+
+  /* ─── Product card ─── */
+  .mp-card {
+    border-radius: var(--mp-card-radius, 16px);
+    overflow: hidden;
+    background: var(--mp-card-bg, #1a1a1a);
+    transition: transform 0.25s ease;
+    position: relative;
+  }
+
+  .mp-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .mp-card__media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+
+  .mp-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .mp-card:hover .mp-card__img {
+    transform: scale(1.04);
+  }
+
+  .mp-card__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #2a2a2a;
+    color: #555;
+  }
+
+  .mp-card__add {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--mp-card-btn, #fff);
+    color: var(--mp-card-btn-text, #1a1a1a);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease;
+    z-index: 2;
+  }
+
+  .mp-card__add:hover {
+    transform: scale(1.12);
+  }
+
+  .mp-card__info {
+    padding: 14px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mp-card__title {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  .mp-card__desc {
+    margin: 0;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.4;
+  }
+
+  .mp-card__price {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #fff;
+    margin-top: 4px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .mp-card__info {
+      padding: 10px 10px 12px;
+    }
+
+    .mp-card__title {
+      font-size: 0.8125rem;
+    }
+
+    .mp-card__desc {
+      font-size: 0.6875rem;
+    }
+
+    .mp-card__price {
+      font-size: 0.875rem;
+    }
+
+    .mp-card__add {
+      width: 32px;
+      height: 32px;
+      top: 8px;
+      right: 8px;
+    }
+  }
+
+  /* ─── Kitchen closed ─── */
+  .mp-closed__card {
+    text-align: center;
+    padding: 60px 24px;
+  }
+
+  .mp-closed__logo {
+    width: 80px;
+    height: auto;
+    margin-bottom: 24px;
+    opacity: 0.5;
+  }
+
+  .mp-closed__heading {
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1a1a1a;
+  }
+
+  .mp-closed__text {
+    margin: 0;
+    font-size: 1rem;
+    color: #666;
+  }
+
+  /* ─── Upsell modal ─── */
+  .mp-upsell-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99992;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .mp-upsell-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mp-upsell {
+    position: fixed;
+    z-index: 99993;
+    background: #fff;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .mp-upsell.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Desktop: centered modal */
+  @media screen and (min-width: 750px) {
+    .mp-upsell {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -48%);
+      width: 480px;
+      max-width: 92vw;
+      max-height: 80vh;
+      border-radius: 24px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    }
+
+    .mp-upsell.is-open {
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  /* Mobile: bottom sheet */
+  @media screen and (max-width: 749px) {
+    .mp-upsell {
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 85vh;
+      border-radius: 24px 24px 0 0;
+      transform: translateY(100%);
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.1);
+    }
+
+    .mp-upsell.is-open {
+      transform: translateY(0);
+    }
+  }
+
+  .mp-upsell__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    color: #333;
+    display: flex;
+    z-index: 2;
+  }
+
+  .mp-upsell__slider {
+    display: flex;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 200%;
+  }
+
+  .mp-upsell__slider[data-page="2"] {
+    transform: translateX(-50%);
+  }
+
+  .mp-upsell__page {
+    width: 50%;
+    flex-shrink: 0;
+    padding: 28px 24px 20px;
+    overflow-y: auto;
+    max-height: 75vh;
+  }
+
+  .mp-upsell__title {
+    margin: 0 0 20px;
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: #1a1a1a;
+  }
+
+  .mp-upsell__list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .mp-upsell__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    gap: 12px;
+  }
+
+  .mp-upsell__item:hover {
+    border-color: #ccc;
+  }
+
+  .mp-upsell__item:has(.mp-upsell__check:checked) {
+    border-color: #024b40;
+    background: rgba(2, 75, 64, 0.04);
+  }
+
+  .mp-upsell__item-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mp-upsell__item-img {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .mp-upsell__item-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mp-upsell__item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .mp-upsell__item-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mp-upsell__item-price {
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .mp-upsell__check {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .mp-upsell__toggle {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 2px solid #ccc;
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+
+  .mp-upsell__check:checked + .mp-upsell__toggle {
+    background: #024b40;
+    border-color: #024b40;
+  }
+
+  .mp-upsell__check:checked + .mp-upsell__toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 6px;
+    width: 5px;
+    height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .mp-upsell__actions {
+    display: flex;
+    gap: 12px;
+    padding-top: 4px;
+  }
+
+  .mp-upsell__skip {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: #fff;
+    color: #666;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    font-family: inherit;
+  }
+
+  .mp-upsell__skip:hover { background: #f5f5f5; }
+
+  .mp-upsell__next {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: #024b40;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    font-family: inherit;
+  }
+
+  .mp-upsell__next:hover { opacity: 0.9; }
+
+  .mp-upsell__dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 0 16px;
+  }
+
+  .mp-upsell__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ddd;
+    transition: background 0.3s ease;
+  }
+
+  .mp-upsell__dot.is-active {
+    background: #024b40;
+  }
+
+  .mp-upsell__empty {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+  }
+
+  /* ─── Cart item (shared layout for drawer/sheet) ─── */
+  .mp-cart-item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .mp-cart-item__img {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .mp-cart-item__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mp-cart-item__name {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mp-cart-item__price {
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .mp-cart-item__qty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .mp-cart-item__qty-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: #333;
+    font-weight: 600;
+    transition: background 0.15s ease;
+    font-family: inherit;
+  }
+
+  .mp-cart-item__qty-btn:hover { background: #f5f5f5; }
+
+  .mp-cart-item__qty-num {
+    font-size: 0.875rem;
+    font-weight: 700;
+    min-width: 16px;
+    text-align: center;
+  }
+
+{% endstylesheet %}
+
+{%- comment -%} ═══════════════════════════════════
+  JAVASCRIPT
+═══════════════════════════════════ {%- endcomment -%}
+<script>
+(function () {
+  'use strict';
+
+  /* ─────────── Utility ─────────── */
+  function getEETTime() {
+    var now = new Date();
+    var eet = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Sofia',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false
+    }).format(now);
+    var parts = eet.split(':');
+    return parseFloat(parts[0]) + parseFloat(parts[1]) / 60;
+  }
+
+  function formatMoney(cents) {
+    return (cents / 100).toFixed(2).replace('.', ',') + ' лв.';
+  }
+
+  function $(sel, ctx) { return (ctx || document).querySelector(sel); }
+  function $$(sel, ctx) { return Array.from((ctx || document).querySelectorAll(sel)); }
+
+  /* ─────────── State ─────────── */
+  var state = {
+    activeCollection: null,
+    cart: null,
+    pendingVariant: null,
+    upsellOpen: false
+  };
+
+  /* ─────────── DOM refs ─────────── */
+  var loader = $('#mp-loader');
+  var nav = $('#mp-nav');
+  var badges = $$('.mp-badge');
+  var collections = $$('.mp-collection');
+  var closedMsg = $('#mp-closed');
+
+  // Desktop cart
+  var cartBtnDesktop = $('#mp-cart-btn-desktop');
+  var drawerOverlay = $('#mp-drawer-overlay');
+  var drawer = $('#mp-drawer-desktop');
+  var drawerClose = $('#mp-drawer-close');
+  var drawerBody = $('#mp-drawer-body');
+  var drawerItems = $('#mp-drawer-items');
+  var drawerEmpty = $('#mp-drawer-empty');
+  var drawerSubtotal = $('#mp-drawer-subtotal');
+  var drawerCount = $('#mp-drawer-count');
+  var cartCountDesktop = $('#mp-cart-count-desktop');
+
+  // Mobile cart
+  var mobBadge = $('#mp-mob-badge');
+  var sheetOverlay = $('#mp-sheet-overlay');
+  var sheet = $('#mp-sheet');
+  var sheetClose = $('#mp-sheet-close');
+  var sheetItems = $('#mp-sheet-items');
+  var sheetEmpty = $('#mp-sheet-empty');
+  var sheetSubtotal = $('#mp-sheet-subtotal');
+  var sheetCount = $('#mp-sheet-count');
+  var cartCountMobile = $('#mp-cart-count-mobile');
+
+  // Upsell
+  var upsellOverlay = $('#mp-upsell-overlay');
+  var upsell = $('#mp-upsell');
+  var upsellClose = $('#mp-upsell-close');
+  var upsellSlider = $('#mp-upsell-slider');
+  var upsellDots = $$('.mp-upsell__dot');
+
+  /* ─────────── Time-based logic ─────────── */
+  function initTimeLogic() {
+    var t = getEETTime();
+    var isDay = t >= 9.75 && t < 17.25;    // 9:45 - 17:15
+    var isNight = t >= 16.75 && t < 22.25;  // 16:45 - 22:15
+    var isClosed = !isDay && !isNight;
+
+    // Show/hide time-based badges
+    badges.forEach(function (b) {
+      if (b.dataset.collection === 'day') {
+        b.classList.toggle('is-hidden', !isDay);
+      }
+      if (b.dataset.collection === 'night') {
+        b.classList.toggle('is-hidden', !isNight);
+      }
+    });
+
+    // Show kitchen closed if no food menu is available
+    if (isClosed) {
+      closedMsg.style.display = '';
+      // Find next opening time
+      var nextTime = t >= 22.25 ? '10:00' : '10:00';
+      var el = $('#mp-closed-time');
+      if (el) el.textContent = nextTime;
+    }
+
+    // Auto-select the time-appropriate category
+    if (isDay) {
+      selectCollection('day');
+    } else if (isNight) {
+      selectCollection('night');
+    } else {
+      // During closed hours, show Fit or Drinks by default
+      var firstAvail = badges.find(function (b) {
+        return !b.classList.contains('is-hidden') && !b.classList.contains('mp-badge--time');
+      });
+      if (firstAvail) {
+        selectCollection(firstAvail.dataset.collection);
+      }
+    }
+  }
+
+  /* ─────────── Collection switching ─────────── */
+  function selectCollection(key) {
+    state.activeCollection = key;
+
+    // Update badges
+    badges.forEach(function (b) {
+      b.classList.toggle('is-active', b.dataset.collection === key);
+    });
+
+    // Show/hide collections
+    collections.forEach(function (c) {
+      c.style.display = c.dataset.collection === key ? '' : 'none';
+    });
+  }
+
+  // Badge clicks
+  badges.forEach(function (b) {
+    b.addEventListener('click', function () {
+      selectCollection(b.dataset.collection);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  /* ─────────── Cart AJAX ─────────── */
+  function fetchCart() {
+    return fetch('/cart.js')
+      .then(function (r) { return r.json(); })
+      .then(function (cart) {
+        state.cart = cart;
+        renderCart(cart);
+        return cart;
+      });
+  }
+
+  function addToCart(items) {
+    return fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: items })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function () { return fetchCart(); });
+  }
+
+  function changeQuantity(key, qty) {
+    return fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: key, quantity: qty })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function () { return fetchCart(); });
+  }
+
+  /* ─────────── Render cart ─────────── */
+  function renderCart(cart) {
+    var count = cart.item_count;
+    var total = formatMoney(cart.total_price);
+
+    // Update all counts
+    if (cartCountDesktop) {
+      cartCountDesktop.textContent = count;
+      cartCountDesktop.dataset.count = count;
+    }
+    if (cartCountMobile) {
+      cartCountMobile.textContent = count;
+      cartCountMobile.dataset.count = count;
+    }
+    if (drawerCount) drawerCount.textContent = '(' + count + ')';
+    if (sheetCount) sheetCount.textContent = '(' + count + ')';
+    if (drawerSubtotal) drawerSubtotal.textContent = total;
+    if (sheetSubtotal) sheetSubtotal.textContent = total;
+
+    // Build item HTML
+    var html = '';
+    cart.items.forEach(function (item) {
+      html += '<div class="mp-cart-item" data-key="' + item.key + '">' +
+        '<img class="mp-cart-item__img" src="' + (item.image ? item.image.replace(/(\.[^.]+)$/, '_100x100$1') : '') + '" alt="' + item.title + '" width="52" height="52">' +
+        '<div class="mp-cart-item__info">' +
+          '<p class="mp-cart-item__name">' + item.product_title + '</p>' +
+          '<span class="mp-cart-item__price">' + formatMoney(item.final_line_price) + '</span>' +
+        '</div>' +
+        '<div class="mp-cart-item__qty">' +
+          '<button type="button" class="mp-cart-item__qty-btn" data-action="minus" data-key="' + item.key + '">−</button>' +
+          '<span class="mp-cart-item__qty-num">' + item.quantity + '</span>' +
+          '<button type="button" class="mp-cart-item__qty-btn" data-action="plus" data-key="' + item.key + '">+</button>' +
+        '</div>' +
+      '</div>';
+    });
+
+    // Desktop drawer
+    if (drawerItems) drawerItems.innerHTML = html;
+    if (drawerEmpty) drawerEmpty.style.display = count === 0 ? '' : 'none';
+
+    // Mobile sheet
+    if (sheetItems) sheetItems.innerHTML = html;
+    if (sheetEmpty) sheetEmpty.style.display = count === 0 ? '' : 'none';
+
+    // Wire quantity buttons
+    $$('.mp-cart-item__qty-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.dataset.key;
+        var numEl = btn.parentElement.querySelector('.mp-cart-item__qty-num');
+        var currentQty = parseInt(numEl.textContent, 10);
+        var newQty = btn.dataset.action === 'plus' ? currentQty + 1 : currentQty - 1;
+        changeQuantity(key, Math.max(0, newQty));
+      });
+    });
+  }
+
+  function bounceCartBadge() {
+    if (cartCountDesktop) {
+      cartCountDesktop.classList.add('is-bouncing');
+      setTimeout(function () { cartCountDesktop.classList.remove('is-bouncing'); }, 400);
+    }
+    if (mobBadge) {
+      mobBadge.classList.add('is-bouncing');
+      setTimeout(function () { mobBadge.classList.remove('is-bouncing'); }, 400);
+    }
+  }
+
+  /* ─────────── Desktop drawer ─────────── */
+  function openDrawer() {
+    if (drawer) drawer.classList.add('is-open');
+    if (drawerOverlay) drawerOverlay.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    if (drawer) drawer.classList.remove('is-open');
+    if (drawerOverlay) drawerOverlay.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+
+  if (cartBtnDesktop) cartBtnDesktop.addEventListener('click', openDrawer);
+  if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+  if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+
+  /* ─────────── Mobile sheet ─────────── */
+  function openSheet() {
+    if (sheet) sheet.classList.add('is-open');
+    if (sheetOverlay) sheetOverlay.classList.add('is-open');
+    if (mobBadge) mobBadge.style.display = 'none';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSheet() {
+    if (sheet) sheet.classList.remove('is-open');
+    if (sheetOverlay) sheetOverlay.classList.remove('is-open');
+    if (mobBadge) mobBadge.style.display = '';
+    document.body.style.overflow = '';
+  }
+
+  if (mobBadge) mobBadge.addEventListener('click', openSheet);
+  if (sheetClose) sheetClose.addEventListener('click', closeSheet);
+  if (sheetOverlay) sheetOverlay.addEventListener('click', closeSheet);
+
+  /* ─────────── Upsell modal ─────────── */
+  function openUpsell(variantId) {
+    state.pendingVariant = variantId;
+    state.upsellOpen = true;
+
+    // Reset selections & slider
+    $$('.mp-upsell__check').forEach(function (c) { c.checked = false; });
+    if (upsellSlider) upsellSlider.removeAttribute('data-page');
+    upsellDots.forEach(function (d, i) { d.classList.toggle('is-active', i === 0); });
+
+    if (upsell) upsell.classList.add('is-open');
+    if (upsellOverlay) upsellOverlay.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeUpsell() {
+    state.upsellOpen = false;
+    state.pendingVariant = null;
+    if (upsell) upsell.classList.remove('is-open');
+    if (upsellOverlay) upsellOverlay.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+
+  function goToUpsellPage(page) {
+    if (upsellSlider) upsellSlider.setAttribute('data-page', page);
+    upsellDots.forEach(function (d) {
+      d.classList.toggle('is-active', d.dataset.dot === String(page));
+    });
+  }
+
+  function collectUpsellItems() {
+    var items = [];
+    // Main product
+    if (state.pendingVariant) {
+      items.push({ id: parseInt(state.pendingVariant, 10), quantity: 1 });
+    }
+    // Checked upsells + downsells
+    $$('.mp-upsell__check:checked').forEach(function (c) {
+      items.push({ id: parseInt(c.value, 10), quantity: 1 });
+    });
+    return items;
+  }
+
+  if (upsellClose) upsellClose.addEventListener('click', closeUpsell);
+  if (upsellOverlay) upsellOverlay.addEventListener('click', closeUpsell);
+
+  // Upsell action buttons
+  $$('.mp-upsell__next, .mp-upsell__skip').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var action = btn.dataset.action;
+      if (action === 'next') {
+        goToUpsellPage(2);
+      } else if (action === 'skip') {
+        var page = btn.closest('.mp-upsell__page');
+        if (page && page.dataset.page === '1') {
+          goToUpsellPage(2);
+        } else {
+          // Skip from page 2 = add only main item
+          var items = [{ id: parseInt(state.pendingVariant, 10), quantity: 1 }];
+          addToCart(items).then(function () {
+            closeUpsell();
+            bounceCartBadge();
+          });
+        }
+      } else if (action === 'add') {
+        var items = collectUpsellItems();
+        if (items.length > 0) {
+          addToCart(items).then(function () {
+            closeUpsell();
+            bounceCartBadge();
+          });
+        }
+      }
+    });
+  });
+
+  /* ─────────── Product card "+" click ─────────── */
+  document.addEventListener('click', function (e) {
+    var addBtn = e.target.closest('.mp-card__add');
+    if (!addBtn) return;
+
+    var variantId = addBtn.dataset.variantId;
+    if (!variantId) return;
+
+    // Check if upsell/downsell collections exist
+    var hasUpsells = $('#mp-upsell-list-1 .mp-upsell__item');
+    var hasDownsells = $('#mp-upsell-list-2 .mp-upsell__item');
+
+    if (hasUpsells || hasDownsells) {
+      openUpsell(variantId);
+    } else {
+      // No upsell collections — add directly
+      addToCart([{ id: parseInt(variantId, 10), quantity: 1 }]).then(bounceCartBadge);
+    }
+  });
+
+  /* ─────────── Init ─────────── */
+  function init() {
+    fetchCart();
+    initTimeLogic();
+
+    // Dismiss loader
+    setTimeout(function () {
+      if (loader) loader.classList.add('is-hidden');
+      setTimeout(function () { if (loader) loader.style.display = 'none'; }, 500);
+    }, 600);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Menu page",
+  "tag": "section",
+  "class": "menu-page-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "color",
+      "id": "nav_bg",
+      "label": "Nav background",
+      "default": "#024b40"
+    },
+    {
+      "type": "color",
+      "id": "nav_text_color",
+      "label": "Nav text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "cart_icon_bg",
+      "label": "Cart button background",
+      "default": "#024b40"
+    },
+    {
+      "type": "color",
+      "id": "cart_icon_color",
+      "label": "Cart button icon color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Category badges"
+    },
+    {
+      "type": "color",
+      "id": "badge_color_day",
+      "label": "Day menu badge",
+      "default": "#2d5e45"
+    },
+    {
+      "type": "color",
+      "id": "badge_color_night",
+      "label": "Night menu badge",
+      "default": "#2d5e45"
+    },
+    {
+      "type": "color",
+      "id": "badge_color_fit",
+      "label": "Fit menu badge",
+      "default": "#2d5e45"
+    },
+    {
+      "type": "color",
+      "id": "badge_color_drinks",
+      "label": "Drinks badge",
+      "default": "#2d5e45"
+    },
+    {
+      "type": "color",
+      "id": "badge_color_addons",
+      "label": "Add-ons badge",
+      "default": "#2d5e45"
+    },
+    {
+      "type": "color",
+      "id": "badge_active_color",
+      "label": "Active badge highlight",
+      "default": "#ffffff"
+    },
+    {
+      "type": "image_picker",
+      "id": "fit_menu_icon",
+      "label": "Fit menu icon",
+      "info": "Small icon/logo shown on the Fit menu badge"
+    },
+    {
+      "type": "header",
+      "content": "Collections"
+    },
+    {
+      "type": "collection",
+      "id": "collection_day",
+      "label": "Day menu collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection_night",
+      "label": "Night menu collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection_fit",
+      "label": "Fit menu collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection_drinks",
+      "label": "Drinks collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection_addons",
+      "label": "Add-ons collection"
+    },
+    {
+      "type": "header",
+      "content": "Product cards"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card background",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card corner radius",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "card_button_color",
+      "label": "Plus button background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_button_text_color",
+      "label": "Plus button icon color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "card_columns_desktop",
+      "label": "Columns (desktop)",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Card gap",
+      "min": 8,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Upsell & Downsell"
+    },
+    {
+      "type": "collection",
+      "id": "upsell_collection",
+      "label": "Upsell collection (page 1)"
+    },
+    {
+      "type": "collection",
+      "id": "downsell_collection",
+      "label": "Downsell collection (page 2)"
+    },
+    {
+      "type": "text",
+      "id": "upsell_title",
+      "label": "Upsell title",
+      "default": "Добави към поръчката"
+    },
+    {
+      "type": "text",
+      "id": "downsell_title",
+      "label": "Downsell title",
+      "default": "Препоръчваме също"
+    },
+    {
+      "type": "header",
+      "content": "Cart"
+    },
+    {
+      "type": "color",
+      "id": "cart_badge_bg",
+      "label": "Mobile cart badge color",
+      "default": "#024b40"
+    },
+    {
+      "type": "text",
+      "id": "cart_cta_text",
+      "label": "Checkout button text",
+      "default": "Завърши поръчката"
+    },
+    {
+      "type": "color",
+      "id": "cart_cta_color",
+      "label": "Checkout button color",
+      "default": "#024b40"
+    },
+    {
+      "type": "header",
+      "content": "Loading"
+    },
+    {
+      "type": "image_picker",
+      "id": "loading_logo",
+      "label": "Loading logo",
+      "info": "Pulsing logo shown during loading. Falls back to theme logo."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color",
+      "id": "page_bg",
+      "label": "Page background",
+      "default": "#f5f3ef"
+    },
+    {
+      "type": "range",
+      "id": "section_margin",
+      "label": "Side margin",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    }
+  ],
+  "presets": [
+    {
+      "name": "Menu page",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

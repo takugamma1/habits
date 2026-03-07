@@ -1,0 +1,101 @@
+{%- doc -%}
+  Two-page upsell/downsell modal. Page 1 = upsells, Page 2 = downsells.
+  Products rendered server-side, JS handles selection + batch add-to-cart.
+  @param {object} upsell_collection - Shopify collection for page 1
+  @param {object} downsell_collection - Shopify collection for page 2
+  @param {string} upsell_title - Heading for page 1
+  @param {string} downsell_title - Heading for page 2
+{%- enddoc -%}
+
+<div class="mp-upsell-overlay" id="mp-upsell-overlay"></div>
+<div class="mp-upsell" id="mp-upsell" aria-hidden="true" role="dialog" aria-label="Add extras">
+  {%- comment -%} Close button {%- endcomment -%}
+  <button type="button" class="mp-upsell__close" id="mp-upsell-close" aria-label="Close">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+
+  {%- comment -%} Sliding pages container {%- endcomment -%}
+  <div class="mp-upsell__slider" id="mp-upsell-slider">
+    {%- comment -%} Page 1: Upsells {%- endcomment -%}
+    <div class="mp-upsell__page" data-page="1">
+      <h3 class="mp-upsell__title">{{ upsell_title | default: 'Добави към поръчката' }}</h3>
+      <div class="mp-upsell__list" id="mp-upsell-list-1">
+        {% if upsell_collection and upsell_collection.products.size > 0 %}
+          {% for product in upsell_collection.products %}
+            {%- assign variant = product.selected_or_first_available_variant | default: product.first_available_variant -%}
+            <label class="mp-upsell__item" data-variant-id="{{ variant.id }}">
+              <div class="mp-upsell__item-info">
+                {% if product.featured_image %}
+                  <div class="mp-upsell__item-img">
+                    {{ product.featured_image | image_url: width: 120 | image_tag: loading: 'lazy', class: 'mp-upsell__item-thumb' }}
+                  </div>
+                {% endif %}
+                <div class="mp-upsell__item-text">
+                  <span class="mp-upsell__item-name">{{ product.title }}</span>
+                  <span class="mp-upsell__item-price">{{ variant.price | money }}</span>
+                </div>
+              </div>
+              <input
+                type="checkbox"
+                class="mp-upsell__check"
+                name="upsell[]"
+                value="{{ variant.id }}"
+              >
+              <span class="mp-upsell__toggle"></span>
+            </label>
+          {% endfor %}
+        {% else %}
+          <p class="mp-upsell__empty">No extras available</p>
+        {% endif %}
+      </div>
+      <div class="mp-upsell__actions">
+        <button type="button" class="mp-upsell__skip" data-action="skip">Пропусни</button>
+        <button type="button" class="mp-upsell__next" data-action="next">Продължи</button>
+      </div>
+    </div>
+
+    {%- comment -%} Page 2: Downsells {%- endcomment -%}
+    <div class="mp-upsell__page" data-page="2">
+      <h3 class="mp-upsell__title">{{ downsell_title | default: 'Препоръчваме също' }}</h3>
+      <div class="mp-upsell__list" id="mp-upsell-list-2">
+        {% if downsell_collection and downsell_collection.products.size > 0 %}
+          {% for product in downsell_collection.products %}
+            {%- assign variant = product.selected_or_first_available_variant | default: product.first_available_variant -%}
+            <label class="mp-upsell__item" data-variant-id="{{ variant.id }}">
+              <div class="mp-upsell__item-info">
+                {% if product.featured_image %}
+                  <div class="mp-upsell__item-img">
+                    {{ product.featured_image | image_url: width: 120 | image_tag: loading: 'lazy', class: 'mp-upsell__item-thumb' }}
+                  </div>
+                {% endif %}
+                <div class="mp-upsell__item-text">
+                  <span class="mp-upsell__item-name">{{ product.title }}</span>
+                  <span class="mp-upsell__item-price">{{ variant.price | money }}</span>
+                </div>
+              </div>
+              <input
+                type="checkbox"
+                class="mp-upsell__check"
+                name="downsell[]"
+                value="{{ variant.id }}"
+              >
+              <span class="mp-upsell__toggle"></span>
+            </label>
+          {% endfor %}
+        {% else %}
+          <p class="mp-upsell__empty">No extras available</p>
+        {% endif %}
+      </div>
+      <div class="mp-upsell__actions">
+        <button type="button" class="mp-upsell__skip" data-action="skip">Пропусни</button>
+        <button type="button" class="mp-upsell__next mp-upsell__next--add" data-action="add">Добави в кошницата</button>
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} Page indicators {%- endcomment -%}
+  <div class="mp-upsell__dots">
+    <span class="mp-upsell__dot is-active" data-dot="1"></span>
+    <span class="mp-upsell__dot" data-dot="2"></span>
+  </div>
+</div>

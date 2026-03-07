@@ -1,0 +1,103 @@
+{%- doc -%}
+  Menu page cart drawer: mobile bottom sheet + desktop side drawer.
+  @param {string} cart_badge_bg - Badge/drawer accent color
+  @param {string} cart_cta_text - CTA button text
+  @param {string} cart_cta_color - CTA button background color
+{%- enddoc -%}
+
+{%- comment -%} ═══ Desktop cart button (next to nav) ═══ {%- endcomment -%}
+<button
+  type="button"
+  class="mp-cart-btn"
+  id="mp-cart-btn-desktop"
+  aria-label="Cart"
+  style="--mp-cart-btn-bg: {{ cart_icon_bg | default: '#024b40' }}; --mp-cart-btn-color: {{ cart_icon_color | default: '#ffffff' }};"
+>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18"/>
+    <path d="M16 10a4 4 0 01-8 0"/>
+  </svg>
+  <span class="mp-cart-btn__count" id="mp-cart-count-desktop" data-count="0">0</span>
+</button>
+
+{%- comment -%} ═══ Desktop side drawer ═══ {%- endcomment -%}
+<div class="mp-drawer-overlay" id="mp-drawer-overlay"></div>
+<div class="mp-drawer" id="mp-drawer-desktop" aria-hidden="true">
+  <div class="mp-drawer__header">
+    <h3 class="mp-drawer__title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18"/>
+        <path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+      Кошница
+      <span class="mp-drawer__count" id="mp-drawer-count">(0)</span>
+    </h3>
+    <button type="button" class="mp-drawer__close" id="mp-drawer-close" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="mp-drawer__body" id="mp-drawer-body">
+    <div class="mp-drawer__empty" id="mp-drawer-empty">
+      <p>Кошницата е празна</p>
+    </div>
+    <div class="mp-drawer__items" id="mp-drawer-items"></div>
+  </div>
+  <div class="mp-drawer__footer" id="mp-drawer-footer">
+    <div class="mp-drawer__subtotal">
+      <span>Общо</span>
+      <span id="mp-drawer-subtotal">0,00 лв.</span>
+    </div>
+    <a
+      href="/checkout"
+      class="mp-drawer__cta"
+      id="mp-drawer-cta"
+      style="--mp-cta-bg: {{ cart_cta_color | default: '#024b40' }};"
+    >
+      {{ cart_cta_text | default: 'Завърши поръчката' }}
+    </a>
+  </div>
+</div>
+
+{%- comment -%} ═══ Mobile bottom badge + sheet ═══ {%- endcomment -%}
+<div class="mp-mob-badge" id="mp-mob-badge" style="--mp-badge-bg: {{ cart_badge_bg | default: '#024b40' }};">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18"/>
+    <path d="M16 10a4 4 0 01-8 0"/>
+  </svg>
+  <span class="mp-mob-badge__count" id="mp-cart-count-mobile" data-count="0">0</span>
+  <svg class="mp-mob-badge__arrow" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M3 7l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</div>
+
+{%- comment -%} Mobile bottom sheet {%- endcomment -%}
+<div class="mp-sheet-overlay" id="mp-sheet-overlay"></div>
+<div class="mp-sheet" id="mp-sheet" aria-hidden="true">
+  <div class="mp-sheet__handle">
+    <span class="mp-sheet__handle-bar"></span>
+  </div>
+  <div class="mp-sheet__header">
+    <h3 class="mp-sheet__title">Кошница <span id="mp-sheet-count">(0)</span></h3>
+    <button type="button" class="mp-sheet__close" id="mp-sheet-close" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="mp-sheet__body" id="mp-sheet-body">
+    <div class="mp-sheet__empty" id="mp-sheet-empty">
+      <p>Кошницата е празна</p>
+    </div>
+    <div class="mp-sheet__items" id="mp-sheet-items"></div>
+  </div>
+  <div class="mp-sheet__footer" id="mp-sheet-footer">
+    <div class="mp-sheet__subtotal">
+      <span>Общо</span>
+      <span id="mp-sheet-subtotal">0,00 лв.</span>
+    </div>
+    <a
+      href="/checkout"
+      class="mp-sheet__cta"
+      id="mp-sheet-cta"
+      style="--mp-cta-bg: {{ cart_cta_color | default: '#024b40' }};"
+    >
+      {{ cart_cta_text | default: 'Завърши поръчката' }}
+    </a>
+  </div>
+</div>
