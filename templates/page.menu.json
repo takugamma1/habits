@@ -27,7 +27,7 @@
         "collection_night": "дневно-меню",
         "collection_fit": "",
         "collection_drinks": "",
-        "collection_addons": "",
+        "collection_addons": "дневно-меню",
         "card_bg": "#1a1a1a",
         "card_radius": 16,
         "card_button_color": "#ffffff",
