@@ -1,9 +1,53 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
       "type": "menu-page",
-      "settings": {}
+      "settings": {
+        "nav_bg": "#024b40",
+        "nav_text_color": "#ffffff",
+        "cart_icon_bg": "#024b40",
+        "cart_icon_color": "#ffffff",
+        "badge_color_day": "#2d5e45",
+        "badge_color_night": "#2d5e45",
+        "badge_color_fit": "#2d5e45",
+        "badge_color_drinks": "#2d5e45",
+        "badge_color_addons": "#2d5e45",
+        "badge_active_color": "#ffffff",
+        "fit_menu_icon": "shopify://shop_images/Untitled_design_-_2026-03-07T004214.784.png",
+        "collection_day": "",
+        "collection_night": "дневно-меню",
+        "collection_fit": "",
+        "collection_drinks": "",
+        "collection_addons": "",
+        "card_bg": "#1a1a1a",
+        "card_radius": 16,
+        "card_button_color": "#ffffff",
+        "card_button_text_color": "#1a1a1a",
+        "card_columns_desktop": 4,
+        "card_gap": 16,
+        "upsell_collection": "",
+        "downsell_collection": "",
+        "upsell_title": "Добави към поръчката",
+        "downsell_title": "Препоръчваме също",
+        "cart_badge_bg": "#024b40",
+        "cart_cta_text": "Завърши поръчката",
+        "cart_cta_color": "#024b40",
+        "page_bg": "#f5f3ef",
+        "section_margin": 12,
+        "border_radius": 24
+      }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }
