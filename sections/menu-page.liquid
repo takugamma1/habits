@@ -1693,39 +1693,6 @@
     fetchCart();
     initTimeLogic();
 
-    // #region agent log
-    (function(){
-      var dEl = document.querySelector('#mp-drawer-desktop');
-      var dOvEl = document.querySelector('#mp-drawer-overlay');
-      var cs = dEl ? window.getComputedStyle(dEl) : null;
-      console.log('[DEBUG-3f73ca] DRAWER STATE:', JSON.stringify({
-        drawerExists:!!dEl, overlayExists:!!dOvEl,
-        drawerClass:dEl?dEl.className:'N/A',
-        visibility:cs?cs.visibility:'N/A',
-        position:cs?cs.position:'N/A',
-        transform:cs?cs.transform:'N/A',
-        display:cs?cs.display:'N/A',
-        offsetW:dEl?dEl.offsetWidth:0, offsetH:dEl?dEl.offsetHeight:0
-      }));
-      var headerGroup = document.querySelector('#header-group');
-      var hgCS = headerGroup ? window.getComputedStyle(headerGroup) : null;
-      console.log('[DEBUG-3f73ca] HEADER GROUP:', JSON.stringify({
-        exists:!!headerGroup, display:hgCS?hgCS.display:'N/A'
-      }));
-      var allDrawers = document.querySelectorAll('[class*="drawer"]');
-      var info = [];
-      allDrawers.forEach(function(el){info.push({tag:el.tagName,id:el.id,cls:el.className.substring(0,80),vis:window.getComputedStyle(el).visibility,disp:window.getComputedStyle(el).display});});
-      console.log('[DEBUG-3f73ca] ALL DRAWER ELS:', JSON.stringify(info));
-      var inlineStyles = document.querySelectorAll('style');
-      var found = [];
-      inlineStyles.forEach(function(s){if((s.textContent||'').indexOf('mp-drawer')!==-1) found.push(s.textContent.substring(0,200));});
-      console.log('[DEBUG-3f73ca] INLINE STYLES WITH mp-drawer:', JSON.stringify({total:inlineStyles.length,matches:found}));
-      var menuSection = document.querySelector('.menu-page-section');
-      var bodyHas;try{bodyHas=document.body.matches(':has(.menu-page-section)');}catch(e){bodyHas='err:'+e.message;}
-      console.log('[DEBUG-3f73ca] SECTION:', JSON.stringify({menuSectionExists:!!menuSection,tag:menuSection?menuSection.tagName:'N/A',bodyHas:bodyHas}));
-    })();
-    // #endregion
-
     // Dismiss loader
     setTimeout(function () {
       if (loader) loader.classList.add('is-hidden');
