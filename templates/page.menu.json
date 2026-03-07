@@ -28,7 +28,7 @@
         "collection_fit": "",
         "collection_drinks": "",
         "collection_addons": "дневно-меню",
-        "card_bg": "#1a1a1a",
+        "card_bg": "#024b40",
         "card_radius": 16,
         "card_button_color": "#ffffff",
         "card_button_text_color": "#1a1a1a",
@@ -41,6 +41,7 @@
         "cart_badge_bg": "#024b40",
         "cart_cta_text": "Завърши поръчката",
         "cart_cta_color": "#024b40",
+        "loading_logo": "shopify://shop_images/Group_10.png",
         "page_bg": "#f5f3ef",
         "section_margin": 12,
         "border_radius": 24
