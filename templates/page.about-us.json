@@ -113,6 +113,27 @@
         "padding-block-end": 40
       }
     },
+    "image_banner_kBNNA6": {
+      "type": "image-banner",
+      "name": "Image banner",
+      "settings": {
+        "arch_color": "#4a8f6d",
+        "logo_size": 60,
+        "title": "Your heading",
+        "text": "<p>HABITS се намира в централната част на Варна, където създаваме уникална атмосфера за всички, които се отдадат на нашата гостоприемна обстановка. Бара е обзаведен в модерен и индустриален стил, комбиниращ дървени, метални и бетонови елементи, съчетани със зеленина, която ти позволява да се откъснеш от градската среда.</p>",
+        "button_label": "Shop now",
+        "button_link": "",
+        "button_style": "button-primary",
+        "button_open_new_tab": false,
+        "heading_alignment": "right",
+        "text_alignment": "right",
+        "button_alignment": "flex-end",
+        "color_scheme": "scheme-1",
+        "section_spacing": 20,
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    },
     "section_q6L68z": {
       "type": "section",
       "blocks": {
@@ -186,6 +207,7 @@
         "text_myDMcF",
         "text_dDVXmk"
       ],
+      "disabled": true,
       "name": "t:names.rich_text_section",
       "settings": {
         "content_direction": "column",
@@ -384,6 +406,7 @@
   "order": [
     "main",
     "hero_zH7mGB",
+    "image_banner_kBNNA6",
     "section_q6L68z",
     "hero_KYGiBm",
     "featured_card_37aRig",
