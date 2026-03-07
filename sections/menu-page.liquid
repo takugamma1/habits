@@ -25,18 +25,19 @@
 </div>
 
 {%- comment -%} ═══════════════════════════════════
-  FLOATING CATEGORY NAV
+  FLOATING CATEGORY NAV (bubble)
 ═══════════════════════════════════ {%- endcomment -%}
-<nav
-  class="mp-nav"
-  id="mp-nav"
+<div
+  class="mp-nav-wrap"
+  id="mp-nav-wrap"
   style="
     --mp-nav-bg: {{ section.settings.nav_bg | default: '#024b40' }};
     --mp-nav-text: {{ section.settings.nav_text_color | default: '#ffffff' }};
     --mp-badge-active: {{ section.settings.badge_active_color | default: '#ffffff' }};
+    --mp-fit-icon-size: {{ section.settings.fit_menu_icon_size | default: 24 }}px;
   "
 >
-  <div class="mp-nav__inner">
+  <nav class="mp-nav" id="mp-nav">
     {%- comment -%} Logo → home {%- endcomment -%}
     <a href="/" class="mp-nav__logo" aria-label="{{ shop.name }}">
       {%- if settings.logo -%}
@@ -46,7 +47,7 @@
       {%- endif -%}
     </a>
 
-    {%- comment -%} Category badges (scrollable on mobile) {%- endcomment -%}
+    {%- comment -%} Category badges {%- endcomment -%}
     <div class="mp-nav__badges" id="mp-nav-badges">
       {% if col_day %}
         <button
@@ -71,14 +72,15 @@
       {% if col_fit %}
         <button
           type="button"
-          class="mp-badge"
+          class="mp-badge mp-badge--fit"
           data-collection="fit"
           style="--mp-badge-bg: {{ section.settings.badge_color_fit | default: '#2d5e45' }};"
         >
           {% if section.settings.fit_menu_icon %}
-            {{ section.settings.fit_menu_icon | image_url: width: 40 | image_tag: class: 'mp-badge__icon' }}
+            {{ section.settings.fit_menu_icon | image_url: width: 80 | image_tag: class: 'mp-badge__icon mp-badge__icon--fit' }}
+          {% else %}
+            {{ col_fit.title | default: 'Fit menu' }}
           {% endif %}
-          {{ col_fit.title | default: 'Fit menu' }}
         </button>
       {% endif %}
       {% if col_drinks %}
@@ -102,17 +104,30 @@
         </button>
       {% endif %}
     </div>
+  </nav>
 
-    {%- comment -%} Desktop cart button {%- endcomment -%}
-    {% render 'menu-cart-drawer',
-      cart_icon_bg: section.settings.cart_icon_bg,
-      cart_icon_color: section.settings.cart_icon_color,
-      cart_badge_bg: section.settings.cart_badge_bg,
-      cart_cta_text: section.settings.cart_cta_text,
-      cart_cta_color: section.settings.cart_cta_color
-    %}
-  </div>
-</nav>
+  {%- comment -%} Desktop cart circle (sits next to bubble) {%- endcomment -%}
+  <button
+    type="button"
+    class="mp-cart-btn"
+    id="mp-cart-btn-desktop"
+    aria-label="Cart"
+    style="--mp-cart-btn-bg: {{ section.settings.cart_icon_bg | default: '#024b40' }}; --mp-cart-btn-color: {{ section.settings.cart_icon_color | default: '#ffffff' }};"
+  >
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18"/>
+      <path d="M16 10a4 4 0 01-8 0"/>
+    </svg>
+    <span class="mp-cart-btn__count" id="mp-cart-count-desktop" data-count="0">0</span>
+  </button>
+</div>
+
+{%- comment -%} Cart drawers & mobile sheet (rendered outside nav) {%- endcomment -%}
+{% render 'menu-cart-drawer',
+  cart_badge_bg: section.settings.cart_badge_bg,
+  cart_cta_text: section.settings.cart_cta_text,
+  cart_cta_color: section.settings.cart_cta_color
+%}
 
 {%- comment -%} ═══════════════════════════════════
   MAIN CONTENT AREA
@@ -288,24 +303,29 @@
     50% { transform: scale(1.1); opacity: 1; }
   }
 
-  /* ─── Floating nav ─── */
-  .mp-nav {
+  /* ─── Floating nav wrapper (positions bubble + cart circle) ─── */
+  .mp-nav-wrap {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 9999;
-    background: var(--mp-nav-bg, #024b40);
-    padding: 12px 20px;
-    transition: transform 0.3s ease;
-  }
-
-  .mp-nav__inner {
     display: flex;
     align-items: center;
-    gap: 16px;
-    max-width: 1400px;
-    margin: 0 auto;
+    gap: 10px;
+    transition: transform 0.3s ease, top 0.3s ease;
+  }
+
+  /* ─── Nav bubble (pill shape) ─── */
+  .mp-nav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--mp-nav-bg, #024b40);
+    padding: 10px 22px;
+    border-radius: 9999px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    transition: box-shadow 0.3s ease;
   }
 
   .mp-nav__logo {
@@ -315,7 +335,7 @@
   }
 
   .mp-nav__logo-img {
-    height: 36px;
+    height: 32px;
     width: auto;
     object-fit: contain;
   }
@@ -323,34 +343,29 @@
   .mp-nav__logo-text {
     color: var(--mp-nav-text);
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 0.9375rem;
     white-space: nowrap;
   }
 
   .mp-nav__badges {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex: 1;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding: 4px 0;
+    gap: 8px;
+    padding: 2px 0;
   }
-
-  .mp-nav__badges::-webkit-scrollbar { display: none; }
 
   /* ─── Category badges ─── */
   .mp-badge {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    padding: 8px 18px;
+    padding: 7px 16px;
     background: var(--mp-badge-bg, #2d5e45);
     color: var(--mp-nav-text, #fff);
     border: 2px solid transparent;
     border-radius: 9999px;
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.03em;
     white-space: nowrap;
@@ -381,22 +396,34 @@
     border-radius: 4px;
   }
 
-  /* ─── Desktop cart button ─── */
+  /* Fit badge: icon-only, controllable size */
+  .mp-badge--fit {
+    padding: 7px 14px;
+  }
+
+  .mp-badge__icon--fit {
+    width: var(--mp-fit-icon-size, 24px);
+    height: auto;
+    object-fit: contain;
+    border-radius: 0;
+  }
+
+  /* ─── Desktop cart circle button (next to bubble) ─── */
   .mp-cart-btn {
     position: relative;
     flex-shrink: 0;
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: var(--mp-cart-btn-bg, #024b40);
     color: var(--mp-cart-btn-color, #fff);
-    border: 2px solid rgba(255,255,255,0.2);
+    border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: transform 0.2s ease;
-    margin-left: auto;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
   }
 
   .mp-cart-btn:hover { transform: scale(1.06); }
@@ -547,14 +574,50 @@
 
   .mp-drawer__cta:hover { opacity: 0.9; }
 
+  /* ─── Mobile overrides ─── */
+  @media screen and (max-width: 749px) {
+    .mp-nav-wrap {
+      top: 12px;
+      max-width: calc(100% - 24px);
+    }
+
+    .mp-nav {
+      gap: 8px;
+      padding: 8px 14px;
+    }
+
+    .mp-nav__logo-img {
+      height: 26px;
+    }
+
+    .mp-nav__badges {
+      gap: 5px;
+    }
+
+    .mp-badge {
+      padding: 5px 10px;
+      font-size: 0.625rem;
+      letter-spacing: 0.02em;
+    }
+
+    .mp-badge--fit {
+      padding: 5px 8px;
+    }
+
+    .mp-badge__icon--fit {
+      width: calc(var(--mp-fit-icon-size, 24px) * 0.75);
+    }
+
+    .mp-cart-btn#mp-cart-btn-desktop { display: none; }
+    .mp-drawer-overlay, .mp-drawer { display: none; }
+  }
+
   /* ─── Mobile bottom badge ─── */
   .mp-mob-badge {
     display: none;
   }
 
   @media screen and (max-width: 749px) {
-    .mp-cart-btn { display: none; }
-    .mp-drawer-overlay, .mp-drawer { display: none; }
 
     .mp-mob-badge {
       position: fixed;
@@ -723,7 +786,7 @@
 
   /* ─── Content area ─── */
   .mp-content {
-    padding-top: 76px;
+    padding-top: 88px;
     padding-inline: var(--mp-margin, 12px);
     padding-bottom: 100px;
     min-height: 100vh;
@@ -1705,7 +1768,18 @@
       "type": "image_picker",
       "id": "fit_menu_icon",
       "label": "Fit menu icon",
-      "info": "Small icon/logo shown on the Fit menu badge"
+      "info": "Logo shown on the Fit badge. When set, replaces the text title."
+    },
+    {
+      "type": "range",
+      "id": "fit_menu_icon_size",
+      "label": "Fit menu icon size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24,
+      "info": "Controls the logo size inside the badge without changing badge size."
     },
     {
       "type": "header",

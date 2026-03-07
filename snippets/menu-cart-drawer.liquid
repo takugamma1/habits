@@ -1,24 +1,10 @@
 {%- doc -%}
   Menu page cart drawer: mobile bottom sheet + desktop side drawer.
+  Desktop cart button is rendered inline in the section (not here).
   @param {string} cart_badge_bg - Badge/drawer accent color
   @param {string} cart_cta_text - CTA button text
   @param {string} cart_cta_color - CTA button background color
 {%- enddoc -%}
-
-{%- comment -%} ═══ Desktop cart button (next to nav) ═══ {%- endcomment -%}
-<button
-  type="button"
-  class="mp-cart-btn"
-  id="mp-cart-btn-desktop"
-  aria-label="Cart"
-  style="--mp-cart-btn-bg: {{ cart_icon_bg | default: '#024b40' }}; --mp-cart-btn-color: {{ cart_icon_color | default: '#ffffff' }};"
->
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18"/>
-    <path d="M16 10a4 4 0 01-8 0"/>
-  </svg>
-  <span class="mp-cart-btn__count" id="mp-cart-count-desktop" data-count="0">0</span>
-</button>
 
 {%- comment -%} ═══ Desktop side drawer ═══ {%- endcomment -%}
 <div class="mp-drawer-overlay" id="mp-drawer-overlay"></div>
