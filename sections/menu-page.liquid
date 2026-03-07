@@ -577,13 +577,17 @@
   /* ─── Mobile overrides ─── */
   @media screen and (max-width: 749px) {
     .mp-nav-wrap {
-      top: 12px;
-      max-width: calc(100% - 24px);
+      top: 10px;
+      left: 50%;
+      width: calc(100% - 16px);
+      max-width: none;
     }
 
     .mp-nav {
       gap: 8px;
-      padding: 8px 14px;
+      padding: 10px 14px;
+      width: 100%;
+      overflow: hidden;
     }
 
     .mp-nav__logo-img {
@@ -592,16 +596,25 @@
 
     .mp-nav__badges {
       gap: 5px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mp-nav__badges::-webkit-scrollbar {
+      display: none;
     }
 
     .mp-badge {
-      padding: 5px 10px;
+      padding: 6px 10px;
       font-size: 0.625rem;
       letter-spacing: 0.02em;
     }
 
     .mp-badge--fit {
-      padding: 5px 8px;
+      padding: 6px 8px;
     }
 
     .mp-badge__icon--fit {
@@ -825,6 +838,7 @@
     background: var(--mp-card-bg, #1a1a1a);
     transition: transform 0.25s ease;
     position: relative;
+    cursor: pointer;
   }
 
   .mp-card:hover {
@@ -986,6 +1000,8 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
   }
 
   .mp-upsell.is-open {
@@ -1045,6 +1061,8 @@
     display: flex;
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     width: 200%;
+    flex: 1;
+    min-height: 0;
   }
 
   .mp-upsell__slider[data-page="2"] {
@@ -1056,7 +1074,7 @@
     flex-shrink: 0;
     padding: 28px 24px 20px;
     overflow-y: auto;
-    max-height: 75vh;
+    -webkit-overflow-scrolling: touch;
   }
 
   .mp-upsell__title {
@@ -1083,6 +1101,7 @@
     cursor: pointer;
     transition: border-color 0.2s ease, background 0.2s ease;
     gap: 12px;
+    position: relative;
   }
 
   .mp-upsell__item:hover {
@@ -1650,22 +1669,20 @@
     });
   });
 
-  /* ─────────── Product card "+" click ─────────── */
+  /* ─────────── Product card click (whole card) ─────────── */
   document.addEventListener('click', function (e) {
-    var addBtn = e.target.closest('.mp-card__add');
-    if (!addBtn) return;
+    var card = e.target.closest('.mp-card');
+    if (!card) return;
 
-    var variantId = addBtn.dataset.variantId;
+    var variantId = card.dataset.variantId;
     if (!variantId) return;
 
-    // Check if upsell/downsell collections exist
     var hasUpsells = $('#mp-upsell-list-1 .mp-upsell__item');
     var hasDownsells = $('#mp-upsell-list-2 .mp-upsell__item');
 
     if (hasUpsells || hasDownsells) {
       openUpsell(variantId);
     } else {
-      // No upsell collections — add directly
       addToCart([{ id: parseInt(variantId, 10), quantity: 1 }]).then(bounceCartBadge);
     }
   });
