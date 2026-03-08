@@ -16,11 +16,11 @@
           "type": "text",
           "name": "t:names.heading",
           "settings": {
-            "text": "<p>Your tasty Habits </p>",
+            "text": "<h1>TWOJTE WKUSNI NAWICI</h1>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
-            "type_preset": "h2",
+            "type_preset": "rte",
             "font": "var(--font-body--family)",
             "font_size": "1rem",
             "line_height": "normal",
@@ -42,7 +42,7 @@
           "type": "button",
           "name": "t:names.button",
           "settings": {
-            "label": "Shop all",
+            "label": "РАЗГЛЕДАЙ ОЩЕ",
             "link": "shopify://collections/all",
             "open_in_new_tab": false,
             "style_class": "button-secondary",
@@ -254,7 +254,7 @@
             "image": "shopify://shop_images/hf_20260227_135214_26d88210-3e53-4a17-841c-59359705f38c.jpg",
             "title": "",
             "title_image": "shopify://shop_images/Untitled_design_-_2026-03-07T004214.784.png",
-            "title_image_width": 105,
+            "title_image_width": 40,
             "link": ""
           }
         }
