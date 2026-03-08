@@ -60,6 +60,7 @@
       ],
       "name": "t:names.hero",
       "settings": {
+        "hero_overlay_logo_width": 400,
         "media_type_1": "image",
         "image_1": "shopify://shop_images/DSC07247.jpg",
         "media_type_2": "image",
@@ -224,7 +225,7 @@
           "type": "category",
           "settings": {
             "image": "shopify://shop_images/DSC00009.jpg",
-            "title": "Hookah",
+            "title": "NARGILETA",
             "title_image_width": 100,
             "link": ""
           }
@@ -233,7 +234,7 @@
           "type": "category",
           "settings": {
             "image": "shopify://shop_images/DSC07247.jpg",
-            "title": "Food",
+            "title": "HRANA",
             "title_image_width": 100,
             "link": ""
           }
@@ -242,7 +243,7 @@
           "type": "category",
           "settings": {
             "image": "shopify://shop_images/DSC07247.jpg",
-            "title": "Drinks",
+            "title": "NAPITKI",
             "title_image_width": 135,
             "link": ""
           }
@@ -476,6 +477,7 @@
       ],
       "name": "t:names.hero_marquee",
       "settings": {
+        "hero_overlay_logo_width": 400,
         "media_type_1": "image",
         "media_type_2": "image",
         "stack_media_on_mobile": false,
