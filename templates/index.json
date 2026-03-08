@@ -243,7 +243,7 @@
           "settings": {
             "image": "shopify://shop_images/DSC07247.jpg",
             "title": "Drinks",
-            "title_image_width": 100,
+            "title_image_width": 135,
             "link": ""
           }
         },
@@ -253,7 +253,7 @@
             "image": "shopify://shop_images/hf_20260227_135214_26d88210-3e53-4a17-841c-59359705f38c.jpg",
             "title": "",
             "title_image": "shopify://shop_images/Untitled_design_-_2026-03-07T004214.784.png",
-            "title_image_width": 40,
+            "title_image_width": 105,
             "link": ""
           }
         }
