@@ -198,6 +198,7 @@
     "image_banner_hB4x7K": {
       "type": "image-banner",
       "settings": {
+        "image": "shopify://shop_images/DSC00009.jpg",
         "arch_color": "#4a8f6d",
         "logo_image": "shopify://shop_images/Group_3.png",
         "logo_size": 30,
