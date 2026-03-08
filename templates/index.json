@@ -60,6 +60,7 @@
       ],
       "name": "t:names.hero",
       "settings": {
+        "hero_overlay_logo": "shopify://shop_images/Group_11.png",
         "hero_overlay_logo_width": 400,
         "media_type_1": "image",
         "image_1": "shopify://shop_images/DSC07247.jpg",
