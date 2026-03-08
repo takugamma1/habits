@@ -1,0 +1,110 @@
+/* ═══════════════════════════════════════════════════
+   HABITS CUSTOM FONTS
+   Main: Westmeath Cyrillic — titles, headings, paragraphs
+   Secondary: Phenomena — buttons, subheadings
+   ═══════════════════════════════════════════════════ */
+
+/* ─── Westmeath Cyrillic ─── */
+@font-face {
+  font-family: 'Westmeath';
+  src: url('WestmeathCyrillic-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── Phenomena ─── */
+@font-face {
+  font-family: 'Phenomena';
+  src: url('Phenomena-Thin.woff2') format('woff2');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Phenomena';
+  src: url('Phenomena-ExtraLight.woff2') format('woff2');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Phenomena';
+  src: url('Phenomena-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Phenomena';
+  src: url('Phenomena-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Phenomena';
+  src: url('Phenomena-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Phenomena';
+  src: url('Phenomena-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Phenomena';
+  src: url('Phenomena-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── Global font assignments ─── */
+
+/* Main font: Westmeath for all text */
+body,
+h1, h2, h3, h4, h5, h6,
+p,
+.rte,
+.rte p,
+blockquote,
+figcaption,
+label,
+input,
+textarea,
+select,
+.heading,
+.card__heading,
+.card__title {
+  font-family: 'Westmeath', var(--font-heading--family), sans-serif;
+}
+
+/* Secondary font: Phenomena for buttons & subheadings */
+button,
+.button,
+.button-primary,
+.button-secondary,
+.button-tertiary,
+a.button,
+[class*="button"],
+.badge,
+.subtitle,
+.subheading,
+.mp-badge,
+.hb__link,
+.hb__mob-link,
+.promo-banner__button,
+nav a {
+  font-family: 'Phenomena', var(--font-body--family), sans-serif;
+}

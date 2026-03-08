@@ -1212,6 +1212,11 @@
     top: auto !important;
   }
 
+  /* Hide native header on all pages (except menu page, which hides it separately) */
+  body:not(:has(.menu-page-section)) #header-component {
+    display: none !important;
+  }
+
   .habits-bubble {
     position: fixed;
     top: 12px;
@@ -1224,8 +1229,8 @@
     opacity: 0;
     pointer-events: none;
     transition:
-      transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-      opacity 0.2s ease;
+      transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.3s ease;
     will-change: transform, opacity;
     max-width: 92vw;
   }
@@ -1234,6 +1239,11 @@
     transform: translateX(-50%) translateY(0);
     opacity: 1;
     pointer-events: auto;
+  }
+
+  /* On menu page, hide the bubble completely (menu page has its own nav) */
+  body:has(.menu-page-section) .habits-bubble {
+    display: none !important;
   }
 
   /* Desktop layout — CSS Grid guarantees perfect logo centering */
@@ -1426,8 +1436,9 @@
     var bubble = document.getElementById('habits-bubble');
     if (!bubble) return;
 
-    var threshold = 50;
-    var ticking = false;
+    /* On menu pages the bubble is hidden via CSS, skip everything */
+    if (document.querySelector('.menu-page-section')) return;
+
     var burger = document.getElementById('hb-burger');
     var mobMenu = document.getElementById('hb-mob-menu');
 
@@ -1438,22 +1449,11 @@
       if (mobMenu) mobMenu.setAttribute('aria-hidden', 'true');
     }
 
-    document.addEventListener('scroll', function () {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(function () {
-        var y = window.scrollY || document.documentElement.scrollTop;
-        if (y > threshold) {
-          bubble.classList.add('is-visible');
-          bubble.setAttribute('aria-hidden', 'false');
-        } else {
-          closeMobileMenu();
-          bubble.classList.remove('is-visible');
-          bubble.setAttribute('aria-hidden', 'true');
-        }
-        ticking = false;
-      });
-    }, { passive: true });
+    /* Show bubble immediately — slides in from top on page load */
+    requestAnimationFrame(function () {
+      bubble.classList.add('is-visible');
+      bubble.setAttribute('aria-hidden', 'false');
+    });
 
     /* Mobile burger → toggle inline menu */
     if (burger && mobMenu) {
