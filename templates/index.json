@@ -384,7 +384,7 @@
       "type": "promo-banner",
       "settings": {
         "heading_image": "shopify://shop_images/Untitled_design_-_2026-03-07T004214.784.png",
-        "heading_image_size": 80,
+        "heading_image_size": 100,
         "title": "Promo banner",
         "text": "<h1>Add a short promotional message here.</h1>",
         "button_label": "Shop now",
