@@ -554,16 +554,6 @@
           style: 'max-width: ' | append: section.settings.hero_overlay_logo_width | append: 'px'
       }}
     </div>
-    <script>
-      (function(){
-        var img = document.querySelector('#hero-overlay-logo-{{ section.id }} .hero-overlay-logo__img');
-        if (img) {
-          img.addEventListener('animationend', function() {
-            img.classList.add('is-revealed');
-          }, { once: true });
-        }
-      })();
-    </script>
   {% endif %}
 </div>
 
@@ -582,34 +572,8 @@
   .hero-overlay-logo__img {
     height: auto;
     object-fit: contain;
-    opacity: 0;
-    transform: translateY(60px) scale(0.92);
-    animation: heroLogoReveal 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+    opacity: 1;
     filter: drop-shadow(0 8px 40px rgba(0,0,0,0.25));
-  }
-
-  @keyframes heroLogoReveal {
-    0% {
-      opacity: 0;
-      transform: translateY(60px) scale(0.92);
-    }
-    40% {
-      opacity: 0.8;
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  /* Subtle float after reveal */
-  .hero-overlay-logo__img.is-revealed {
-    animation: heroLogoFloat 4s ease-in-out infinite;
-  }
-
-  @keyframes heroLogoFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
   }
 
   @media screen and (max-width: 749px) {

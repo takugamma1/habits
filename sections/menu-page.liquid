@@ -1577,9 +1577,6 @@
 
   /* ─────────── Mobile sheet ─────────── */
   function openSheet() {
-    // #region agent log
-    if(sheet){var cs=window.getComputedStyle(sheet);console.log('[DEBUG-3f73ca] openSheet:',JSON.stringify({display:cs.display,transform:cs.transform,position:cs.position,visibility:cs.visibility}));}
-    // #endregion
     if (sheet) sheet.classList.add('is-open');
     if (sheetOverlay) sheetOverlay.classList.add('is-open');
     if (mobBadge) mobBadge.style.display = 'none';
