@@ -223,6 +223,7 @@
         "cat_hookah": {
           "type": "category",
           "settings": {
+            "image": "shopify://shop_images/DSC00009.jpg",
             "title": "Hookah",
             "title_image_width": 100,
             "link": ""
@@ -240,6 +241,7 @@
         "cat_drinks": {
           "type": "category",
           "settings": {
+            "image": "shopify://shop_images/DSC07247.jpg",
             "title": "Drinks",
             "title_image_width": 100,
             "link": ""
