@@ -1004,18 +1004,21 @@
   }
 
   .mp-fit-macro--protein {
-    background: rgba(59, 130, 246, 0.15);
-    color: #2563eb;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.5);
+    color: #fff;
   }
 
   .mp-fit-macro--carbs {
-    background: rgba(245, 158, 11, 0.15);
-    color: #d97706;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.5);
+    color: #fff;
   }
 
   .mp-fit-macro--fats {
-    background: rgba(239, 68, 68, 0.15);
-    color: #dc2626;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: #fff;
   }
 
   .mp-fit-macro__val {
@@ -1968,21 +1971,10 @@
   var productPopupAddBtn = $('#mp-product-popup-add');
   var currentPopupTile = null;
 
-  // Tile click: short tap toggles selection, long press or dedicated area opens product detail
-  var tileDownTime = 0;
+  // Tile click: toggles selection
   document.addEventListener('click', function (e) {
     var tile = e.target.closest('.mp-addon-tile');
     if (!tile) return;
-
-    // Check if clicking on image area (open product popup)
-    var imgWrap = e.target.closest('.mp-addon-tile__img-wrap');
-    if (imgWrap) {
-      e.preventDefault();
-      openProductPopup(tile);
-      return;
-    }
-
-    // Click on name/price area toggles checkbox
     toggleTileSelection(tile);
   });
 
