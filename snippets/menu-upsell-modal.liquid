@@ -1,10 +1,12 @@
 {%- doc -%}
   Two-page upsell/downsell modal. Page 1 = upsells, Page 2 = downsells.
-  Products rendered server-side, JS handles selection + batch add-to-cart.
+  Products rendered as image grid squares. Clicking opens product detail popup on top.
+  JS handles selection + batch add-to-cart.
   @param {object} upsell_collection - Shopify collection for page 1
   @param {object} downsell_collection - Shopify collection for page 2
   @param {string} upsell_title - Heading for page 1
   @param {string} downsell_title - Heading for page 2
+  @param {number} addon_grid_cols - Number of columns for addon grid (default 3)
 {%- enddoc -%}
 
 <div class="mp-upsell-overlay" id="mp-upsell-overlay"></div>
@@ -19,30 +21,41 @@
     {%- comment -%} Page 1: Upsells {%- endcomment -%}
     <div class="mp-upsell__page" data-page="1">
       <h3 class="mp-upsell__title">{{ upsell_title | default: 'Добави към поръчката' }}</h3>
-      <div class="mp-upsell__list" id="mp-upsell-list-1">
+      <div class="mp-upsell__grid" id="mp-upsell-list-1" style="--mp-addon-cols: {{ addon_grid_cols | default: 3 }};">
         {% if upsell_collection and upsell_collection.products.size > 0 %}
           {% for product in upsell_collection.products %}
             {%- assign variant = product.selected_or_first_available_variant | default: product.first_available_variant -%}
-            <label class="mp-upsell__item" data-variant-id="{{ variant.id }}">
-              <div class="mp-upsell__item-info">
+            <div
+              class="mp-addon-tile"
+              data-variant-id="{{ variant.id }}"
+              data-product-id="{{ product.id }}"
+              data-product-title="{{ product.title | escape }}"
+              data-product-price="{{ variant.price | money }}"
+              data-product-price-raw="{{ variant.price }}"
+              data-product-image="{{ product.featured_image | image_url: width: 600 }}"
+              data-product-description="{{ product.description | strip_html | escape }}"
+            >
+              <div class="mp-addon-tile__img-wrap">
                 {% if product.featured_image %}
-                  <div class="mp-upsell__item-img">
-                    {{ product.featured_image | image_url: width: 120 | image_tag: loading: 'lazy', class: 'mp-upsell__item-thumb' }}
+                  {{ product.featured_image | image_url: width: 300 | image_tag: loading: 'lazy', class: 'mp-addon-tile__img' }}
+                {% else %}
+                  <div class="mp-addon-tile__placeholder">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                   </div>
                 {% endif %}
-                <div class="mp-upsell__item-text">
-                  <span class="mp-upsell__item-name">{{ product.title }}</span>
-                  <span class="mp-upsell__item-price">{{ variant.price | money }}</span>
-                </div>
+                <span class="mp-addon-tile__check-icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
               </div>
+              <span class="mp-addon-tile__name">{{ product.title }}</span>
+              <span class="mp-addon-tile__price">{{ variant.price | money }}</span>
               <input
                 type="checkbox"
-                class="mp-upsell__check"
+                class="mp-upsell__check mp-addon-tile__input"
                 name="upsell[]"
                 value="{{ variant.id }}"
               >
-              <span class="mp-upsell__toggle"></span>
-            </label>
+            </div>
           {% endfor %}
         {% else %}
           <p class="mp-upsell__empty">No extras available</p>
@@ -57,30 +70,41 @@
     {%- comment -%} Page 2: Downsells {%- endcomment -%}
     <div class="mp-upsell__page" data-page="2">
       <h3 class="mp-upsell__title">{{ downsell_title | default: 'Препоръчваме също' }}</h3>
-      <div class="mp-upsell__list" id="mp-upsell-list-2">
+      <div class="mp-upsell__grid" id="mp-upsell-list-2" style="--mp-addon-cols: {{ addon_grid_cols | default: 3 }};">
         {% if downsell_collection and downsell_collection.products.size > 0 %}
           {% for product in downsell_collection.products %}
             {%- assign variant = product.selected_or_first_available_variant | default: product.first_available_variant -%}
-            <label class="mp-upsell__item" data-variant-id="{{ variant.id }}">
-              <div class="mp-upsell__item-info">
+            <div
+              class="mp-addon-tile"
+              data-variant-id="{{ variant.id }}"
+              data-product-id="{{ product.id }}"
+              data-product-title="{{ product.title | escape }}"
+              data-product-price="{{ variant.price | money }}"
+              data-product-price-raw="{{ variant.price }}"
+              data-product-image="{{ product.featured_image | image_url: width: 600 }}"
+              data-product-description="{{ product.description | strip_html | escape }}"
+            >
+              <div class="mp-addon-tile__img-wrap">
                 {% if product.featured_image %}
-                  <div class="mp-upsell__item-img">
-                    {{ product.featured_image | image_url: width: 120 | image_tag: loading: 'lazy', class: 'mp-upsell__item-thumb' }}
+                  {{ product.featured_image | image_url: width: 300 | image_tag: loading: 'lazy', class: 'mp-addon-tile__img' }}
+                {% else %}
+                  <div class="mp-addon-tile__placeholder">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                   </div>
                 {% endif %}
-                <div class="mp-upsell__item-text">
-                  <span class="mp-upsell__item-name">{{ product.title }}</span>
-                  <span class="mp-upsell__item-price">{{ variant.price | money }}</span>
-                </div>
+                <span class="mp-addon-tile__check-icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
               </div>
+              <span class="mp-addon-tile__name">{{ product.title }}</span>
+              <span class="mp-addon-tile__price">{{ variant.price | money }}</span>
               <input
                 type="checkbox"
-                class="mp-upsell__check"
+                class="mp-upsell__check mp-addon-tile__input"
                 name="downsell[]"
                 value="{{ variant.id }}"
               >
-              <span class="mp-upsell__toggle"></span>
-            </label>
+            </div>
           {% endfor %}
         {% else %}
           <p class="mp-upsell__empty">No extras available</p>
@@ -97,5 +121,27 @@
   <div class="mp-upsell__dots">
     <span class="mp-upsell__dot is-active" data-dot="1"></span>
     <span class="mp-upsell__dot" data-dot="2"></span>
+  </div>
+</div>
+
+{%- comment -%} ═══════════════════════════════════
+  PRODUCT DETAIL POPUP (opens on top of upsell modal)
+═══════════════════════════════════ {%- endcomment -%}
+<div class="mp-product-popup-overlay" id="mp-product-popup-overlay"></div>
+<div class="mp-product-popup" id="mp-product-popup" aria-hidden="true" role="dialog" aria-label="Product details">
+  <button type="button" class="mp-product-popup__back" id="mp-product-popup-back" aria-label="Back">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M13 4L7 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div class="mp-product-popup__body" id="mp-product-popup-body">
+    <div class="mp-product-popup__img-wrap" id="mp-product-popup-img-wrap"></div>
+    <div class="mp-product-popup__info">
+      <h3 class="mp-product-popup__title" id="mp-product-popup-title"></h3>
+      <span class="mp-product-popup__price" id="mp-product-popup-price"></span>
+      <p class="mp-product-popup__desc" id="mp-product-popup-desc"></p>
+      <button type="button" class="mp-product-popup__add-btn" id="mp-product-popup-add">
+        <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Добави
+      </button>
+    </div>
   </div>
 </div>

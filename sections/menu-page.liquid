@@ -194,13 +194,12 @@
   {% endif %}
 
   {% if col_fit and col_fit.products.size > 0 %}
-    <div class="mp-collection" data-collection="fit" style="display:none;">
+    <div class="mp-collection mp-collection--fit" data-collection="fit" style="display:none;">
       <h2 class="mp-collection__title">{{ col_fit.title }}</h2>
-      <div class="mp-grid">
+      <div class="mp-grid mp-grid--fit">
         {% for product in col_fit.products %}
-          {% render 'menu-product-card',
+          {% render 'menu-fit-card',
             product: product,
-            collection_title: col_fit.title,
             card_bg: section.settings.card_bg,
             card_radius: section.settings.card_radius,
             button_color: section.settings.card_button_color,
@@ -255,7 +254,8 @@
   upsell_collection: col_upsell,
   downsell_collection: col_downsell,
   upsell_title: section.settings.upsell_title,
-  downsell_title: section.settings.downsell_title
+  downsell_title: section.settings.downsell_title,
+  addon_grid_cols: section.settings.addon_grid_cols
 %}
 
 {%- comment -%} ═══════════════════════════════════
@@ -951,6 +951,138 @@
     }
   }
 
+  /* ─── Fit menu cards ─── */
+  .mp-grid--fit {
+    grid-template-columns: repeat(var(--mp-columns, 4), 1fr);
+  }
+
+  @media screen and (min-width: 750px) {
+    .mp-grid--fit {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .mp-grid--fit {
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+
+  .mp-card--fit .mp-card__media--fit {
+    aspect-ratio: 16 / 10;
+  }
+
+  .mp-card--fit .mp-card__info--fit {
+    padding: 16px 18px 20px;
+    gap: 6px;
+  }
+
+  .mp-card--fit .mp-card__title {
+    font-size: 1.0625rem;
+  }
+
+  .mp-card--fit .mp-card__price {
+    font-size: 1.0625rem;
+    margin-bottom: 4px;
+  }
+
+  .mp-fit-macros {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  .mp-fit-macro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 10px;
+    min-width: 62px;
+    gap: 2px;
+  }
+
+  .mp-fit-macro--protein {
+    background: rgba(59, 130, 246, 0.15);
+    color: #2563eb;
+  }
+
+  .mp-fit-macro--carbs {
+    background: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+  }
+
+  .mp-fit-macro--fats {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+  }
+
+  .mp-fit-macro__val {
+    font-size: 0.8125rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .mp-fit-macro__label {
+    font-size: 0.5625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.8;
+    line-height: 1;
+  }
+
+  .mp-fit-calories {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.75);
+  }
+
+  .mp-fit-calories svg {
+    color: #f59e0b;
+    flex-shrink: 0;
+  }
+
+  .mp-fit-ingredients {
+    margin-top: 6px;
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .mp-fit-ingredients__label {
+    font-weight: 700;
+    color: rgba(255,255,255,0.65);
+  }
+
+  @media screen and (max-width: 749px) {
+    .mp-card--fit .mp-card__info--fit {
+      padding: 12px 14px 16px;
+    }
+
+    .mp-card--fit .mp-card__title {
+      font-size: 0.9375rem;
+    }
+
+    .mp-fit-macro {
+      padding: 5px 8px;
+      min-width: 54px;
+    }
+
+    .mp-fit-macro__val {
+      font-size: 0.75rem;
+    }
+
+    .mp-fit-macro__label {
+      font-size: 0.5rem;
+    }
+  }
+
   /* ─── Kitchen closed ─── */
   .mp-closed__card {
     text-align: center;
@@ -1085,76 +1217,102 @@
     color: #1a1a1a;
   }
 
-  .mp-upsell__list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  /* ─── Addon tile grid (replaces old list) ─── */
+  .mp-upsell__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--mp-addon-cols, 3), 1fr);
+    gap: 10px;
     margin-bottom: 24px;
   }
 
-  .mp-upsell__item {
+  .mp-addon-tile {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    border: 1px solid #eee;
-    border-radius: 12px;
+    text-align: center;
     cursor: pointer;
-    transition: border-color 0.2s ease, background 0.2s ease;
-    gap: 12px;
     position: relative;
   }
 
-  .mp-upsell__item:hover {
+  .mp-addon-tile__img-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid #eee;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: #f9f9f9;
+  }
+
+  .mp-addon-tile:hover .mp-addon-tile__img-wrap {
     border-color: #ccc;
   }
 
-  .mp-upsell__item:has(.mp-upsell__check:checked) {
+  .mp-addon-tile.is-selected .mp-addon-tile__img-wrap {
     border-color: #024b40;
-    background: rgba(2, 75, 64, 0.04);
+    box-shadow: 0 0 0 1px #024b40;
   }
 
-  .mp-upsell__item-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .mp-upsell__item-img {
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-
-  .mp-upsell__item-thumb {
+  .mp-addon-tile__img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
   }
 
-  .mp-upsell__item-text {
+  .mp-addon-tile__placeholder {
+    width: 100%;
+    height: 100%;
     display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
   }
 
-  .mp-upsell__item-name {
-    font-size: 0.875rem;
+  .mp-addon-tile__check-icon {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #024b40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .mp-addon-tile.is-selected .mp-addon-tile__check-icon {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .mp-addon-tile__name {
+    font-size: 0.75rem;
     font-weight: 600;
     color: #1a1a1a;
-    white-space: nowrap;
+    margin-top: 6px;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
-  .mp-upsell__item-price {
-    font-size: 0.75rem;
+  .mp-addon-tile__price {
+    font-size: 0.6875rem;
     color: #888;
+    margin-top: 2px;
+  }
+
+  .mp-addon-tile__input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .mp-upsell__check {
@@ -1163,31 +1321,160 @@
     pointer-events: none;
   }
 
-  .mp-upsell__toggle {
-    width: 22px;
-    height: 22px;
-    border-radius: 6px;
-    border: 2px solid #ccc;
-    flex-shrink: 0;
-    position: relative;
-    transition: all 0.2s ease;
+  /* ─── Product detail popup (layered on top of upsell) ─── */
+  .mp-product-popup-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99994;
+    background: rgba(0,0,0,0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
   }
 
-  .mp-upsell__check:checked + .mp-upsell__toggle {
-    background: #024b40;
-    border-color: #024b40;
+  .mp-product-popup-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
   }
 
-  .mp-upsell__check:checked + .mp-upsell__toggle::after {
-    content: '';
+  .mp-product-popup {
+    position: fixed;
+    z-index: 99995;
+    background: #fff;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mp-product-popup.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media screen and (min-width: 750px) {
+    .mp-product-popup {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -46%);
+      width: 420px;
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: 20px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+    }
+    .mp-product-popup.is-open {
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .mp-product-popup {
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 88vh;
+      border-radius: 20px 20px 0 0;
+      transform: translateY(100%);
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.12);
+    }
+    .mp-product-popup.is-open {
+      transform: translateY(0);
+    }
+  }
+
+  .mp-product-popup__back {
     position: absolute;
-    top: 3px;
-    left: 6px;
-    width: 5px;
-    height: 9px;
-    border: solid #fff;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+    top: 14px;
+    left: 14px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(8px);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.15s ease;
+  }
+
+  .mp-product-popup__back:hover {
+    transform: scale(1.08);
+  }
+
+  .mp-product-popup__body {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mp-product-popup__img-wrap {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #f5f3ef;
+  }
+
+  .mp-product-popup__img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .mp-product-popup__info {
+    padding: 20px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mp-product-popup__title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1a1a1a;
+  }
+
+  .mp-product-popup__price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #024b40;
+  }
+
+  .mp-product-popup__desc {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #666;
+    line-height: 1.5;
+  }
+
+  .mp-product-popup__add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 14px;
+    background: #024b40;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    font-family: inherit;
+  }
+
+  .mp-product-popup__add-btn:hover {
+    opacity: 0.9;
   }
 
   .mp-upsell__actions {
@@ -1670,6 +1957,85 @@
     });
   });
 
+  /* ─────────── Addon tile interactions ─────────── */
+  var productPopupOverlay = $('#mp-product-popup-overlay');
+  var productPopup = $('#mp-product-popup');
+  var productPopupBack = $('#mp-product-popup-back');
+  var productPopupImgWrap = $('#mp-product-popup-img-wrap');
+  var productPopupTitle = $('#mp-product-popup-title');
+  var productPopupPrice = $('#mp-product-popup-price');
+  var productPopupDesc = $('#mp-product-popup-desc');
+  var productPopupAddBtn = $('#mp-product-popup-add');
+  var currentPopupTile = null;
+
+  // Tile click: short tap toggles selection, long press or dedicated area opens product detail
+  var tileDownTime = 0;
+  document.addEventListener('click', function (e) {
+    var tile = e.target.closest('.mp-addon-tile');
+    if (!tile) return;
+
+    // Check if clicking on image area (open product popup)
+    var imgWrap = e.target.closest('.mp-addon-tile__img-wrap');
+    if (imgWrap) {
+      e.preventDefault();
+      openProductPopup(tile);
+      return;
+    }
+
+    // Click on name/price area toggles checkbox
+    toggleTileSelection(tile);
+  });
+
+  function toggleTileSelection(tile) {
+    var checkbox = tile.querySelector('.mp-addon-tile__input');
+    if (!checkbox) return;
+    checkbox.checked = !checkbox.checked;
+    tile.classList.toggle('is-selected', checkbox.checked);
+  }
+
+  function openProductPopup(tile) {
+    currentPopupTile = tile;
+    var imgSrc = tile.dataset.productImage;
+    var title = tile.dataset.productTitle;
+    var price = tile.dataset.productPrice;
+    var desc = tile.dataset.productDescription || '';
+
+    if (productPopupImgWrap) {
+      productPopupImgWrap.innerHTML = imgSrc
+        ? '<img src="' + imgSrc + '" alt="' + title + '" loading="lazy">'
+        : '';
+    }
+    if (productPopupTitle) productPopupTitle.textContent = title;
+    if (productPopupPrice) productPopupPrice.textContent = price;
+    if (productPopupDesc) productPopupDesc.textContent = desc;
+
+    if (productPopup) productPopup.classList.add('is-open');
+    if (productPopupOverlay) productPopupOverlay.classList.add('is-open');
+  }
+
+  function closeProductPopup() {
+    if (productPopup) productPopup.classList.remove('is-open');
+    if (productPopupOverlay) productPopupOverlay.classList.remove('is-open');
+    currentPopupTile = null;
+  }
+
+  if (productPopupBack) productPopupBack.addEventListener('click', closeProductPopup);
+  if (productPopupOverlay) productPopupOverlay.addEventListener('click', closeProductPopup);
+
+  // Product popup add button: selects the tile and closes popup
+  if (productPopupAddBtn) {
+    productPopupAddBtn.addEventListener('click', function () {
+      if (currentPopupTile) {
+        var checkbox = currentPopupTile.querySelector('.mp-addon-tile__input');
+        if (checkbox && !checkbox.checked) {
+          checkbox.checked = true;
+          currentPopupTile.classList.add('is-selected');
+        }
+      }
+      closeProductPopup();
+    });
+  }
+
   /* ─────────── Product card click (whole card) ─────────── */
   document.addEventListener('click', function (e) {
     var card = e.target.closest('.mp-card');
@@ -1678,8 +2044,8 @@
     var variantId = card.dataset.variantId;
     if (!variantId) return;
 
-    var hasUpsells = $('#mp-upsell-list-1 .mp-upsell__item');
-    var hasDownsells = $('#mp-upsell-list-2 .mp-upsell__item');
+    var hasUpsells = $('#mp-upsell-list-1 .mp-addon-tile');
+    var hasDownsells = $('#mp-upsell-list-2 .mp-addon-tile');
 
     if (hasUpsells || hasDownsells) {
       openUpsell(variantId);
@@ -1904,6 +2270,16 @@
       "id": "downsell_title",
       "label": "Downsell title",
       "default": "Препоръчваме също"
+    },
+    {
+      "type": "range",
+      "id": "addon_grid_cols",
+      "label": "Add-on grid columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "info": "Number of columns for add-on product tiles in the upsell/downsell modal."
     },
     {
       "type": "header",

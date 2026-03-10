@@ -1,0 +1,139 @@
+{%- doc -%}
+  Renders a fit-menu product card with nutrition badges (protein, carbs, fats),
+  total calories, ingredient list, and a larger card layout.
+  Nutritional data comes from product metafields: custom.calories, custom.protein, custom.carbs, custom.fats
+  Ingredients come from custom.ingredients metafield (comma-separated) or falls back to product description.
+  @param {object} product - The product object
+  @param {string} card_bg - Card background color
+  @param {string} card_radius - Card border radius in px
+  @param {string} button_color - Plus button background
+  @param {string} button_text_color - Plus button icon color
+{%- enddoc -%}
+
+{%- liquid
+  assign variant = product.selected_or_first_available_variant | default: product.first_available_variant
+  assign image = product.featured_image
+
+  assign calories_meta = product.metafields.custom.calories
+  if calories_meta
+    assign calories = calories_meta.value | default: calories_meta
+  endif
+
+  assign protein_meta = product.metafields.custom.protein
+  if protein_meta
+    assign protein = protein_meta.value | default: protein_meta
+  endif
+
+  assign carbs_meta = product.metafields.custom.carbs
+  if carbs_meta
+    assign carbs = carbs_meta.value | default: carbs_meta
+  endif
+
+  assign fats_meta = product.metafields.custom.fats
+  if fats_meta
+    assign fats = fats_meta.value | default: fats_meta
+  endif
+
+  assign ingredients_meta = product.metafields.custom.ingredients
+  if ingredients_meta
+    assign ingredients_raw = ingredients_meta.value | default: ingredients_meta
+  endif
+-%}
+
+<div
+  class="mp-card mp-card--fit"
+  data-product-id="{{ product.id }}"
+  data-variant-id="{{ variant.id }}"
+  data-product-title="{{ product.title | escape }}"
+  data-product-price="{{ variant.price | money }}"
+  data-product-image="{{ image | image_url: width: 200 }}"
+  style="
+    --mp-card-bg: {{ card_bg | default: '#1a1a1a' }};
+    --mp-card-radius: {{ card_radius | default: 16 }}px;
+    --mp-card-btn: {{ button_color | default: '#ffffff' }};
+    --mp-card-btn-text: {{ button_text_color | default: '#1a1a1a' }};
+  "
+>
+  {%- comment -%} Image area {%- endcomment -%}
+  <div class="mp-card__media mp-card__media--fit">
+    {% if image %}
+      {{
+        image
+        | image_url: width: 800
+        | image_tag:
+          loading: 'lazy',
+          sizes: '(max-width: 749px) 45vw, 30vw',
+          widths: '200, 300, 400, 600, 800',
+          class: 'mp-card__img'
+      }}
+    {% else %}
+      <div class="mp-card__placeholder">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </div>
+    {% endif %}
+
+    {%- comment -%} Plus button {%- endcomment -%}
+    <button
+      type="button"
+      class="mp-card__add"
+      aria-label="{{ 'actions.add_to_cart' | t | default: 'Add to cart' }}"
+      data-variant-id="{{ variant.id }}"
+      data-product-id="{{ product.id }}"
+    >
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  {%- comment -%} Info area {%- endcomment -%}
+  <div class="mp-card__info mp-card__info--fit">
+    <h3 class="mp-card__title">{{ product.title }}</h3>
+    <span class="mp-card__price">{{ variant.price | money }}</span>
+
+    {%- comment -%} Macro badges row {%- endcomment -%}
+    {% if protein or carbs or fats %}
+      <div class="mp-fit-macros">
+        {% if protein %}
+          <span class="mp-fit-macro mp-fit-macro--protein">
+            <span class="mp-fit-macro__val">{{ protein }}g</span>
+            <span class="mp-fit-macro__label">Протеин</span>
+          </span>
+        {% endif %}
+        {% if carbs %}
+          <span class="mp-fit-macro mp-fit-macro--carbs">
+            <span class="mp-fit-macro__val">{{ carbs }}g</span>
+            <span class="mp-fit-macro__label">Въглехидрати</span>
+          </span>
+        {% endif %}
+        {% if fats %}
+          <span class="mp-fit-macro mp-fit-macro--fats">
+            <span class="mp-fit-macro__val">{{ fats }}g</span>
+            <span class="mp-fit-macro__label">Мазнини</span>
+          </span>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {%- comment -%} Total calories {%- endcomment -%}
+    {% if calories %}
+      <div class="mp-fit-calories">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c.5 3.5 4 6 4 10a4 4 0 1 1-8 0c0-4 3.5-6.5 4-10z"/></svg>
+        <span>{{ calories }} kcal</span>
+      </div>
+    {% endif %}
+
+    {%- comment -%} Ingredients list {%- endcomment -%}
+    {% if ingredients_raw != blank %}
+      <div class="mp-fit-ingredients">
+        <span class="mp-fit-ingredients__label">Съставки:</span>
+        <span class="mp-fit-ingredients__list">{{ ingredients_raw }}</span>
+      </div>
+    {% elsif product.description != blank %}
+      <div class="mp-fit-ingredients">
+        <span class="mp-fit-ingredients__label">Съставки:</span>
+        <span class="mp-fit-ingredients__list">{{ product.description | strip_html | truncate: 120 }}</span>
+      </div>
+    {% endif %}
+  </div>
+</div>
