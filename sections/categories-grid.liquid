@@ -81,7 +81,15 @@
 
                 {%- comment -%} Title: logo image or text {%- endcomment -%}
                 {% if block.settings.title_image != blank %}
-                  <div class="categories-grid__card-logo">
+                  <div
+                    class="categories-grid__card-logo"
+                    style="
+                      padding-top: {{ block.settings.logo_padding_top | default: 16 }}px;
+                      padding-bottom: {{ block.settings.logo_padding_bottom | default: 20 }}px;
+                      padding-left: {{ block.settings.logo_padding_left | default: 12 }}px;
+                      padding-right: {{ block.settings.logo_padding_right | default: 12 }}px;
+                    "
+                  >
                     {{
                       block.settings.title_image
                       | image_url: width: 400
@@ -578,6 +586,50 @@
           "type": "url",
           "id": "link",
           "label": "Link"
+        },
+        {
+          "type": "header",
+          "content": "Logo padding"
+        },
+        {
+          "type": "range",
+          "id": "logo_padding_top",
+          "label": "Top",
+          "min": 0,
+          "max": 80,
+          "step": 2,
+          "unit": "px",
+          "default": 16
+        },
+        {
+          "type": "range",
+          "id": "logo_padding_bottom",
+          "label": "Bottom",
+          "min": 0,
+          "max": 80,
+          "step": 2,
+          "unit": "px",
+          "default": 20
+        },
+        {
+          "type": "range",
+          "id": "logo_padding_left",
+          "label": "Left",
+          "min": 0,
+          "max": 80,
+          "step": 2,
+          "unit": "px",
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "logo_padding_right",
+          "label": "Right",
+          "min": 0,
+          "max": 80,
+          "step": 2,
+          "unit": "px",
+          "default": 12
         }
       ]
     }
