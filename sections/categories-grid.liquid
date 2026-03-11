@@ -131,7 +131,12 @@
     var total = cards.length;
     var current = 0;
 
+    function isMobile() {
+      return window.innerWidth < 750;
+    }
+
     function update() {
+      if (!isMobile()) return;
       cards.forEach(function(card, i) {
         card.classList.toggle('categories-grid__card--active', i === current);
       });
@@ -192,63 +197,31 @@
 
   /* Carousel wrapper */
   .categories-grid__carousel {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
     width: 100%;
-    padding-inline: 16px;
+    padding-inline: var(--cg-card-gap, 20px);
     box-sizing: border-box;
   }
 
-  /* Arrow buttons */
+  /* Arrow buttons — hidden on desktop */
   .categories-grid__arrow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+    display: none;
   }
 
-  .categories-grid__arrow:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.7);
-  }
-
-  .categories-grid__arrow:disabled {
-    opacity: 0.3;
-    cursor: default;
-  }
-
-  /* Cards area — single card visible */
+  /* Cards area */
   .categories-grid__cards {
     width: 100%;
-    max-width: 280px;
     overflow: hidden;
   }
 
+  /* Desktop: full grid */
   .categories-grid__track {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(var(--cg-columns, 4), 1fr);
+    gap: var(--cg-card-gap, 20px);
   }
 
-  /* All cards hidden by default, active one shown */
   .categories-grid__card {
-    display: none;
     width: 100%;
-  }
-
-  .categories-grid__card--active {
-    display: block;
-    animation: cg-fade-in 0.35s ease;
   }
 
   @keyframes cg-fade-in {
@@ -342,24 +315,80 @@
     display: block;
   }
 
-  /* Mobile adjustments */
+  /* Mobile: single-card carousel with arrows */
   @media screen and (max-width: 749px) {
     .categories-grid__container {
       gap: 24px;
+    }
+
+    .categories-grid__carousel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding-inline: 16px;
+    }
+
+    .categories-grid__arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+    }
+
+    .categories-grid__arrow:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.7);
+    }
+
+    .categories-grid__arrow:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    .categories-grid__arrow svg {
+      width: 20px;
+      height: 20px;
     }
 
     .categories-grid__cards {
       max-width: 240px;
     }
 
-    .categories-grid__arrow {
-      width: 40px;
-      height: 40px;
+    .categories-grid__track {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .categories-grid__arrow svg {
-      width: 20px;
-      height: 20px;
+    .categories-grid__card {
+      display: none;
+    }
+
+    .categories-grid__card--active {
+      display: block;
+      animation: cg-fade-in 0.35s ease;
+    }
+
+    .categories-grid__arch {
+      aspect-ratio: 2.5 / 4;
+    }
+
+    .categories-grid__card-title {
+      font-size: clamp(1.125rem, 5vw, 1.5rem);
+      padding: 12px 10px 16px;
+    }
+
+    .categories-grid__card-logo {
+      padding: 12px 10px 16px;
     }
   }
 {% endstylesheet %}
