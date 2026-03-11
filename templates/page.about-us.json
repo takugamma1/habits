@@ -131,6 +131,8 @@
         "heading_alignment": "right",
         "text_alignment": "right",
         "button_alignment": "flex-end",
+        "desktop_layout": "image_left",
+        "mobile_layout": "image_bottom",
         "color_scheme": "scheme-1",
         "section_spacing": 20,
         "padding-block-start": 48,
