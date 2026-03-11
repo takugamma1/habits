@@ -260,7 +260,11 @@
             "image": "shopify://shop_images/DSC00009.jpg",
             "title": "NARGILETA",
             "title_image_width": 100,
-            "link": ""
+            "link": "",
+            "logo_padding_top": 16,
+            "logo_padding_bottom": 20,
+            "logo_padding_left": 12,
+            "logo_padding_right": 12
           }
         },
         "cat_food": {
@@ -269,7 +273,11 @@
             "image": "shopify://shop_images/DSC07247.jpg",
             "title": "HRANA",
             "title_image_width": 100,
-            "link": ""
+            "link": "",
+            "logo_padding_top": 16,
+            "logo_padding_bottom": 20,
+            "logo_padding_left": 12,
+            "logo_padding_right": 12
           }
         },
         "cat_drinks": {
@@ -278,7 +286,11 @@
             "image": "shopify://shop_images/DSC07247.jpg",
             "title": "NAPITKI",
             "title_image_width": 135,
-            "link": ""
+            "link": "",
+            "logo_padding_top": 16,
+            "logo_padding_bottom": 20,
+            "logo_padding_left": 12,
+            "logo_padding_right": 12
           }
         },
         "cat_delivery": {
@@ -288,7 +300,11 @@
             "title": "",
             "title_image": "shopify://shop_images/Untitled_design_-_2026-03-07T004214.784.png",
             "title_image_width": 200,
-            "link": ""
+            "link": "",
+            "logo_padding_top": 42,
+            "logo_padding_bottom": 22,
+            "logo_padding_left": 60,
+            "logo_padding_right": 12
           }
         }
       },
