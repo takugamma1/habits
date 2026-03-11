@@ -200,6 +200,7 @@
       "type": "image-banner",
       "name": "Image banner",
       "settings": {
+        "image": "shopify://shop_images/hf_20260227_135214_26d88210-3e53-4a17-841c-59359705f38c.jpg",
         "arch_color": "#4a8f6d",
         "logo_size": 60,
         "title": "Your heading",
