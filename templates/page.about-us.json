@@ -136,7 +136,9 @@
         "color_scheme": "scheme-1",
         "section_spacing": 20,
         "padding-block-start": 48,
-        "padding-block-end": 48
+        "padding-block-end": 48,
+        "hide_on_desktop": false,
+        "hide_on_mobile": false
       }
     },
     "section_q6L68z": {
@@ -239,7 +241,9 @@
         "overlay_style": "solid",
         "gradient_direction": "to top",
         "padding-block-start": 48,
-        "padding-block-end": 48
+        "padding-block-end": 48,
+        "hide_on_desktop": false,
+        "hide_on_mobile": false
       }
     },
     "hero_KYGiBm": {
@@ -407,6 +411,68 @@
         "padding-inline-start": 40,
         "padding-inline-end": 40
       }
+    },
+    "instagram_grid_PGEXGf": {
+      "type": "instagram-grid",
+      "blocks": {
+        "post_LLwFTn": {
+          "type": "post",
+          "settings": {
+            "aspect_ratio": "tall",
+            "link": ""
+          }
+        },
+        "post_TJb8XN": {
+          "type": "post",
+          "settings": {
+            "aspect_ratio": "square",
+            "link": ""
+          }
+        },
+        "post_8DGjpz": {
+          "type": "post",
+          "settings": {
+            "aspect_ratio": "square",
+            "link": ""
+          }
+        },
+        "post_iVwqBE": {
+          "type": "post",
+          "settings": {
+            "aspect_ratio": "square",
+            "link": ""
+          }
+        },
+        "post_Jc9MFk": {
+          "type": "post",
+          "settings": {
+            "aspect_ratio": "square",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "post_LLwFTn",
+        "post_TJb8XN",
+        "post_8DGjpz",
+        "post_iVwqBE",
+        "post_Jc9MFk"
+      ],
+      "name": "Instagram grid",
+      "settings": {
+        "heading_image_size": 160,
+        "title": "",
+        "instagram_url": "",
+        "grid_gap": 8,
+        "card_radius": 16,
+        "overlay_color": "#000000",
+        "overlay_opacity": 50,
+        "button_label": "",
+        "button_style": "button-primary",
+        "section_spacing": 20,
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
     }
   },
   "order": [
@@ -416,6 +482,7 @@
     "section_q6L68z",
     "hero_KYGiBm",
     "featured_card_37aRig",
-    "promo_banner_gdRN4A"
+    "promo_banner_gdRN4A",
+    "instagram_grid_PGEXGf"
   ]
 }
