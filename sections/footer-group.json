@@ -18,7 +18,7 @@
           "type": "logo",
           "name": "t:names.logo",
           "settings": {
-            "inverse": true,
+            "inverse": false,
             "font": "heading",
             "unit": "pixel",
             "percent_width": 100,
@@ -161,12 +161,11 @@
         "group_H6VpwJ",
         "email_signup_crihX7"
       ],
-      "disabled": true,
       "name": "t:names.footer",
       "settings": {
         "section_width": "page-width",
         "gap": 20,
-        "color_scheme": "scheme-1",
+        "color_scheme": "scheme-51e46fd2-3761-469a-90a9-9dd6dd243b55",
         "padding-block-start": 30,
         "padding-block-end": 30
       }
