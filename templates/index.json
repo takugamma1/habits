@@ -570,6 +570,13 @@
             "link": ""
           }
         },
+        "post_k79ddC": {
+          "type": "post",
+          "settings": {
+            "aspect_ratio": "square",
+            "link": ""
+          }
+        },
         "ig_post_2": {
           "type": "post",
           "settings": {
@@ -590,21 +597,14 @@
             "aspect_ratio": "square",
             "link": ""
           }
-        },
-        "ig_post_5": {
-          "type": "post",
-          "settings": {
-            "aspect_ratio": "square",
-            "link": ""
-          }
         }
       },
       "block_order": [
         "ig_post_1",
+        "post_k79ddC",
         "ig_post_2",
         "ig_post_3",
-        "ig_post_4",
-        "ig_post_5"
+        "ig_post_4"
       ],
       "settings": {
         "heading_image_size": 160,
