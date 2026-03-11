@@ -41,62 +41,118 @@
       <h2 class="categories-grid__title">{{ section.settings.title }}</h2>
     {% endif %}
 
-    {%- comment -%} Cards {%- endcomment -%}
-    <div class="categories-grid__cards">
-      <div class="categories-grid__track">
-        {% for block in section.blocks %}
-          <div class="categories-grid__card" {{ block.shopify_attributes }}>
-            {% if block.settings.link != blank %}
-              <a href="{{ block.settings.link }}" class="categories-grid__card-link">
-            {% endif %}
+    {%- comment -%} Cards carousel {%- endcomment -%}
+    <div class="categories-grid__carousel">
+      <button
+        class="categories-grid__arrow categories-grid__arrow--prev"
+        type="button"
+        aria-label="Previous"
+        data-carousel-prev="{{ section.id }}"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
 
-            <div class="categories-grid__arch">
-              {%- comment -%} Background image {%- endcomment -%}
-              {% if block.settings.image != blank %}
-                {{
-                  block.settings.image
-                  | image_url: width: 800
-                  | image_tag:
-                    loading: 'lazy',
-                    sizes: '(max-width: 749px) 55vw, 25vw',
-                    widths: '200, 300, 400, 600, 800',
-                    class: 'categories-grid__card-img'
-                }}
+      <div class="categories-grid__cards">
+        <div class="categories-grid__track" data-carousel-track="{{ section.id }}">
+          {% for block in section.blocks %}
+            <div class="categories-grid__card{% if forloop.first %} categories-grid__card--active{% endif %}" data-card-index="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+              {% if block.settings.link != blank %}
+                <a href="{{ block.settings.link }}" class="categories-grid__card-link">
               {% endif %}
 
-              {%- comment -%} Gradient overlay {%- endcomment -%}
-              <div class="categories-grid__card-gradient"></div>
-
-              {%- comment -%} Title: logo image or text {%- endcomment -%}
-              {% if block.settings.title_image != blank %}
-                <div class="categories-grid__card-logo">
+              <div class="categories-grid__arch">
+                {%- comment -%} Background image {%- endcomment -%}
+                {% if block.settings.image != blank %}
                   {{
-                    block.settings.title_image
-                    | image_url: width: 400
+                    block.settings.image
+                    | image_url: width: 800
                     | image_tag:
                       loading: 'lazy',
-                      class: 'categories-grid__card-logo-img',
-                      style: 'width: ' | append: block.settings.title_image_width | append: 'px'
+                      sizes: '(max-width: 749px) 55vw, 25vw',
+                      widths: '200, 300, 400, 600, 800',
+                      class: 'categories-grid__card-img'
                   }}
-                </div>
-              {% elsif block.settings.title != blank %}
-                <h1 class="categories-grid__card-title">{{ block.settings.title }}</h1>
+                {% endif %}
+
+                {%- comment -%} Gradient overlay {%- endcomment -%}
+                <div class="categories-grid__card-gradient"></div>
+
+                {%- comment -%} Title: logo image or text {%- endcomment -%}
+                {% if block.settings.title_image != blank %}
+                  <div class="categories-grid__card-logo">
+                    {{
+                      block.settings.title_image
+                      | image_url: width: 400
+                      | image_tag:
+                        loading: 'lazy',
+                        class: 'categories-grid__card-logo-img',
+                        style: 'width: ' | append: block.settings.title_image_width | append: 'px'
+                    }}
+                  </div>
+                {% elsif block.settings.title != blank %}
+                  <h1 class="categories-grid__card-title">{{ block.settings.title }}</h1>
+                {% endif %}
+              </div>
+
+              {% if block.settings.link != blank %}
+                </a>
               {% endif %}
             </div>
-
-            {% if block.settings.link != blank %}
-              </a>
-            {% endif %}
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
       </div>
+
+      <button
+        class="categories-grid__arrow categories-grid__arrow--next"
+        type="button"
+        aria-label="Next"
+        data-carousel-next="{{ section.id }}"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
     </div>
 
   </div>
 </div>
 
+<script>
+  (function() {
+    var sectionId = '{{ section.id }}';
+    var track = document.querySelector('[data-carousel-track="' + sectionId + '"]');
+    var prevBtn = document.querySelector('[data-carousel-prev="' + sectionId + '"]');
+    var nextBtn = document.querySelector('[data-carousel-next="' + sectionId + '"]');
+    if (!track || !prevBtn || !nextBtn) return;
+
+    var cards = track.querySelectorAll('.categories-grid__card');
+    var total = cards.length;
+    var current = 0;
+
+    function update() {
+      cards.forEach(function(card, i) {
+        card.classList.toggle('categories-grid__card--active', i === current);
+      });
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === total - 1;
+    }
+
+    prevBtn.addEventListener('click', function() {
+      if (current > 0) { current--; update(); }
+    });
+
+    nextBtn.addEventListener('click', function() {
+      if (current < total - 1) { current++; update(); }
+    });
+
+    update();
+  })();
+</script>
+
 {% stylesheet %}
-  /* Outer frame — matches hero rounded container pattern */
+  /* Outer frame */
   .categories-grid-section {
     margin-block: var(--cg-section-spacing, 20px);
   }
@@ -134,17 +190,70 @@
     text-align: center;
   }
 
-  /* Cards wrapper */
-  .categories-grid__cards {
+  /* Carousel wrapper */
+  .categories-grid__carousel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
     width: 100%;
-    padding-inline: var(--cg-card-gap, 20px);
+    padding-inline: 16px;
     box-sizing: border-box;
   }
 
+  /* Arrow buttons */
+  .categories-grid__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+  }
+
+  .categories-grid__arrow:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.7);
+  }
+
+  .categories-grid__arrow:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  /* Cards area — single card visible */
+  .categories-grid__cards {
+    width: 100%;
+    max-width: 280px;
+    overflow: hidden;
+  }
+
   .categories-grid__track {
-    display: grid;
-    grid-template-columns: repeat(var(--cg-columns, 4), 1fr);
-    gap: var(--cg-card-gap, 20px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* All cards hidden by default, active one shown */
+  .categories-grid__card {
+    display: none;
+    width: 100%;
+  }
+
+  .categories-grid__card--active {
+    display: block;
+    animation: cg-fade-in 0.35s ease;
+  }
+
+  @keyframes cg-fade-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
   }
 
   /* Individual card */
@@ -197,7 +306,7 @@
     border-radius: inherit;
   }
 
-  /* Title: large heading that fits the arch */
+  /* Title: large heading */
   .categories-grid__card-title {
     position: relative;
     z-index: 2;
@@ -213,7 +322,7 @@
     hyphens: auto;
   }
 
-  /* Title logo image (instead of text) — bottom center */
+  /* Title logo image */
   .categories-grid__card-logo {
     position: absolute;
     bottom: 0;
@@ -233,64 +342,24 @@
     display: block;
   }
 
-  /* ─── Mobile: centered carousel with smooth transitions ─── */
+  /* Mobile adjustments */
   @media screen and (max-width: 749px) {
     .categories-grid__container {
       gap: 24px;
     }
 
     .categories-grid__cards {
-      overflow: visible;
-      padding-inline: 0;
+      max-width: 240px;
     }
 
-    .categories-grid__track {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-      scroll-behavior: smooth;
-      gap: 16px;
-      padding-inline: calc(50% - 35%); /* center the active card */
-
-      /* hide scrollbar */
-      scrollbar-width: none;
-      -ms-overflow-style: none;
+    .categories-grid__arrow {
+      width: 40px;
+      height: 40px;
     }
 
-    .categories-grid__track::-webkit-scrollbar {
-      display: none;
-    }
-
-    .categories-grid__card {
-      flex: 0 0 70%;
-      scroll-snap-align: center;
-      min-width: 0;
-      transition: transform 0.35s ease, opacity 0.35s ease;
-    }
-
-    .categories-grid__arch {
-      aspect-ratio: 2.5 / 4;
-    }
-
-    .categories-grid__card-title {
-      font-size: clamp(1.125rem, 5vw, 1.5rem);
-      padding: 12px 10px 16px;
-    }
-
-    .categories-grid__card-logo {
-      padding: 12px 10px 16px;
-    }
-  }
-
-  /* Small phones */
-  @media screen and (max-width: 390px) {
-    .categories-grid__track {
-      padding-inline: calc(50% - 38%);
-    }
-
-    .categories-grid__card {
-      flex: 0 0 76%;
+    .categories-grid__arrow svg {
+      width: 20px;
+      height: 20px;
     }
   }
 {% endstylesheet %}

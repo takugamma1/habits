@@ -10,6 +10,21 @@
   endif
 %}
 
+{% if section.settings.hide_on_desktop %}
+  <style>
+    @media screen and (min-width: 750px) {
+      #shopify-section-{{ section.id }} { display: none !important; }
+    }
+  </style>
+{% endif %}
+{% if section.settings.hide_on_mobile %}
+  <style>
+    @media screen and (max-width: 749px) {
+      #shopify-section-{{ section.id }} { display: none !important; }
+    }
+  </style>
+{% endif %}
+
 {% liquid
   assign desktop_layout = section.settings.desktop_layout | default: 'image_left'
   assign mobile_layout = section.settings.mobile_layout | default: 'image_top'
@@ -421,6 +436,22 @@
       "step": 1,
       "unit": "px",
       "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_desktop",
+      "label": "Hide on desktop",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide on mobile",
+      "default": false
     }
   ],
   "presets": [

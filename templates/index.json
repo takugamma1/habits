@@ -193,7 +193,9 @@
         "overlay_style": "solid",
         "gradient_direction": "to top",
         "padding-block-start": 100,
-        "padding-block-end": 100
+        "padding-block-end": 100,
+        "hide_on_desktop": true,
+        "hide_on_mobile": false
       }
     },
     "image_banner_mwnYpY": {
@@ -241,7 +243,9 @@
         "color_scheme": "scheme-1",
         "section_spacing": 40,
         "padding-block-start": 48,
-        "padding-block-end": 100
+        "padding-block-end": 100,
+        "hide_on_desktop": false,
+        "hide_on_mobile": true
       }
     },
     "categories_grid_Rk3m7P": {
@@ -536,6 +540,59 @@
         "padding-block-end": 0
       }
     },
+    "instagram_grid_Xg4kP1": {
+      "type": "instagram-grid",
+      "blocks": {
+        "ig_post_1": {
+          "type": "post",
+          "settings": {
+            "aspect_ratio": "tall"
+          }
+        },
+        "ig_post_2": {
+          "type": "post",
+          "settings": {
+            "aspect_ratio": "square"
+          }
+        },
+        "ig_post_3": {
+          "type": "post",
+          "settings": {
+            "aspect_ratio": "square"
+          }
+        },
+        "ig_post_4": {
+          "type": "post",
+          "settings": {
+            "aspect_ratio": "square"
+          }
+        },
+        "ig_post_5": {
+          "type": "post",
+          "settings": {
+            "aspect_ratio": "square"
+          }
+        }
+      },
+      "block_order": [
+        "ig_post_1",
+        "ig_post_2",
+        "ig_post_3",
+        "ig_post_4",
+        "ig_post_5"
+      ],
+      "settings": {
+        "title": "При нас можеш да се насладиш на както на вкусната храна и напитки,",
+        "instagram_url": "",
+        "grid_gap": 8,
+        "card_radius": 16,
+        "overlay_color": "#000000",
+        "overlay_opacity": 50,
+        "section_spacing": 20,
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    },
     "reservation_form_Qk7mN3": {
       "type": "reservation-form",
       "settings": {
@@ -586,6 +643,7 @@
     "promo_banner_Xt9w2J",
     "featured_card_aTgGdf",
     "hero_NQNriT",
+    "instagram_grid_Xg4kP1",
     "reservation_form_Qk7mN3"
   ]
 }

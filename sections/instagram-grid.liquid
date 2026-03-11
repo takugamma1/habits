@@ -1,0 +1,420 @@
+{% liquid
+  assign has_heading_image = false
+  if section.settings.heading_image != blank
+    assign has_heading_image = true
+  endif
+%}
+
+<div
+  id="InstagramGrid-{{ section.id }}"
+  class="instagram-grid"
+  style="
+    --ig-gap: {{ section.settings.grid_gap | default: 8 }}px;
+    --ig-radius: {{ section.settings.card_radius | default: 16 }}px;
+    --ig-overlay-color: {{ section.settings.overlay_color | default: '#000000' }};
+    --ig-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --ig-section-spacing: {{ section.settings.section_spacing | default: 20 }}px;
+    --ig-heading-size: {{ section.settings.heading_image_size | default: 160 }}px;
+  "
+>
+  <div class="instagram-grid__container spacing-style" style="{% render 'spacing-style', settings: section.settings %}">
+
+    {%- comment -%} Heading {%- endcomment -%}
+    {% if has_heading_image %}
+      <div class="instagram-grid__heading">
+        {{
+          section.settings.heading_image
+          | image_url: width: 600
+          | image_tag:
+            loading: 'lazy',
+            widths: '120, 160, 240, 320, 480, 600',
+            sizes: '(max-width: 749px) 120px, 160px',
+            class: 'instagram-grid__heading-img'
+        }}
+      </div>
+    {% endif %}
+
+    {% if section.settings.title != blank %}
+      <p class="instagram-grid__subtitle">{{ section.settings.title }}</p>
+    {% endif %}
+
+    {%- comment -%} Bento Grid {%- endcomment -%}
+    <div class="instagram-grid__bento">
+      {% for block in section.blocks %}
+        {% liquid
+          assign aspect = block.settings.aspect_ratio | default: 'square'
+          assign span_class = ''
+          if aspect == 'tall'
+            assign span_class = ' instagram-grid__item--tall'
+          elsif aspect == 'wide'
+            assign span_class = ' instagram-grid__item--wide'
+          endif
+        %}
+
+        <a
+          href="{{ block.settings.link | default: section.settings.instagram_url }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="instagram-grid__item{{ span_class }}"
+          {{ block.shopify_attributes }}
+        >
+          {% if block.settings.image != blank %}
+            {{
+              block.settings.image
+              | image_url: width: 800
+              | image_tag:
+                loading: 'lazy',
+                sizes: '(max-width: 749px) 50vw, 33vw',
+                widths: '200, 300, 400, 600, 800',
+                class: 'instagram-grid__item-img'
+            }}
+          {% else %}
+            <div class="instagram-grid__item-placeholder"></div>
+          {% endif %}
+
+          {%- comment -%} Hover overlay {%- endcomment -%}
+          <div class="instagram-grid__overlay">
+            <svg class="instagram-grid__icon" width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="20" height="20" rx="5" stroke="white" stroke-width="1.5"/>
+              <circle cx="12" cy="12" r="5" stroke="white" stroke-width="1.5"/>
+              <circle cx="17.5" cy="6.5" r="1.25" fill="white"/>
+            </svg>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+
+    {% if section.settings.button_label != blank %}
+      <div class="instagram-grid__cta">
+        <a
+          href="{{ section.settings.instagram_url }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="instagram-grid__button button {{ section.settings.button_style }}"
+        >
+          {{ section.settings.button_label }}
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% stylesheet %}
+  .instagram-grid-section {
+    margin-block: var(--ig-section-spacing, 20px);
+  }
+
+  .instagram-grid__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+
+  /* Heading */
+  .instagram-grid__heading {
+    display: flex;
+    justify-content: center;
+  }
+
+  .instagram-grid__heading-img {
+    width: var(--ig-heading-size, 160px);
+    height: auto;
+    object-fit: contain;
+  }
+
+  .instagram-grid__subtitle {
+    margin: 0;
+    font-size: clamp(0.875rem, 1.2vw, 1.1rem);
+    color: var(--color-foreground);
+    text-align: center;
+  }
+
+  /* Bento grid */
+  .instagram-grid__bento {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 1fr;
+    gap: var(--ig-gap, 8px);
+    width: 100%;
+  }
+
+  /* Grid items */
+  .instagram-grid__item {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--ig-radius, 16px);
+    display: block;
+    text-decoration: none;
+    aspect-ratio: 1 / 1;
+  }
+
+  /* Tall item: spans 2 rows */
+  .instagram-grid__item--tall {
+    grid-row: span 2;
+    aspect-ratio: auto;
+  }
+
+  /* Wide item: spans 2 columns */
+  .instagram-grid__item--wide {
+    grid-column: span 2;
+    aspect-ratio: auto;
+  }
+
+  .instagram-grid__item-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .instagram-grid__item-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--cg-card-bg, #2d5e45);
+  }
+
+  /* Hover overlay */
+  .instagram-grid__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(
+      from var(--ig-overlay-color) r g b / var(--ig-overlay-opacity, 0.5)
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: inherit;
+  }
+
+  .instagram-grid__item:hover .instagram-grid__overlay {
+    opacity: 1;
+  }
+
+  .instagram-grid__item:hover .instagram-grid__item-img {
+    transform: scale(1.05);
+  }
+
+  .instagram-grid__icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* CTA */
+  .instagram-grid__cta {
+    display: flex;
+    justify-content: center;
+  }
+
+  .instagram-grid__button {
+    border-radius: 8px;
+    padding-block: 10px;
+    padding-inline: 28px;
+    font-size: 0.875rem;
+  }
+
+  /* Mobile */
+  @media screen and (max-width: 749px) {
+    .instagram-grid__bento {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .instagram-grid__item--wide {
+      grid-column: span 2;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Instagram grid",
+  "tag": "section",
+  "class": "instagram-grid-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "image_picker",
+      "id": "heading_image",
+      "label": "Heading image",
+      "info": "Logo or decorative heading"
+    },
+    {
+      "type": "range",
+      "id": "heading_image_size",
+      "label": "Heading image width",
+      "min": 60,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 160
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Subtitle text"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram profile URL",
+      "info": "Default link for all items"
+    },
+    {
+      "type": "header",
+      "content": "Grid"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "Gap between items",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card corner radius",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Hover overlay"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 10,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "button-primary", "label": "Primary" },
+        { "value": "button-secondary", "label": "Secondary" },
+        { "value": "button-tertiary", "label": "Tertiary" }
+      ],
+      "default": "button-primary"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "section_spacing",
+      "label": "Space above & below section",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "post",
+      "name": "Post",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "select",
+          "id": "aspect_ratio",
+          "label": "Card size",
+          "options": [
+            { "value": "square", "label": "Square (1:1 — Post)" },
+            { "value": "tall", "label": "Tall (spans 2 rows — Reel)" },
+            { "value": "wide", "label": "Wide (spans 2 columns)" }
+          ],
+          "default": "square",
+          "info": "Square for posts, Tall for reels (9:16)"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Post link",
+          "info": "Override the default Instagram URL for this item"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Instagram grid",
+      "category": "Social",
+      "blocks": [
+        { "type": "post" },
+        { "type": "post" },
+        { "type": "post" },
+        { "type": "post" },
+        { "type": "post" }
+      ]
+    }
+  ]
+}
+{% endschema %}
