@@ -10,9 +10,14 @@
   endif
 %}
 
+{% liquid
+  assign desktop_layout = section.settings.desktop_layout | default: 'image_left'
+  assign mobile_layout = section.settings.mobile_layout | default: 'image_top'
+%}
+
 <div
   id="ImageBanner-{{ section.id }}"
-  class="image-banner color-{{ section.settings.color_scheme }}"
+  class="image-banner color-{{ section.settings.color_scheme }}{% if desktop_layout == 'image_right' %} image-banner--reversed{% endif %}{% if mobile_layout == 'image_bottom' %} image-banner--mobile-reversed{% endif %}"
   style="
     --ib-arch-color: {{ section.settings.arch_color | default: '#4a8f6d' }};
     --ib-logo-size: {{ section.settings.logo_size | default: 60 }}px;
@@ -178,11 +183,24 @@
     font-size: 0.875rem;
   }
 
+  /* Desktop: reversed layout (image right, text left) */
+  .image-banner--reversed .image-banner__grid {
+    direction: rtl;
+  }
+
+  .image-banner--reversed .image-banner__grid > * {
+    direction: ltr;
+  }
+
   /* Mobile: stack vertically */
   @media screen and (max-width: 749px) {
     .image-banner__grid {
       grid-template-columns: 1fr;
       gap: 32px;
+    }
+
+    .image-banner--reversed .image-banner__grid {
+      direction: ltr;
     }
 
     .image-banner__arch-inner {
@@ -195,6 +213,15 @@
       --ib-text-align: center !important;
       --ib-button-align: center !important;
       align-items: center;
+    }
+
+    /* Mobile: image bottom (text first, image second) */
+    .image-banner--mobile-reversed .image-banner__arch {
+      order: 2;
+    }
+
+    .image-banner--mobile-reversed .image-banner__content {
+      order: 1;
     }
   }
 {% endstylesheet %}
@@ -326,6 +353,26 @@
     {
       "type": "header",
       "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "desktop_layout",
+      "label": "Desktop layout",
+      "options": [
+        { "value": "image_left", "label": "Image left / Text right" },
+        { "value": "image_right", "label": "Image right / Text left" }
+      ],
+      "default": "image_left"
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
+      "options": [
+        { "value": "image_top", "label": "Image top / Text bottom" },
+        { "value": "image_bottom", "label": "Image bottom / Text top" }
+      ],
+      "default": "image_top"
     },
     {
       "type": "select",
