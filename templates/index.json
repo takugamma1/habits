@@ -315,9 +315,8 @@
         "cat_delivery"
       ],
       "settings": {
-        "heading_image": "shopify://shop_images/Group_7.png",
         "heading_image_size": 160,
-        "title": "НАШИТЕ ПРЕДЛОЖЕНИЯ",
+        "title": "Разгледай менюто",
         "background_color": "#024b40",
         "card_color": "#2d5e45",
         "card_title_color": "#ffffff",
