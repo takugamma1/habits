@@ -1449,6 +1449,10 @@
       if (mobMenu) mobMenu.setAttribute('aria-hidden', 'true');
     }
 
+    /* Override meta theme-color to white since the bubble replaces the native header */
+    var metaThemeColor = document.head.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#ffffff');
+
     /* Show bubble immediately — slides in from top on page load */
     requestAnimationFrame(function () {
       bubble.classList.add('is-visible');
