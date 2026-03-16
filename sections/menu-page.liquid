@@ -1151,9 +1151,9 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -48%);
-      width: 480px;
+      width: 420px;
       max-width: 92vw;
-      max-height: 80vh;
+      max-height: 85vh;
       border-radius: 24px;
       box-shadow: 0 8px 40px rgba(0,0,0,0.15);
     }
@@ -1169,7 +1169,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      max-height: 85vh;
+      max-height: 80vh;
       border-radius: 24px 24px 0 0;
       transform: translateY(100%);
       box-shadow: 0 -4px 30px rgba(0,0,0,0.1);
@@ -1177,6 +1177,11 @@
 
     .mp-upsell.is-open {
       transform: translateY(0);
+    }
+
+    .mp-upsell__preview-img {
+      width: 44px;
+      height: 44px;
     }
   }
 
@@ -1193,39 +1198,68 @@
     z-index: 2;
   }
 
-  .mp-upsell__slider {
+  /* ─── Selected product preview ─── */
+  .mp-upsell__preview {
     display: flex;
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    width: 200%;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px 0;
+    flex-shrink: 0;
+  }
+
+  .mp-upsell__preview-img {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #f5f3ef;
+    flex-shrink: 0;
+  }
+
+  .mp-upsell__preview-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .mp-upsell__preview-name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mp-upsell__preview-price {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #024b40;
+  }
+
+  /* ─── Body (single page) ─── */
+  .mp-upsell__body {
+    padding: 16px 20px 0;
     flex: 1;
     min-height: 0;
-  }
-
-  .mp-upsell__slider[data-page="2"] {
-    transform: translateX(-50%);
-  }
-
-  .mp-upsell__page {
-    width: 50%;
-    flex-shrink: 0;
-    padding: 28px 24px 20px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
   .mp-upsell__title {
-    margin: 0 0 20px;
-    font-size: 1.125rem;
+    margin: 0 0 12px;
+    font-size: 1rem;
     font-weight: 800;
     color: #1a1a1a;
   }
 
-  /* ─── Addon tile grid (replaces old list) ─── */
+  /* ─── Addon tile grid ─── */
   .mp-upsell__grid {
     display: grid;
     grid-template-columns: repeat(var(--mp-addon-cols, 3), 1fr);
-    gap: 10px;
-    margin-bottom: 24px;
+    gap: 8px;
+    margin-bottom: 0;
   }
 
   .mp-addon-tile {
@@ -1482,8 +1516,9 @@
 
   .mp-upsell__actions {
     display: flex;
-    gap: 12px;
-    padding-top: 4px;
+    gap: 10px;
+    padding: 12px 20px 16px;
+    flex-shrink: 0;
   }
 
   .mp-upsell__skip {
@@ -1518,24 +1553,7 @@
 
   .mp-upsell__next:hover { opacity: 0.9; }
 
-  .mp-upsell__dots {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    padding: 8px 0 16px;
-  }
-
-  .mp-upsell__dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #ddd;
-    transition: background 0.3s ease;
-  }
-
-  .mp-upsell__dot.is-active {
-    background: #024b40;
-  }
+  /* dots removed — single page layout */
 
   .mp-upsell__empty {
     text-align: center;
@@ -1682,8 +1700,6 @@
   var upsellOverlay = $('#mp-upsell-overlay');
   var upsell = $('#mp-upsell');
   var upsellClose = $('#mp-upsell-close');
-  var upsellSlider = $('#mp-upsell-slider');
-  var upsellDots = $$('.mp-upsell__dot');
 
   /* ─────────── Time-based logic ─────────── */
   function initTimeLogic() {
@@ -1767,8 +1783,20 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items: items })
     })
-    .then(function (r) { return r.json(); })
-    .then(function () { return fetchCart(); });
+    .then(function (r) {
+      if (!r.ok) {
+        return r.json().then(function (err) {
+          console.error('[Habits] Cart add failed:', err);
+          throw new Error(err.description || err.message || 'Cart add failed');
+        });
+      }
+      return r.json();
+    })
+    .then(function () { return fetchCart(); })
+    .catch(function (err) {
+      console.error('[Habits] addToCart error:', err);
+      return fetchCart();
+    });
   }
 
   function changeQuantity(key, qty) {
@@ -1885,14 +1913,27 @@
   if (sheetOverlay) sheetOverlay.addEventListener('click', closeSheet);
 
   /* ─────────── Upsell modal ─────────── */
-  function openUpsell(variantId) {
+  var previewImg = $('#mp-upsell-preview-img');
+  var previewName = $('#mp-upsell-preview-name');
+  var previewPrice = $('#mp-upsell-preview-price');
+
+  function openUpsell(variantId, card) {
     state.pendingVariant = variantId;
     state.upsellOpen = true;
 
-    // Reset selections & slider
+    // Reset selections
     $$('.mp-upsell__check').forEach(function (c) { c.checked = false; });
-    if (upsellSlider) upsellSlider.removeAttribute('data-page');
-    upsellDots.forEach(function (d, i) { d.classList.toggle('is-active', i === 0); });
+    $$('.mp-addon-tile.is-selected').forEach(function (t) { t.classList.remove('is-selected'); });
+
+    // Populate product preview from the clicked card
+    if (card) {
+      if (previewImg) {
+        previewImg.src = card.dataset.productImage || '';
+        previewImg.alt = card.dataset.productTitle || '';
+      }
+      if (previewName) previewName.textContent = card.dataset.productTitle || '';
+      if (previewPrice) previewPrice.textContent = card.dataset.productPrice || '';
+    }
 
     if (upsell) upsell.classList.add('is-open');
     if (upsellOverlay) upsellOverlay.classList.add('is-open');
@@ -1907,20 +1948,13 @@
     document.body.style.overflow = '';
   }
 
-  function goToUpsellPage(page) {
-    if (upsellSlider) upsellSlider.setAttribute('data-page', page);
-    upsellDots.forEach(function (d) {
-      d.classList.toggle('is-active', d.dataset.dot === String(page));
-    });
-  }
-
   function collectUpsellItems() {
     var items = [];
     // Main product
     if (state.pendingVariant) {
       items.push({ id: parseInt(state.pendingVariant, 10), quantity: 1 });
     }
-    // Checked upsells + downsells
+    // Checked addons
     $$('.mp-upsell__check:checked').forEach(function (c) {
       items.push({ id: parseInt(c.value, 10), quantity: 1 });
     });
@@ -1930,25 +1964,19 @@
   if (upsellClose) upsellClose.addEventListener('click', closeUpsell);
   if (upsellOverlay) upsellOverlay.addEventListener('click', closeUpsell);
 
-  // Upsell action buttons
+  // Upsell action buttons (single page: skip-all or add)
   $$('.mp-upsell__next, .mp-upsell__skip').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var action = btn.dataset.action;
-      if (action === 'next') {
-        goToUpsellPage(2);
-      } else if (action === 'skip') {
-        var page = btn.closest('.mp-upsell__page');
-        if (page && page.dataset.page === '1') {
-          goToUpsellPage(2);
-        } else {
-          // Skip from page 2 = add only main item
-          var items = [{ id: parseInt(state.pendingVariant, 10), quantity: 1 }];
-          addToCart(items).then(function () {
-            closeUpsell();
-            bounceCartBadge();
-          });
-        }
+      if (action === 'skip-all') {
+        // "Не искам добавка" = add only the main item, no addons
+        var items = [{ id: parseInt(state.pendingVariant, 10), quantity: 1 }];
+        addToCart(items).then(function () {
+          closeUpsell();
+          bounceCartBadge();
+        });
       } else if (action === 'add') {
+        // "Добави в количката" = add main item + selected addons
         var items = collectUpsellItems();
         if (items.length > 0) {
           addToCart(items).then(function () {
@@ -2036,11 +2064,10 @@
     var variantId = card.dataset.variantId;
     if (!variantId) return;
 
-    var hasUpsells = $('#mp-upsell-list-1 .mp-addon-tile');
-    var hasDownsells = $('#mp-upsell-list-2 .mp-addon-tile');
+    var hasAddons = $('#mp-upsell-list-1 .mp-addon-tile');
 
-    if (hasUpsells || hasDownsells) {
-      openUpsell(variantId);
+    if (hasAddons) {
+      openUpsell(variantId, card);
     } else {
       addToCart([{ id: parseInt(variantId, 10), quantity: 1 }]).then(bounceCartBadge);
     }
