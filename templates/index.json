@@ -101,7 +101,7 @@
           "type": "text",
           "name": "t:names.heading",
           "settings": {
-            "text": "<h2>Всички твой навици на едно място</h2>",
+            "text": "<h2>Всички твои навици на едно място</h2>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
