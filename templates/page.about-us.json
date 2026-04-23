@@ -247,6 +247,62 @@
         "hide_on_mobile": false
       }
     },
+    "featured_card_37aRig": {
+      "type": "featured-card",
+      "name": "Featured card",
+      "settings": {
+        "image": "shopify://shop_images/DSC07246.jpg",
+        "card_color": "#4a8f6d",
+        "card_radius": 24,
+        "badge_top_image": "shopify://shop_images/Group_11.png",
+        "badge_top_width": 100,
+        "badge_top_text": "",
+        "badge_top_color": "#f5f0e8",
+        "badge_top_text_color": "#1a1a1a",
+        "badge_bottom_image": "shopify://shop_images/Group_10.png",
+        "show_bottom_arch": true,
+        "badge_bottom_size": 50,
+        "badge_bottom_color": "#ffffff",
+        "heading_image_size": 200,
+        "title": "Мястото където да комбинираш всеки един твой навик",
+        "text": "<p>HABITS се намира в централната част на Варна, където създаваме уникална атмосфера за всички, които се отдадат на нашата гостоприемна обстановка. Бара е обзаведен в модерен и индустриален стил, комбиниращ дървени, метални и бетонови елементи, съчетани със зеленина, която ти позволява да се откъснеш от градската среда.</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "button-primary",
+        "button_open_new_tab": false,
+        "heading_alignment": "flex-start",
+        "text_alignment": "left",
+        "button_alignment": "flex-start",
+        "color_scheme": "scheme-1",
+        "section_spacing": 20,
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    },
+    "promo_banner_gdRN4A": {
+      "type": "promo-banner",
+      "name": "Promo banner",
+      "settings": {
+        "heading_image_size": 200,
+        "title": "Запомнящо изживяване",
+        "text": "<p>В HABITS се грижим за всеки детайл от обслужването Ви, за да предоставим на нашите гости най-доброто изживяване. Ние сме тук, за да направим  престоя ти при нас незабравим.</p>",
+        "button_label": "Разгледай меню",
+        "button_link": "",
+        "button_style": "button-primary",
+        "button_open_new_tab": false,
+        "image": "shopify://shop_images/DVP01263.jpg",
+        "image_radius": 16,
+        "badge_size": 56,
+        "background_color": "#024b40",
+        "border_radius": 24,
+        "section_margin": 12,
+        "section_spacing": 20,
+        "padding-block-start": 48,
+        "padding-block-end": 48,
+        "padding-inline-start": 40,
+        "padding-inline-end": 40
+      }
+    },
     "hero_KYGiBm": {
       "type": "hero",
       "blocks": {
@@ -267,8 +323,8 @@
               "name": "t:names.icon",
               "settings": {
                 "icon": "price_tag",
-                "image_upload": "shopify://shop_images/DSC07247.jpg",
-                "width": 200,
+                "image_upload": "shopify://shop_images/DSC07488.jpg",
+                "width": 166,
                 "link": "",
                 "open_in_new_tab": false
               },
@@ -279,8 +335,8 @@
               "name": "t:names.icon",
               "settings": {
                 "icon": "price_tag",
-                "image_upload": "shopify://shop_images/hf_20260227_135214_26d88210-3e53-4a17-841c-59359705f38c.jpg",
-                "width": 140,
+                "image_upload": "shopify://shop_images/DVP01202.jpg",
+                "width": 166,
                 "link": "",
                 "open_in_new_tab": false
               },
@@ -291,7 +347,7 @@
               "name": "t:names.icon",
               "settings": {
                 "icon": "price_tag",
-                "image_upload": "shopify://shop_images/DSC00009.jpg",
+                "image_upload": "shopify://shop_images/DSC07508.jpg",
                 "width": 166,
                 "link": "",
                 "open_in_new_tab": false
@@ -303,8 +359,8 @@
               "name": "t:names.icon",
               "settings": {
                 "icon": "price_tag",
-                "image_upload": "shopify://shop_images/DSC07247.jpg",
-                "width": 200,
+                "image_upload": "shopify://shop_images/DSC09708.jpg",
+                "width": 166,
                 "link": "",
                 "open_in_new_tab": false
               },
@@ -355,62 +411,6 @@
         "section_margin": 0,
         "padding-block-start": 0,
         "padding-block-end": 0
-      }
-    },
-    "featured_card_37aRig": {
-      "type": "featured-card",
-      "name": "Featured card",
-      "settings": {
-        "image": "shopify://shop_images/DSC07247.jpg",
-        "card_color": "#4a8f6d",
-        "card_radius": 24,
-        "badge_top_image": "shopify://shop_images/Group_11.png",
-        "badge_top_width": 100,
-        "badge_top_text": "",
-        "badge_top_color": "#f5f0e8",
-        "badge_top_text_color": "#1a1a1a",
-        "badge_bottom_image": "shopify://shop_images/Group_10.png",
-        "show_bottom_arch": true,
-        "badge_bottom_size": 50,
-        "badge_bottom_color": "#ffffff",
-        "heading_image_size": 200,
-        "title": "Мястото където да комбинираш всеки един твой навик",
-        "text": "<p>HABITS се намира в централната част на Варна, където създаваме уникална атмосфера за всички, които се отдадат на нашата гостоприемна обстановка. Бара е обзаведен в модерен и индустриален стил, комбиниращ дървени, метални и бетонови елементи, съчетани със зеленина, която ти позволява да се откъснеш от градската среда.</p>",
-        "button_label": "",
-        "button_link": "",
-        "button_style": "button-primary",
-        "button_open_new_tab": false,
-        "heading_alignment": "flex-start",
-        "text_alignment": "left",
-        "button_alignment": "flex-start",
-        "color_scheme": "scheme-1",
-        "section_spacing": 20,
-        "padding-block-start": 48,
-        "padding-block-end": 48
-      }
-    },
-    "promo_banner_gdRN4A": {
-      "type": "promo-banner",
-      "name": "Promo banner",
-      "settings": {
-        "heading_image_size": 200,
-        "title": "Запомнящо изживяване",
-        "text": "<p>В HABITS се грижим за всеки детайл от обслужването Ви, за да предоставим на нашите гости най-доброто изживяване. Ние сме тук, за да направим  престоя ти при нас незабравим.</p>",
-        "button_label": "Разгледай меню",
-        "button_link": "",
-        "button_style": "button-primary",
-        "button_open_new_tab": false,
-        "image": "shopify://shop_images/DSC07247.jpg",
-        "image_radius": 16,
-        "badge_size": 56,
-        "background_color": "#024b40",
-        "border_radius": 24,
-        "section_margin": 12,
-        "section_spacing": 20,
-        "padding-block-start": 48,
-        "padding-block-end": 48,
-        "padding-inline-start": 40,
-        "padding-inline-end": 40
       }
     },
     "instagram_grid_PGEXGf": {
