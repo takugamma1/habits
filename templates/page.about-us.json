@@ -287,7 +287,7 @@
         "title": "Запомнящо изживяване",
         "text": "<p>В HABITS се грижим за всеки детайл от обслужването Ви, за да предоставим на нашите гости най-доброто изживяване. Ние сме тук, за да направим  престоя ти при нас незабравим.</p>",
         "button_label": "Разгледай меню",
-        "button_link": "",
+        "button_link": "shopify://pages/меню",
         "button_style": "button-primary",
         "button_open_new_tab": false,
         "image": "shopify://shop_images/DVP01263.jpg",
