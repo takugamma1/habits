@@ -62,7 +62,7 @@
       "settings": {
         "hero_overlay_logo_width": 800,
         "media_type_1": "image",
-        "image_1": "shopify://shop_images/DSC07247.jpg",
+        "image_1": "shopify://shop_images/DVP01244.jpg",
         "media_type_2": "image",
         "stack_media_on_mobile": false,
         "custom_mobile_media": false,
@@ -566,7 +566,7 @@
         "ig_post_1": {
           "type": "post",
           "settings": {
-            "image": "shopify://shop_images/DVP01214.jpg",
+            "image": "shopify://shop_images/DSC07480.jpg",
             "aspect_ratio": "tall",
             "link": ""
           }
@@ -574,6 +574,7 @@
         "post_k79ddC": {
           "type": "post",
           "settings": {
+            "image": "shopify://shop_images/DVP01027.jpg",
             "aspect_ratio": "square",
             "link": ""
           }
@@ -581,6 +582,7 @@
         "ig_post_2": {
           "type": "post",
           "settings": {
+            "image": "shopify://shop_images/DVP01028.jpg",
             "aspect_ratio": "square",
             "link": ""
           }
@@ -588,6 +590,7 @@
         "ig_post_3": {
           "type": "post",
           "settings": {
+            "image": "shopify://shop_images/DSC00023.jpg",
             "aspect_ratio": "square",
             "link": ""
           }
@@ -595,6 +598,7 @@
         "ig_post_4": {
           "type": "post",
           "settings": {
+            "image": "shopify://shop_images/DSC07412.jpg",
             "aspect_ratio": "square",
             "link": ""
           }
@@ -625,7 +629,7 @@
     "reservation_form_Qk7mN3": {
       "type": "reservation-form",
       "settings": {
-        "image": "shopify://shop_images/DSC07247.jpg",
+        "image": "shopify://shop_images/DVP01037.jpg",
         "card_radius": 48,
         "heading_image_size": 200,
         "title": "Резервирай си маса",
