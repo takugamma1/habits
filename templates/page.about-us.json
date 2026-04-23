@@ -116,6 +116,7 @@
     },
     "image_banner_kBNNA6": {
       "type": "image-banner",
+      "disabled": true,
       "name": "Image banner",
       "settings": {
         "image": "shopify://shop_images/DSC07549.jpg",
@@ -458,6 +459,7 @@
         "post_iVwqBE",
         "post_Jc9MFk"
       ],
+      "disabled": true,
       "name": "Instagram grid",
       "settings": {
         "heading_image_size": 160,
@@ -480,9 +482,9 @@
     "hero_zH7mGB",
     "image_banner_kBNNA6",
     "section_q6L68z",
-    "hero_KYGiBm",
     "featured_card_37aRig",
     "promo_banner_gdRN4A",
+    "hero_KYGiBm",
     "instagram_grid_PGEXGf"
   ]
 }
