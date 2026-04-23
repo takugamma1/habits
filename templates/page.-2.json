@@ -51,7 +51,7 @@
       "settings": {
         "content_direction": "column",
         "gap": 25,
-        "color_scheme": "",
+        "color_scheme": "scheme-1",
         "padding-block-start": 40,
         "padding-block-end": 80
       }
@@ -88,7 +88,7 @@
         "button_color": "#dd5934",
         "button_text_color": "#ffffff",
         "border_radius": 24,
-        "section_margin": 12,
+        "section_margin": 0,
         "section_spacing": 20,
         "padding-block-start": 48,
         "padding-block-end": 80,
