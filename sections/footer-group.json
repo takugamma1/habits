@@ -76,7 +76,7 @@
             "text_LWt8Pz": {
               "type": "text",
               "settings": {
-                "text": "<h2>Join our email list</h2>",
+                "text": "<h2>Запиши се за нашият имейл лист.</h2>",
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",
@@ -101,7 +101,7 @@
             "text_f9CFLH": {
               "type": "text",
               "settings": {
-                "text": "<p>Get exclusive deals and early access to new products.</p>",
+                "text": "",
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",
