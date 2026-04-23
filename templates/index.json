@@ -202,7 +202,7 @@
       "type": "image-banner",
       "name": "Image banner",
       "settings": {
-        "image": "shopify://shop_images/hf_20260227_135214_26d88210-3e53-4a17-841c-59359705f38c.jpg",
+        "image": "shopify://shop_images/DSC07475.jpg",
         "arch_color": "#4a8f6d",
         "logo_image": "shopify://shop_images/Group_3.png",
         "logo_size": 30,
@@ -228,7 +228,7 @@
     "image_banner_hB4x7K": {
       "type": "image-banner",
       "settings": {
-        "image": "shopify://shop_images/DSC00009.jpg",
+        "image": "shopify://shop_images/DSC07493.jpg",
         "arch_color": "#4a8f6d",
         "logo_image": "shopify://shop_images/Group_3.png",
         "logo_size": 30,
@@ -257,7 +257,7 @@
         "cat_hookah": {
           "type": "category",
           "settings": {
-            "image": "shopify://shop_images/DSC00009.jpg",
+            "image": "shopify://shop_images/DVP01226.jpg",
             "title": "НАРГИЛЕТА",
             "title_image_width": 100,
             "link": "",
