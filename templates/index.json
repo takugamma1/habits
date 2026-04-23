@@ -16,7 +16,7 @@
           "type": "text",
           "name": "t:names.heading",
           "settings": {
-            "text": "<h1>Your tasty Habits</h1>",
+            "text": "<h1>Your Tasty Habits</h1>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
