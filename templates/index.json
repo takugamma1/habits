@@ -283,7 +283,7 @@
         "cat_drinks": {
           "type": "category",
           "settings": {
-            "image": "shopify://shop_images/DSC07247.jpg",
+            "image": "shopify://shop_images/DSC07414.jpg",
             "title": "НАПИТКИ",
             "title_image_width": 135,
             "link": "",
@@ -461,7 +461,7 @@
       "type": "featured-card",
       "name": "Featured card",
       "settings": {
-        "image": "shopify://shop_images/DSC07247.jpg",
+        "image": "shopify://shop_images/DSC07477_Large_995a3fe1-fe11-40ec-a117-91513c787ba4.jpg",
         "card_color": "#4a8f6d",
         "card_radius": 24,
         "badge_top_image": "shopify://shop_images/Group_7.png",
@@ -566,6 +566,7 @@
         "ig_post_1": {
           "type": "post",
           "settings": {
+            "image": "shopify://shop_images/DVP01214.jpg",
             "aspect_ratio": "tall",
             "link": ""
           }
