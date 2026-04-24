@@ -254,24 +254,79 @@
 </div>
 
 <div class="cart__ctas">
-  <div class="cart__delivery-phone" data-cart-delivery-phone>
-    <p class="cart__delivery-phone-title">Въведете телефонен номер за да продължите напред</p>
-    <label class="cart__delivery-phone-label" for="cart-delivery-phone">Телефон за доставка *</label>
-    <input
-      type="tel"
-      id="cart-delivery-phone"
-      class="cart__delivery-phone-input"
-      name="attributes[Delivery phone]"
-      form="cart-form"
-      inputmode="tel"
-      autocomplete="tel"
-      pattern="^(\+359|0)[0-9]{9}$"
-      placeholder="+359..."
-      value="{{ cart.attributes['Delivery phone'] | escape }}"
-      required
-    >
-    <small class="cart__delivery-phone-hint">Необходим за доставка с Wolt — ще получите SMS с проследяване</small>
-    <div class="cart__delivery-phone-error" role="alert" aria-live="polite"></div>
+  <div class="cart__delivery-info" data-cart-delivery-info>
+    <p class="cart__delivery-info-title">Въведете информация за доставка за да продължите напред</p>
+
+    <div class="cart__delivery-phone" data-cart-delivery-phone>
+      <label class="cart__delivery-info-label" for="cart-delivery-phone">Телефон за доставка *</label>
+      <input
+        type="tel"
+        id="cart-delivery-phone"
+        class="cart__delivery-info-input"
+        name="attributes[Delivery phone]"
+        form="cart-form"
+        inputmode="tel"
+        autocomplete="tel"
+        pattern="^(\+359|0)[0-9]{9}$"
+        placeholder="+359..."
+        value="{{ cart.attributes['Delivery phone'] | escape }}"
+        required
+      >
+      <small class="cart__delivery-info-hint">Необходим за доставка с Wolt — ще получите SMS с проследяване</small>
+      <div class="cart__delivery-phone-error cart__delivery-info-error" role="alert" aria-live="polite"></div>
+    </div>
+
+    <div class="cart__delivery-address" data-cart-delivery-address>
+      <label class="cart__delivery-info-label" for="cart-delivery-address">Адрес за доставка *</label>
+      <input
+        type="text"
+        id="cart-delivery-address"
+        class="cart__delivery-info-input"
+        name="attributes[Delivery address]"
+        form="cart-form"
+        autocomplete="street-address"
+        placeholder="ул. Преслав 5, ап. 3"
+        value="{{ cart.attributes['Delivery address'] | escape }}"
+        required
+      >
+
+      <div class="cart__delivery-info-row">
+        <div class="cart__delivery-info-col">
+          <label class="cart__delivery-info-label" for="cart-delivery-city">Град *</label>
+          <input
+            type="text"
+            id="cart-delivery-city"
+            class="cart__delivery-info-input"
+            name="attributes[Delivery city]"
+            form="cart-form"
+            autocomplete="address-level2"
+            placeholder="Варна"
+            value="{{ cart.attributes['Delivery city'] | escape }}"
+            required
+          >
+        </div>
+        <div class="cart__delivery-info-col cart__delivery-info-col--zip">
+          <label class="cart__delivery-info-label" for="cart-delivery-zip">Пощенски код *</label>
+          <input
+            type="text"
+            id="cart-delivery-zip"
+            class="cart__delivery-info-input"
+            name="attributes[Delivery zip]"
+            form="cart-form"
+            inputmode="numeric"
+            autocomplete="postal-code"
+            pattern="^[0-9]{4}$"
+            maxlength="4"
+            placeholder="9000"
+            value="{{ cart.attributes['Delivery zip'] | escape }}"
+            required
+          >
+        </div>
+      </div>
+
+      <small class="cart__delivery-info-hint">Необходимо за доставка с Wolt — куриерът ще бъде изпратен до този адрес</small>
+      <div class="cart__delivery-address-error cart__delivery-info-error" role="alert" aria-live="polite"></div>
+    </div>
   </div>
   <button
     type="submit"
@@ -488,13 +543,13 @@
     padding-inline: var(--padding-4xl);
   }
 
-  .cart__delivery-phone {
+  .cart__delivery-info {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-3xs, 4px);
+    gap: var(--gap-md, 10px);
   }
 
-  .cart__delivery-phone-title {
+  .cart__delivery-info-title {
     margin: 0 0 var(--margin-3xs, 4px);
     font-size: var(--font-size--sm);
     font-weight: var(--font-weight-bold);
@@ -502,13 +557,20 @@
     line-height: 1.35;
   }
 
-  .cart__delivery-phone-label {
+  .cart__delivery-phone,
+  .cart__delivery-address {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-3xs, 4px);
+  }
+
+  .cart__delivery-info-label {
     font-size: var(--font-size--2xs);
     font-weight: 500;
     color: var(--color-foreground);
   }
 
-  .cart__delivery-phone-input {
+  .cart__delivery-info-input {
     width: 100%;
     color: var(--color-input-text);
     background-color: var(--color-input-background);
@@ -520,32 +582,59 @@
     font-size: var(--font-size--sm);
     transition: box-shadow var(--animation-speed) ease, border-color var(--animation-speed) ease;
     box-shadow: var(--input-box-shadow);
+    box-sizing: border-box;
   }
 
-  .cart__delivery-phone-input::placeholder {
+  .cart__delivery-info-input::placeholder {
     color: rgb(var(--color-input-text-rgb) / var(--opacity-subdued-text));
   }
 
-  .cart__delivery-phone.is-invalid .cart__delivery-phone-input {
+  .cart__delivery-phone.is-invalid .cart__delivery-info-input,
+  .cart__delivery-info-input.is-invalid {
     border-color: #c0392b;
     box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
   }
 
-  .cart__delivery-phone-hint {
+  .cart__delivery-info-hint {
     font-size: var(--font-size--2xs);
     color: rgb(var(--color-foreground-rgb) / var(--opacity-subdued-text));
     line-height: 1.4;
   }
 
-  .cart__delivery-phone-error {
+  .cart__delivery-info-error {
     display: none;
     font-size: var(--font-size--2xs);
     color: #c0392b;
     margin-top: var(--margin-3xs, 2px);
   }
 
-  .cart__delivery-phone.is-invalid .cart__delivery-phone-error {
+  .cart__delivery-phone.is-invalid > .cart__delivery-info-error,
+  .cart__delivery-address.is-invalid > .cart__delivery-info-error {
     display: block;
+  }
+
+  .cart__delivery-info-row {
+    display: flex;
+    gap: var(--gap-sm, 10px);
+    margin-top: var(--margin-3xs, 4px);
+  }
+
+  .cart__delivery-info-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-3xs, 4px);
+    flex: 2 1 0;
+    min-width: 0;
+  }
+
+  .cart__delivery-info-col--zip {
+    flex: 1 1 0;
+  }
+
+  @media screen and (max-width: 380px) {
+    .cart__delivery-info-row {
+      flex-direction: column;
+    }
   }
 
   .cart-drawer__summary .cart-totals:not(:has(.cart-totals__original-container:empty)) {
@@ -716,6 +805,39 @@
       });
     }
 
+    var ADDRESS_KEYS = {
+      address: 'habits_delivery_address',
+      city: 'habits_delivery_city',
+      zip: 'habits_delivery_zip'
+    };
+    var ZIP_REGEX = /^[0-9]{4}$/;
+
+    function validateAddress(addrInput, cityInput, zipInput) {
+      var a = (addrInput.value || '').trim();
+      var c = (cityInput.value || '').trim();
+      var z = (zipInput.value || '').trim();
+      if (!a || a.length < 3) return { ok: false, message: 'Моля въведете адрес', focus: addrInput };
+      if (!c || c.length < 2) return { ok: false, message: 'Моля въведете град', focus: cityInput };
+      if (!ZIP_REGEX.test(z)) return { ok: false, message: 'Невалиден пощенски код (4 цифри)', focus: zipInput };
+      return { ok: true, address: a, city: c, zip: z };
+    }
+
+    function saveAddressToCart(address, city, zip) {
+      var attrs = {};
+      if (address) attrs['Delivery address'] = address;
+      if (city) attrs['Delivery city'] = city;
+      if (zip) attrs['Delivery zip'] = zip;
+      if (Object.keys(attrs).length === 0) return Promise.resolve(null);
+      return fetch('/cart/update.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ attributes: attrs })
+      }).then(function (r) {
+        if (!r.ok) throw new Error('cart update failed');
+        return r.json();
+      });
+    }
+
     function init() {
       var input = document.getElementById('cart-delivery-phone');
       if (!input) return;
@@ -756,36 +878,121 @@
         if (wrapper && wrapper.classList.contains('is-invalid')) setState(validate(input.value));
       });
 
+      // ---- Address / city / zip ----
+      var addrInput = document.getElementById('cart-delivery-address');
+      var cityInput = document.getElementById('cart-delivery-city');
+      var zipInput = document.getElementById('cart-delivery-zip');
+      var addrWrapper = addrInput ? addrInput.closest('.cart__delivery-address') : null;
+      var addrError = addrWrapper ? addrWrapper.querySelector('.cart__delivery-address-error') : null;
+      var addressInputs = [addrInput, cityInput, zipInput].filter(Boolean);
+
+      try {
+        if (window.localStorage) {
+          if (addrInput && !addrInput.value) addrInput.value = window.localStorage.getItem(ADDRESS_KEYS.address) || '';
+          if (cityInput && !cityInput.value) cityInput.value = window.localStorage.getItem(ADDRESS_KEYS.city) || '';
+          if (zipInput && !zipInput.value) zipInput.value = window.localStorage.getItem(ADDRESS_KEYS.zip) || '';
+        }
+      } catch (e) { /* ignore */ }
+
+      function setAddressState(result) {
+        addressInputs.forEach(function (el) { el.classList.remove('is-invalid'); });
+        if (!addrWrapper) return;
+        if (result.ok) {
+          addrWrapper.classList.remove('is-invalid');
+          if (addrError) addrError.textContent = '';
+        } else {
+          addrWrapper.classList.add('is-invalid');
+          if (addrError) addrError.textContent = result.message;
+          if (result.focus) result.focus.classList.add('is-invalid');
+        }
+      }
+
+      if (addressInputs.length === 3) {
+        addressInputs.forEach(function (el) {
+          el.addEventListener('blur', function () {
+            el.value = (el.value || '').trim();
+            var result = validateAddress(addrInput, cityInput, zipInput);
+            setAddressState(result);
+            try {
+              if (window.localStorage) {
+                if (addrInput.value) window.localStorage.setItem(ADDRESS_KEYS.address, addrInput.value);
+                if (cityInput.value) window.localStorage.setItem(ADDRESS_KEYS.city, cityInput.value);
+                if (zipInput.value) window.localStorage.setItem(ADDRESS_KEYS.zip, zipInput.value);
+              }
+            } catch (err) { /* ignore */ }
+            saveAddressToCart(addrInput.value, cityInput.value, zipInput.value).catch(function (err) {
+              console.error('[Habits] address save failed:', err);
+            });
+          });
+
+          el.addEventListener('input', function () {
+            if (addrWrapper && addrWrapper.classList.contains('is-invalid')) {
+              setAddressState(validateAddress(addrInput, cityInput, zipInput));
+            }
+          });
+        });
+
+        // Keep zip digit-only up to 4 chars
+        zipInput.addEventListener('input', function () {
+          var digits = zipInput.value.replace(/\D+/g, '').slice(0, 4);
+          if (digits !== zipInput.value) zipInput.value = digits;
+        });
+      }
+
       // Block checkout button with capture phase (runs before theme handlers)
       var checkoutBtn = document.querySelector('[name="checkout"]');
       if (checkoutBtn) {
         checkoutBtn.addEventListener('click', function (e) {
-          var result = validate(input.value);
-          if (!result.ok) {
+          var phoneResult = validate(input.value);
+          if (!phoneResult.ok) {
             e.preventDefault();
             e.stopPropagation();
-            setState(result);
+            setState(phoneResult);
             input.focus();
             return;
           }
-          input.value = result.normalized;
+          input.value = phoneResult.normalized;
           try {
-            if (window.localStorage) window.localStorage.setItem(STORAGE_KEY, result.normalized);
+            if (window.localStorage) window.localStorage.setItem(STORAGE_KEY, phoneResult.normalized);
           } catch (err) { /* ignore */ }
-          // Fire-and-forget save in case blur didn't run (e.g. keyboard shortcut)
-          saveToCart(result.normalized).catch(function (err) {
+          saveToCart(phoneResult.normalized).catch(function (err) {
             console.error('[Habits] phone save failed:', err);
           });
+
+          if (addressInputs.length === 3) {
+            var addrResult = validateAddress(addrInput, cityInput, zipInput);
+            if (!addrResult.ok) {
+              e.preventDefault();
+              e.stopPropagation();
+              setAddressState(addrResult);
+              if (addrResult.focus) addrResult.focus.focus();
+              return;
+            }
+            setAddressState(addrResult);
+            try {
+              if (window.localStorage) {
+                window.localStorage.setItem(ADDRESS_KEYS.address, addrResult.address);
+                window.localStorage.setItem(ADDRESS_KEYS.city, addrResult.city);
+                window.localStorage.setItem(ADDRESS_KEYS.zip, addrResult.zip);
+              }
+            } catch (err) { /* ignore */ }
+            saveAddressToCart(addrResult.address, addrResult.city, addrResult.zip).catch(function (err) {
+              console.error('[Habits] address save failed:', err);
+            });
+          }
         }, true);
       }
 
-      // Hydrate from the cart so a reopened drawer reflects the real saved value
+      // Hydrate all delivery fields from the cart so a reopened cart reflects real server state
       fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (cart) {
           if (!cart || !cart.attributes) return;
-          var savedAttr = cart.attributes['Delivery phone'];
-          if (savedAttr && !input.value) input.value = savedAttr;
+          var attrs = cart.attributes;
+          if (attrs['Delivery phone'] && !input.value) input.value = attrs['Delivery phone'];
+          if (addrInput && attrs['Delivery address'] && !addrInput.value) addrInput.value = attrs['Delivery address'];
+          if (cityInput && attrs['Delivery city'] && !cityInput.value) cityInput.value = attrs['Delivery city'];
+          if (zipInput && attrs['Delivery zip'] && !zipInput.value) zipInput.value = attrs['Delivery zip'];
         })
         .catch(function () { /* ignore */ });
     }

@@ -34,22 +34,71 @@
       <span>Общо</span>
       <span id="mp-drawer-subtotal">0,00 лв.</span>
     </div>
-    <div class="mp-phone-field" data-mp-phone-scope="drawer">
-      <p class="mp-phone-field__title">Въведете телефонен номер за да продължите напред</p>
-      <label class="mp-phone-field__label" for="mp-drawer-phone">Телефон за доставка *</label>
-      <input
-        type="tel"
-        id="mp-drawer-phone"
-        class="mp-phone-field__input"
-        name="attributes[Delivery phone]"
-        inputmode="tel"
-        autocomplete="tel"
-        pattern="^(\+359|0)[0-9]{9}$"
-        placeholder="+359..."
-        required
-      >
-      <small class="mp-phone-field__hint">Необходим за доставка с Wolt — ще получите SMS с проследяване</small>
-      <div class="mp-phone-field__error" id="mp-drawer-phone-error" role="alert" aria-live="polite"></div>
+    <div class="mp-delivery-info" data-mp-delivery-scope="drawer">
+      <p class="mp-delivery-info__title">Въведете информация за доставка за да продължите напред</p>
+
+      <div class="mp-phone-field" data-mp-phone-scope="drawer">
+        <label class="mp-delivery-info__label" for="mp-drawer-phone">Телефон за доставка *</label>
+        <input
+          type="tel"
+          id="mp-drawer-phone"
+          class="mp-delivery-info__input"
+          name="attributes[Delivery phone]"
+          inputmode="tel"
+          autocomplete="tel"
+          pattern="^(\+359|0)[0-9]{9}$"
+          placeholder="+359..."
+          required
+        >
+        <small class="mp-delivery-info__hint">Необходим за доставка с Wolt — ще получите SMS с проследяване</small>
+        <div class="mp-delivery-info__error" id="mp-drawer-phone-error" role="alert" aria-live="polite"></div>
+      </div>
+
+      <div class="mp-address-field" data-mp-address-scope="drawer">
+        <label class="mp-delivery-info__label" for="mp-drawer-address">Адрес за доставка *</label>
+        <input
+          type="text"
+          id="mp-drawer-address"
+          class="mp-delivery-info__input"
+          name="attributes[Delivery address]"
+          autocomplete="street-address"
+          placeholder="ул. Преслав 5, ап. 3"
+          required
+        >
+
+        <div class="mp-delivery-info__row">
+          <div class="mp-delivery-info__col">
+            <label class="mp-delivery-info__label" for="mp-drawer-city">Град *</label>
+            <input
+              type="text"
+              id="mp-drawer-city"
+              class="mp-delivery-info__input"
+              name="attributes[Delivery city]"
+              autocomplete="address-level2"
+              placeholder="Варна"
+              required
+            >
+          </div>
+          <div class="mp-delivery-info__col mp-delivery-info__col--zip">
+            <label class="mp-delivery-info__label" for="mp-drawer-zip">Пощенски код *</label>
+            <input
+              type="text"
+              id="mp-drawer-zip"
+              class="mp-delivery-info__input"
+              name="attributes[Delivery zip]"
+              inputmode="numeric"
+              autocomplete="postal-code"
+              pattern="^[0-9]{4}$"
+              maxlength="4"
+              placeholder="9000"
+              required
+            >
+          </div>
+        </div>
+
+        <small class="mp-delivery-info__hint">Необходимо за доставка с Wolt — куриерът ще бъде изпратен до този адрес</small>
+        <div class="mp-delivery-info__error" id="mp-drawer-address-error" role="alert" aria-live="polite"></div>
+      </div>
     </div>
     <a
       href="/checkout"
@@ -95,22 +144,71 @@
       <span>Общо</span>
       <span id="mp-sheet-subtotal">0,00 лв.</span>
     </div>
-    <div class="mp-phone-field" data-mp-phone-scope="sheet">
-      <p class="mp-phone-field__title">Въведете телефонен номер за да продължите напред</p>
-      <label class="mp-phone-field__label" for="mp-sheet-phone">Телефон за доставка *</label>
-      <input
-        type="tel"
-        id="mp-sheet-phone"
-        class="mp-phone-field__input"
-        name="attributes[Delivery phone]"
-        inputmode="tel"
-        autocomplete="tel"
-        pattern="^(\+359|0)[0-9]{9}$"
-        placeholder="+359..."
-        required
-      >
-      <small class="mp-phone-field__hint">Необходим за доставка с Wolt — ще получите SMS с проследяване</small>
-      <div class="mp-phone-field__error" id="mp-sheet-phone-error" role="alert" aria-live="polite"></div>
+    <div class="mp-delivery-info" data-mp-delivery-scope="sheet">
+      <p class="mp-delivery-info__title">Въведете информация за доставка за да продължите напред</p>
+
+      <div class="mp-phone-field" data-mp-phone-scope="sheet">
+        <label class="mp-delivery-info__label" for="mp-sheet-phone">Телефон за доставка *</label>
+        <input
+          type="tel"
+          id="mp-sheet-phone"
+          class="mp-delivery-info__input"
+          name="attributes[Delivery phone]"
+          inputmode="tel"
+          autocomplete="tel"
+          pattern="^(\+359|0)[0-9]{9}$"
+          placeholder="+359..."
+          required
+        >
+        <small class="mp-delivery-info__hint">Необходим за доставка с Wolt — ще получите SMS с проследяване</small>
+        <div class="mp-delivery-info__error" id="mp-sheet-phone-error" role="alert" aria-live="polite"></div>
+      </div>
+
+      <div class="mp-address-field" data-mp-address-scope="sheet">
+        <label class="mp-delivery-info__label" for="mp-sheet-address">Адрес за доставка *</label>
+        <input
+          type="text"
+          id="mp-sheet-address"
+          class="mp-delivery-info__input"
+          name="attributes[Delivery address]"
+          autocomplete="street-address"
+          placeholder="ул. Преслав 5, ап. 3"
+          required
+        >
+
+        <div class="mp-delivery-info__row">
+          <div class="mp-delivery-info__col">
+            <label class="mp-delivery-info__label" for="mp-sheet-city">Град *</label>
+            <input
+              type="text"
+              id="mp-sheet-city"
+              class="mp-delivery-info__input"
+              name="attributes[Delivery city]"
+              autocomplete="address-level2"
+              placeholder="Варна"
+              required
+            >
+          </div>
+          <div class="mp-delivery-info__col mp-delivery-info__col--zip">
+            <label class="mp-delivery-info__label" for="mp-sheet-zip">Пощенски код *</label>
+            <input
+              type="text"
+              id="mp-sheet-zip"
+              class="mp-delivery-info__input"
+              name="attributes[Delivery zip]"
+              inputmode="numeric"
+              autocomplete="postal-code"
+              pattern="^[0-9]{4}$"
+              maxlength="4"
+              placeholder="9000"
+              required
+            >
+          </div>
+        </div>
+
+        <small class="mp-delivery-info__hint">Необходимо за доставка с Wolt — куриерът ще бъде изпратен до този адрес</small>
+        <div class="mp-delivery-info__error" id="mp-sheet-address-error" role="alert" aria-live="polite"></div>
+      </div>
     </div>
     <a
       href="/checkout"
