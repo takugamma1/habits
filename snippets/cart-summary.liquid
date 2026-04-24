@@ -687,7 +687,7 @@
     if (window.__cartDeliveryPhoneWired) return;
     window.__cartDeliveryPhoneWired = true;
 
-    var PHONE_REGEX = /^(\+359|0)[0-9]{9}$/;
+    var PHONE_REGEX = /^\+359[0-9]{9}$/;
     var STORAGE_KEY = 'habits_delivery_phone';
 
     function normalizePhone(val) {
@@ -697,12 +697,23 @@
     }
 
     function validate(val) {
-      var v = (val || '').trim();
-      if (!v) return { ok: false, message: 'Моля въведете телефон за доставка' };
-      if (!PHONE_REGEX.test(v.replace(/\s+/g, ''))) {
+      var normalized = normalizePhone(val);
+      if (!normalized) return { ok: false, message: 'Моля въведете телефон за доставка' };
+      if (!PHONE_REGEX.test(normalized)) {
         return { ok: false, message: 'Невалиден телефонен номер (формат: +359XXXXXXXXX)' };
       }
-      return { ok: true };
+      return { ok: true, normalized: normalized };
+    }
+
+    function saveToCart(phone) {
+      return fetch('/cart/update.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ attributes: { 'Delivery phone': phone } })
+      }).then(function (r) {
+        if (!r.ok) throw new Error('cart update failed');
+        return r.json();
+      });
     }
 
     function init() {
@@ -727,27 +738,56 @@
         }
       }
 
-      input.addEventListener('blur', function () { setState(validate(input.value)); });
+      // Save on blur: validate, normalize, persist to cart.attributes immediately
+      input.addEventListener('blur', function () {
+        var result = validate(input.value);
+        setState(result);
+        if (!result.ok) return;
+        input.value = result.normalized;
+        try {
+          if (window.localStorage) window.localStorage.setItem(STORAGE_KEY, result.normalized);
+        } catch (err) { /* ignore */ }
+        saveToCart(result.normalized).catch(function (err) {
+          console.error('[Habits] phone save failed:', err);
+        });
+      });
+
       input.addEventListener('input', function () {
         if (wrapper && wrapper.classList.contains('is-invalid')) setState(validate(input.value));
       });
 
-      var form = input.form || document.getElementById('cart-form');
-      if (form) {
-        form.addEventListener('submit', function (e) {
+      // Block checkout button with capture phase (runs before theme handlers)
+      var checkoutBtn = document.querySelector('[name="checkout"]');
+      if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', function (e) {
           var result = validate(input.value);
           if (!result.ok) {
             e.preventDefault();
+            e.stopPropagation();
             setState(result);
             input.focus();
             return;
           }
-          input.value = normalizePhone(input.value);
+          input.value = result.normalized;
           try {
-            if (window.localStorage) window.localStorage.setItem(STORAGE_KEY, input.value);
+            if (window.localStorage) window.localStorage.setItem(STORAGE_KEY, result.normalized);
           } catch (err) { /* ignore */ }
-        });
+          // Fire-and-forget save in case blur didn't run (e.g. keyboard shortcut)
+          saveToCart(result.normalized).catch(function (err) {
+            console.error('[Habits] phone save failed:', err);
+          });
+        }, true);
       }
+
+      // Hydrate from the cart so a reopened drawer reflects the real saved value
+      fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (cart) {
+          if (!cart || !cart.attributes) return;
+          var savedAttr = cart.attributes['Delivery phone'];
+          if (savedAttr && !input.value) input.value = savedAttr;
+        })
+        .catch(function () { /* ignore */ });
     }
 
     if (document.readyState === 'loading') {
