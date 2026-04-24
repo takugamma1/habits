@@ -574,29 +574,36 @@
 
   .mp-drawer__cta:hover { opacity: 0.9; }
 
-  /* ─── Phone field (shared by drawer + sheet) ─── */
-  .mp-phone-field {
+  /* ─── Delivery info (phone + address fields, shared by drawer + sheet) ─── */
+  .mp-delivery-info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 10px;
     margin-bottom: 14px;
   }
 
-  .mp-phone-field__title {
-    margin: 0 0 6px;
+  .mp-delivery-info__title {
+    margin: 0 0 4px;
     font-size: 0.8125rem;
     font-weight: 600;
     color: #1a1a1a;
     line-height: 1.35;
   }
 
-  .mp-phone-field__label {
+  .mp-phone-field,
+  .mp-address-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mp-delivery-info__label {
     font-size: 0.75rem;
     font-weight: 600;
     color: #333;
   }
 
-  .mp-phone-field__input {
+  .mp-delivery-info__input {
     width: 100%;
     padding: 12px 14px;
     font-size: 1rem;
@@ -608,37 +615,64 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     -webkit-appearance: none;
     appearance: none;
+    box-sizing: border-box;
   }
 
-  .mp-phone-field__input::placeholder {
+  .mp-delivery-info__input::placeholder {
     color: #9a9a94;
   }
 
-  .mp-phone-field__input:focus {
+  .mp-delivery-info__input:focus {
     border-color: var(--mp-cta-bg, #024b40);
     box-shadow: 0 0 0 3px rgba(2, 75, 64, 0.12);
   }
 
-  .mp-phone-field.is-invalid .mp-phone-field__input {
+  .mp-phone-field.is-invalid .mp-delivery-info__input,
+  .mp-delivery-info__input.is-invalid {
     border-color: #c0392b;
     box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
   }
 
-  .mp-phone-field__hint {
+  .mp-delivery-info__hint {
     font-size: 0.6875rem;
     color: #6b6b63;
     line-height: 1.4;
   }
 
-  .mp-phone-field__error {
+  .mp-delivery-info__error {
     display: none;
     font-size: 0.75rem;
     color: #c0392b;
     margin-top: 2px;
   }
 
-  .mp-phone-field.is-invalid .mp-phone-field__error {
+  .mp-phone-field.is-invalid > .mp-delivery-info__error,
+  .mp-address-field.is-invalid > .mp-delivery-info__error {
     display: block;
+  }
+
+  .mp-delivery-info__row {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .mp-delivery-info__col {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 2 1 0;
+    min-width: 0;
+  }
+
+  .mp-delivery-info__col--zip {
+    flex: 1 1 0;
+  }
+
+  @media screen and (max-width: 380px) {
+    .mp-delivery-info__row {
+      flex-direction: column;
+    }
   }
 
   .mp-drawer__cta.is-disabled,
@@ -2058,44 +2092,227 @@
         setFieldState(fieldEl, errorEl, validatePhoneValue(input.value));
       }
     });
-
-    // Capture phase: run before Shopify / any other handler on the CTA
-    cta.addEventListener('click', function (e) {
-      var result = validatePhoneValue(input.value);
-      if (!result.ok) {
-        e.preventDefault();
-        e.stopPropagation();
-        setFieldState(fieldEl, errorEl, result);
-        input.focus();
-        return;
-      }
-      e.preventDefault();
-      input.value = result.normalized;
-      try {
-        if (window.localStorage) window.localStorage.setItem(PHONE_STORAGE_KEY, result.normalized);
-      } catch (err) { /* ignore */ }
-      cta.classList.add('is-disabled');
-      savePhoneToCart(result.normalized)
-        .catch(function (err) { console.error('[Habits] phone save failed:', err); })
-        .then(function () {
-          window.location.href = cta.getAttribute('href') || '/checkout';
-        });
-    }, true);
   }
 
   wirePhoneField('#mp-drawer-phone', '#mp-drawer-phone-error', '#mp-drawer-cta');
   wirePhoneField('#mp-sheet-phone', '#mp-sheet-phone-error', '#mp-sheet-cta');
 
-  // Hydrate from the cart so a reopened drawer reflects the real saved value
+  /* ─────────── Delivery address / city / zip ─────────── */
+  var ADDRESS_STORAGE_KEYS = {
+    address: 'habits_delivery_address',
+    city: 'habits_delivery_city',
+    zip: 'habits_delivery_zip'
+  };
+  var ZIP_REGEX = /^[0-9]{4}$/;
+
+  function validateAddressFields(addrInput, cityInput, zipInput) {
+    var a = (addrInput.value || '').trim();
+    var c = (cityInput.value || '').trim();
+    var z = (zipInput.value || '').trim();
+    if (!a || a.length < 3) return { ok: false, message: 'Моля въведете адрес', focus: addrInput };
+    if (!c || c.length < 2) return { ok: false, message: 'Моля въведете град', focus: cityInput };
+    if (!ZIP_REGEX.test(z)) return { ok: false, message: 'Невалиден пощенски код (4 цифри)', focus: zipInput };
+    return { ok: true, address: a, city: c, zip: z };
+  }
+
+  function saveAddressToCart(address, city, zip) {
+    var attrs = {};
+    if (address) attrs['Delivery address'] = address;
+    if (city) attrs['Delivery city'] = city;
+    if (zip) attrs['Delivery zip'] = zip;
+    if (Object.keys(attrs).length === 0) return Promise.resolve(null);
+    return fetch('/cart/update.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ attributes: attrs })
+    }).then(function (r) {
+      if (!r.ok) throw new Error('cart update failed');
+      return r.json();
+    });
+  }
+
+  function wireAddressField(addrId, cityId, zipId, errorId) {
+    var addrInput = $(addrId);
+    var cityInput = $(cityId);
+    var zipInput = $(zipId);
+    var errorEl = $(errorId);
+    if (!addrInput || !cityInput || !zipInput) return;
+    var fieldEl = addrInput.closest('.mp-address-field');
+    var inputs = [addrInput, cityInput, zipInput];
+
+    try {
+      if (window.localStorage) {
+        if (!addrInput.value) addrInput.value = window.localStorage.getItem(ADDRESS_STORAGE_KEYS.address) || '';
+        if (!cityInput.value) cityInput.value = window.localStorage.getItem(ADDRESS_STORAGE_KEYS.city) || '';
+        if (!zipInput.value) zipInput.value = window.localStorage.getItem(ADDRESS_STORAGE_KEYS.zip) || '';
+      }
+    } catch (e) { /* ignore */ }
+
+    function setState(result) {
+      inputs.forEach(function (el) { el.classList.remove('is-invalid'); });
+      if (!fieldEl) return;
+      if (result.ok) {
+        fieldEl.classList.remove('is-invalid');
+        if (errorEl) errorEl.textContent = '';
+      } else {
+        fieldEl.classList.add('is-invalid');
+        if (errorEl) errorEl.textContent = result.message;
+        if (result.focus) result.focus.classList.add('is-invalid');
+      }
+    }
+
+    // Save on blur: normalize trim, persist all three attributes, show errors as they happen
+    inputs.forEach(function (input) {
+      input.addEventListener('blur', function () {
+        input.value = (input.value || '').trim();
+        var result = validateAddressFields(addrInput, cityInput, zipInput);
+        setState(result);
+        // Persist each non-empty field even when the group is still incomplete,
+        // so the user's typing isn't lost if they close the drawer mid-entry.
+        try {
+          if (window.localStorage) {
+            if (addrInput.value) window.localStorage.setItem(ADDRESS_STORAGE_KEYS.address, addrInput.value);
+            if (cityInput.value) window.localStorage.setItem(ADDRESS_STORAGE_KEYS.city, cityInput.value);
+            if (zipInput.value) window.localStorage.setItem(ADDRESS_STORAGE_KEYS.zip, zipInput.value);
+          }
+        } catch (err) { /* ignore */ }
+        saveAddressToCart(addrInput.value, cityInput.value, zipInput.value).catch(function (err) {
+          console.error('[Habits] address save failed:', err);
+        });
+      });
+
+      input.addEventListener('input', function () {
+        if (fieldEl && fieldEl.classList.contains('is-invalid')) {
+          setState(validateAddressFields(addrInput, cityInput, zipInput));
+        }
+      });
+    });
+
+    // Digit-only zip (strip non-digits as user types)
+    zipInput.addEventListener('input', function () {
+      var digits = zipInput.value.replace(/\D+/g, '').slice(0, 4);
+      if (digits !== zipInput.value) zipInput.value = digits;
+    });
+  }
+
+  wireAddressField('#mp-drawer-address', '#mp-drawer-city', '#mp-drawer-zip', '#mp-drawer-address-error');
+  wireAddressField('#mp-sheet-address', '#mp-sheet-city', '#mp-sheet-zip', '#mp-sheet-address-error');
+
+  /* ─────────── Checkout gate: validate phone + address, save both, navigate ─────────── */
+  function wireCheckoutGate(ctaId, phoneId, phoneErrorId, addrId, cityId, zipId, addrErrorId) {
+    var cta = $(ctaId);
+    if (!cta) return;
+    var phoneInput = $(phoneId);
+    var phoneErrorEl = $(phoneErrorId);
+    var addrInput = $(addrId);
+    var cityInput = $(cityId);
+    var zipInput = $(zipId);
+    var addrErrorEl = $(addrErrorId);
+
+    cta.addEventListener('click', function (e) {
+      var phoneFieldEl = phoneInput && phoneInput.closest('.mp-phone-field');
+      var addrFieldEl = addrInput && addrInput.closest('.mp-address-field');
+
+      // 1) Phone
+      var phoneResult = phoneInput ? validatePhoneValue(phoneInput.value) : { ok: true };
+      if (!phoneResult.ok) {
+        e.preventDefault();
+        e.stopPropagation();
+        setFieldState(phoneFieldEl, phoneErrorEl, phoneResult);
+        phoneInput.focus();
+        return;
+      }
+      if (phoneInput) {
+        phoneInput.value = phoneResult.normalized;
+        setFieldState(phoneFieldEl, phoneErrorEl, { ok: true });
+      }
+
+      // 2) Address
+      var addrResult = (addrInput && cityInput && zipInput)
+        ? validateAddressFields(addrInput, cityInput, zipInput)
+        : { ok: true };
+      if (!addrResult.ok) {
+        e.preventDefault();
+        e.stopPropagation();
+        [addrInput, cityInput, zipInput].forEach(function (el) { if (el) el.classList.remove('is-invalid'); });
+        if (addrFieldEl) {
+          addrFieldEl.classList.add('is-invalid');
+          if (addrErrorEl) addrErrorEl.textContent = addrResult.message;
+        }
+        if (addrResult.focus) {
+          addrResult.focus.classList.add('is-invalid');
+          addrResult.focus.focus();
+        }
+        return;
+      }
+      if (addrFieldEl) {
+        addrFieldEl.classList.remove('is-invalid');
+        [addrInput, cityInput, zipInput].forEach(function (el) { if (el) el.classList.remove('is-invalid'); });
+        if (addrErrorEl) addrErrorEl.textContent = '';
+      }
+
+      // 3) All valid — save everything in parallel, then navigate
+      e.preventDefault();
+      cta.classList.add('is-disabled');
+
+      try {
+        if (window.localStorage) {
+          if (phoneInput) window.localStorage.setItem(PHONE_STORAGE_KEY, phoneResult.normalized);
+          if (addrResult.address) {
+            window.localStorage.setItem(ADDRESS_STORAGE_KEYS.address, addrResult.address);
+            window.localStorage.setItem(ADDRESS_STORAGE_KEYS.city, addrResult.city);
+            window.localStorage.setItem(ADDRESS_STORAGE_KEYS.zip, addrResult.zip);
+          }
+        }
+      } catch (err) { /* ignore */ }
+
+      var saves = [];
+      if (phoneInput) {
+        saves.push(savePhoneToCart(phoneResult.normalized).catch(function (err) {
+          console.error('[Habits] phone save failed:', err);
+        }));
+      }
+      if (addrResult.address) {
+        saves.push(saveAddressToCart(addrResult.address, addrResult.city, addrResult.zip).catch(function (err) {
+          console.error('[Habits] address save failed:', err);
+        }));
+      }
+
+      Promise.all(saves).then(function () {
+        window.location.href = cta.getAttribute('href') || '/checkout';
+      });
+    }, true);
+  }
+
+  wireCheckoutGate(
+    '#mp-drawer-cta',
+    '#mp-drawer-phone', '#mp-drawer-phone-error',
+    '#mp-drawer-address', '#mp-drawer-city', '#mp-drawer-zip', '#mp-drawer-address-error'
+  );
+  wireCheckoutGate(
+    '#mp-sheet-cta',
+    '#mp-sheet-phone', '#mp-sheet-phone-error',
+    '#mp-sheet-address', '#mp-sheet-city', '#mp-sheet-zip', '#mp-sheet-address-error'
+  );
+
+  // Hydrate all delivery fields from the cart on init (real server state > localStorage mirror)
   fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (cart) {
       if (!cart || !cart.attributes) return;
-      var saved = cart.attributes['Delivery phone'];
-      if (!saved) return;
-      ['#mp-drawer-phone', '#mp-sheet-phone'].forEach(function (sel) {
-        var el = $(sel);
-        if (el && !el.value) el.value = saved;
+      var map = {
+        'Delivery phone': ['#mp-drawer-phone', '#mp-sheet-phone'],
+        'Delivery address': ['#mp-drawer-address', '#mp-sheet-address'],
+        'Delivery city': ['#mp-drawer-city', '#mp-sheet-city'],
+        'Delivery zip': ['#mp-drawer-zip', '#mp-sheet-zip']
+      };
+      Object.keys(map).forEach(function (key) {
+        var val = cart.attributes[key];
+        if (!val) return;
+        map[key].forEach(function (sel) {
+          var el = $(sel);
+          if (el && !el.value) el.value = val;
+        });
       });
     })
     .catch(function () { /* ignore */ });
