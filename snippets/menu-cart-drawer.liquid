@@ -34,6 +34,23 @@
       <span>Общо</span>
       <span id="mp-drawer-subtotal">0,00 лв.</span>
     </div>
+    <div class="mp-phone-field" data-mp-phone-scope="drawer">
+      <p class="mp-phone-field__title">Въведете телефонен номер за да продължите напред</p>
+      <label class="mp-phone-field__label" for="mp-drawer-phone">Телефон за доставка *</label>
+      <input
+        type="tel"
+        id="mp-drawer-phone"
+        class="mp-phone-field__input"
+        name="attributes[Delivery phone]"
+        inputmode="tel"
+        autocomplete="tel"
+        pattern="^(\+359|0)[0-9]{9}$"
+        placeholder="+359..."
+        required
+      >
+      <small class="mp-phone-field__hint">Необходим за доставка с Wolt — ще получите SMS с проследяване</small>
+      <div class="mp-phone-field__error" id="mp-drawer-phone-error" role="alert" aria-live="polite"></div>
+    </div>
     <a
       href="/checkout"
       class="mp-drawer__cta"
@@ -77,6 +94,23 @@
     <div class="mp-sheet__subtotal">
       <span>Общо</span>
       <span id="mp-sheet-subtotal">0,00 лв.</span>
+    </div>
+    <div class="mp-phone-field" data-mp-phone-scope="sheet">
+      <p class="mp-phone-field__title">Въведете телефонен номер за да продължите напред</p>
+      <label class="mp-phone-field__label" for="mp-sheet-phone">Телефон за доставка *</label>
+      <input
+        type="tel"
+        id="mp-sheet-phone"
+        class="mp-phone-field__input"
+        name="attributes[Delivery phone]"
+        inputmode="tel"
+        autocomplete="tel"
+        pattern="^(\+359|0)[0-9]{9}$"
+        placeholder="+359..."
+        required
+      >
+      <small class="mp-phone-field__hint">Необходим за доставка с Wolt — ще получите SMS с проследяване</small>
+      <div class="mp-phone-field__error" id="mp-sheet-phone-error" role="alert" aria-live="polite"></div>
     </div>
     <a
       href="/checkout"

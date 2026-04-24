@@ -574,6 +574,80 @@
 
   .mp-drawer__cta:hover { opacity: 0.9; }
 
+  /* ─── Phone field (shared by drawer + sheet) ─── */
+  .mp-phone-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+
+  .mp-phone-field__title {
+    margin: 0 0 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.35;
+  }
+
+  .mp-phone-field__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .mp-phone-field__input {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1rem;
+    color: #1a1a1a;
+    background: #fff;
+    border: 1px solid #d9d9d4;
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .mp-phone-field__input::placeholder {
+    color: #9a9a94;
+  }
+
+  .mp-phone-field__input:focus {
+    border-color: var(--mp-cta-bg, #024b40);
+    box-shadow: 0 0 0 3px rgba(2, 75, 64, 0.12);
+  }
+
+  .mp-phone-field.is-invalid .mp-phone-field__input {
+    border-color: #c0392b;
+    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+  }
+
+  .mp-phone-field__hint {
+    font-size: 0.6875rem;
+    color: #6b6b63;
+    line-height: 1.4;
+  }
+
+  .mp-phone-field__error {
+    display: none;
+    font-size: 0.75rem;
+    color: #c0392b;
+    margin-top: 2px;
+  }
+
+  .mp-phone-field.is-invalid .mp-phone-field__error {
+    display: block;
+  }
+
+  .mp-drawer__cta.is-disabled,
+  .mp-sheet__cta.is-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
   /* ─── Mobile overrides ─── */
   @media screen and (max-width: 749px) {
     .mp-nav-wrap {
@@ -1911,6 +1985,94 @@
   if (mobBadge) mobBadge.addEventListener('click', openSheet);
   if (sheetClose) sheetClose.addEventListener('click', closeSheet);
   if (sheetOverlay) sheetOverlay.addEventListener('click', closeSheet);
+
+  /* ─────────── Delivery phone (required for Wolt dispatch) ─────────── */
+  var PHONE_REGEX = /^(\+359|0)[0-9]{9}$/;
+  var PHONE_STORAGE_KEY = 'habits_delivery_phone';
+
+  function normalizePhone(val) {
+    var trimmed = (val || '').trim().replace(/\s+/g, '');
+    if (trimmed.charAt(0) === '0') return '+359' + trimmed.substring(1);
+    return trimmed;
+  }
+
+  function validatePhoneValue(val) {
+    var trimmed = (val || '').trim();
+    if (!trimmed) return { ok: false, message: 'Моля въведете телефон за доставка' };
+    if (!PHONE_REGEX.test(trimmed.replace(/\s+/g, ''))) {
+      return { ok: false, message: 'Невалиден телефонен номер (формат: +359XXXXXXXXX)' };
+    }
+    return { ok: true };
+  }
+
+  function setFieldState(fieldEl, errorEl, result) {
+    if (!fieldEl) return;
+    if (result.ok) {
+      fieldEl.classList.remove('is-invalid');
+      if (errorEl) errorEl.textContent = '';
+    } else {
+      fieldEl.classList.add('is-invalid');
+      if (errorEl) errorEl.textContent = result.message;
+    }
+  }
+
+  function savePhoneToCart(phone) {
+    return fetch('/cart/update.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ attributes: { 'Delivery phone': phone } })
+    }).then(function (r) {
+      if (!r.ok) throw new Error('cart update failed');
+      return r.json();
+    });
+  }
+
+  function wirePhoneField(inputId, errorId, ctaId) {
+    var input = $(inputId);
+    var errorEl = $(errorId);
+    var cta = $(ctaId);
+    if (!input || !cta) return;
+    var fieldEl = input.closest('.mp-phone-field');
+
+    try {
+      var saved = window.localStorage && window.localStorage.getItem(PHONE_STORAGE_KEY);
+      if (saved && !input.value) input.value = saved;
+    } catch (e) { /* localStorage may be blocked */ }
+
+    input.addEventListener('blur', function () {
+      setFieldState(fieldEl, errorEl, validatePhoneValue(input.value));
+    });
+    input.addEventListener('input', function () {
+      if (fieldEl && fieldEl.classList.contains('is-invalid')) {
+        setFieldState(fieldEl, errorEl, validatePhoneValue(input.value));
+      }
+    });
+
+    cta.addEventListener('click', function (e) {
+      var result = validatePhoneValue(input.value);
+      if (!result.ok) {
+        e.preventDefault();
+        setFieldState(fieldEl, errorEl, result);
+        input.focus();
+        return;
+      }
+      e.preventDefault();
+      var normalized = normalizePhone(input.value);
+      input.value = normalized;
+      try {
+        if (window.localStorage) window.localStorage.setItem(PHONE_STORAGE_KEY, normalized);
+      } catch (err) { /* ignore */ }
+      cta.classList.add('is-disabled');
+      savePhoneToCart(normalized)
+        .catch(function (err) { console.error('[Habits] phone save failed:', err); })
+        .then(function () {
+          window.location.href = cta.getAttribute('href') || '/checkout';
+        });
+    });
+  }
+
+  wirePhoneField('#mp-drawer-phone', '#mp-drawer-phone-error', '#mp-drawer-cta');
+  wirePhoneField('#mp-sheet-phone', '#mp-sheet-phone-error', '#mp-sheet-cta');
 
   /* ─────────── Upsell modal ─────────── */
   var previewImg = $('#mp-upsell-preview-img');

@@ -254,6 +254,25 @@
 </div>
 
 <div class="cart__ctas">
+  <div class="cart__delivery-phone" data-cart-delivery-phone>
+    <p class="cart__delivery-phone-title">Въведете телефонен номер за да продължите напред</p>
+    <label class="cart__delivery-phone-label" for="cart-delivery-phone">Телефон за доставка *</label>
+    <input
+      type="tel"
+      id="cart-delivery-phone"
+      class="cart__delivery-phone-input"
+      name="attributes[Delivery phone]"
+      form="cart-form"
+      inputmode="tel"
+      autocomplete="tel"
+      pattern="^(\+359|0)[0-9]{9}$"
+      placeholder="+359..."
+      value="{{ cart.attributes['Delivery phone'] | escape }}"
+      required
+    >
+    <small class="cart__delivery-phone-hint">Необходим за доставка с Wolt — ще получите SMS с проследяване</small>
+    <div class="cart__delivery-phone-error" role="alert" aria-live="polite"></div>
+  </div>
   <button
     type="submit"
     id="checkout"
@@ -469,6 +488,66 @@
     padding-inline: var(--padding-4xl);
   }
 
+  .cart__delivery-phone {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-3xs, 4px);
+  }
+
+  .cart__delivery-phone-title {
+    margin: 0 0 var(--margin-3xs, 4px);
+    font-size: var(--font-size--sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-foreground);
+    line-height: 1.35;
+  }
+
+  .cart__delivery-phone-label {
+    font-size: var(--font-size--2xs);
+    font-weight: 500;
+    color: var(--color-foreground);
+  }
+
+  .cart__delivery-phone-input {
+    width: 100%;
+    color: var(--color-input-text);
+    background-color: var(--color-input-background);
+    border-width: var(--style-border-width-inputs);
+    border-color: var(--color-input-border);
+    border-style: solid;
+    border-radius: var(--style-border-radius-inputs);
+    padding: var(--padding-sm) var(--padding-md);
+    font-size: var(--font-size--sm);
+    transition: box-shadow var(--animation-speed) ease, border-color var(--animation-speed) ease;
+    box-shadow: var(--input-box-shadow);
+  }
+
+  .cart__delivery-phone-input::placeholder {
+    color: rgb(var(--color-input-text-rgb) / var(--opacity-subdued-text));
+  }
+
+  .cart__delivery-phone.is-invalid .cart__delivery-phone-input {
+    border-color: #c0392b;
+    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+  }
+
+  .cart__delivery-phone-hint {
+    font-size: var(--font-size--2xs);
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-subdued-text));
+    line-height: 1.4;
+  }
+
+  .cart__delivery-phone-error {
+    display: none;
+    font-size: var(--font-size--2xs);
+    color: #c0392b;
+    margin-top: var(--margin-3xs, 2px);
+  }
+
+  .cart__delivery-phone.is-invalid .cart__delivery-phone-error {
+    display: block;
+  }
+
   .cart-drawer__summary .cart-totals:not(:has(.cart-totals__original-container:empty)) {
     border-block-start: var(--style-border-width) solid var(--color-border);
     padding-block-start: var(--padding-2xl);
@@ -602,3 +681,79 @@
     }
   }
 {% endstylesheet %}
+
+<script>
+  (function () {
+    if (window.__cartDeliveryPhoneWired) return;
+    window.__cartDeliveryPhoneWired = true;
+
+    var PHONE_REGEX = /^(\+359|0)[0-9]{9}$/;
+    var STORAGE_KEY = 'habits_delivery_phone';
+
+    function normalizePhone(val) {
+      var v = (val || '').trim().replace(/\s+/g, '');
+      if (v.charAt(0) === '0') return '+359' + v.substring(1);
+      return v;
+    }
+
+    function validate(val) {
+      var v = (val || '').trim();
+      if (!v) return { ok: false, message: 'Моля въведете телефон за доставка' };
+      if (!PHONE_REGEX.test(v.replace(/\s+/g, ''))) {
+        return { ok: false, message: 'Невалиден телефонен номер (формат: +359XXXXXXXXX)' };
+      }
+      return { ok: true };
+    }
+
+    function init() {
+      var input = document.getElementById('cart-delivery-phone');
+      if (!input) return;
+      var wrapper = input.closest('.cart__delivery-phone');
+      var errorEl = wrapper ? wrapper.querySelector('.cart__delivery-phone-error') : null;
+
+      try {
+        var saved = window.localStorage && window.localStorage.getItem(STORAGE_KEY);
+        if (saved && !input.value) input.value = saved;
+      } catch (e) { /* ignore */ }
+
+      function setState(result) {
+        if (!wrapper) return;
+        if (result.ok) {
+          wrapper.classList.remove('is-invalid');
+          if (errorEl) errorEl.textContent = '';
+        } else {
+          wrapper.classList.add('is-invalid');
+          if (errorEl) errorEl.textContent = result.message;
+        }
+      }
+
+      input.addEventListener('blur', function () { setState(validate(input.value)); });
+      input.addEventListener('input', function () {
+        if (wrapper && wrapper.classList.contains('is-invalid')) setState(validate(input.value));
+      });
+
+      var form = input.form || document.getElementById('cart-form');
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          var result = validate(input.value);
+          if (!result.ok) {
+            e.preventDefault();
+            setState(result);
+            input.focus();
+            return;
+          }
+          input.value = normalizePhone(input.value);
+          try {
+            if (window.localStorage) window.localStorage.setItem(STORAGE_KEY, input.value);
+          } catch (err) { /* ignore */ }
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
