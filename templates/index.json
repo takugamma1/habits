@@ -358,7 +358,7 @@
           "name": "t:names.text",
           "settings": {
             "text": "<h4>Вечеря или брънч с приятели в прохладната ни градина, приятно комбинирани с коктейли и наргиле. <br/><br/>Идваш ли?</h4>",
-            "width": "fit-content",
+            "width": "100%",
             "max_width": "narrow",
             "alignment": "center",
             "type_preset": "rte",
