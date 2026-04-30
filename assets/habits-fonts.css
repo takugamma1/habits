@@ -1,10 +1,41 @@
 /* ═══════════════════════════════════════════════════
    HABITS CUSTOM FONTS
-   Main: Westmeath Cyrillic — titles, headings, paragraphs
-   Secondary: Phenomena — buttons, subheadings
+   Phenomena — Cyrillic only (via unicode-range).
+   Latin characters fall back to the theme fonts.
+     Bold (700)    → titles / headings
+     Regular (400) → buttons / nav / badges
+     Light (300)   → paragraphs / body text
    ═══════════════════════════════════════════════════ */
 
-/* ─── Westmeath Cyrillic ─── */
+/* ─── Phenomena (Cyrillic only) ─── */
+@font-face {
+  font-family: 'Phenomena';
+  src: url('Phenomena-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0400-04FF, U+0500-052F, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+@font-face {
+  font-family: 'Phenomena';
+  src: url('Phenomena-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0400-04FF, U+0500-052F, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+@font-face {
+  font-family: 'Phenomena';
+  src: url('Phenomena-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0400-04FF, U+0500-052F, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+/* ─── Westmeath kept as legacy fallback (Cyrillic only) ─── */
 @font-face {
   font-family: 'Westmeath';
   src: url('WestmeathCyrillic-Regular.woff2') format('woff2');
@@ -14,84 +45,23 @@
   unicode-range: U+0400-04FF, U+0500-052F, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 
-/* ─── Phenomena ─── */
-@font-face {
-  font-family: 'Phenomena';
-  src: url('Phenomena-Thin.woff2') format('woff2');
-  font-weight: 100;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Phenomena';
-  src: url('Phenomena-ExtraLight.woff2') format('woff2');
-  font-weight: 200;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Phenomena';
-  src: url('Phenomena-Light.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Phenomena';
-  src: url('Phenomena-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Phenomena';
-  src: url('Phenomena-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Phenomena';
-  src: url('Phenomena-ExtraBold.woff2') format('woff2');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Phenomena';
-  src: url('Phenomena-Black.woff2') format('woff2');
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-
 /* ─── Global font assignments ─── */
 
-/* Main font: Westmeath for all text */
-body,
+/* Headings → Phenomena Bold (Cyrillic), theme heading font for Latin */
 h1, h2, h3, h4, h5, h6,
-p,
-.rte,
-.rte p,
-blockquote,
-figcaption,
-label,
-input,
-textarea,
-select,
 .heading,
 .card__heading,
-.card__title {
-  font-family: 'Westmeath', var(--font-heading--family), sans-serif;
+.card__title,
+.categories-grid__card-title,
+.categories-grid__title,
+.promo-banner__title,
+.image-banner__title,
+.mp-collection__title {
+  font-family: 'Phenomena', var(--font-heading--family), sans-serif;
+  font-weight: 700;
 }
 
-/* Letter-spacing for Westmeath headings — improves Cyrillic readability */
+/* Letter-spacing tuning for Cyrillic readability */
 h1, h2, h3, h4,
 .heading,
 .card__heading,
@@ -100,16 +70,33 @@ h1, h2, h3, h4,
 .categories-grid__title,
 .promo-banner__title,
 .image-banner__title {
+  letter-spacing: 0.04em;
+}
+
+h1, h2 {
   letter-spacing: 0.06em;
 }
 
-/* Extra spacing for large display headings */
-h1, h2 {
-  letter-spacing: 0.08em;
-  word-spacing: 0.04em;
+/* Body baseline → Phenomena (default weight), keeps inputs/labels neutral */
+body,
+input,
+textarea,
+select,
+label {
+  font-family: 'Phenomena', var(--font-body--family), sans-serif;
 }
 
-/* Secondary font: Phenomena for buttons & subheadings */
+/* Paragraphs → Phenomena Light (300) */
+p,
+.rte,
+.rte p,
+blockquote,
+figcaption {
+  font-family: 'Phenomena', var(--font-body--family), sans-serif;
+  font-weight: 300;
+}
+
+/* Buttons / nav / badges → Phenomena Regular (400) */
 button,
 .button,
 .button-primary,
@@ -126,4 +113,5 @@ a.button,
 .promo-banner__button,
 nav a {
   font-family: 'Phenomena', var(--font-body--family), sans-serif;
+  font-weight: 400;
 }

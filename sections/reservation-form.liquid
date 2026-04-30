@@ -13,6 +13,7 @@
 <div
   id="ReservationForm-{{ section.id }}"
   class="reservation-form"
+  data-default-method="{{ section.settings.default_method | default: 'chooser' }}"
   style="
     --rf-bg: {{ section.settings.background_color | default: '#4a8f6d' }};
     --rf-radius: {{ section.settings.border_radius | default: 24 }}px;
@@ -28,6 +29,11 @@
     --rf-text-color: {{ section.settings.text_color | default: '#ffffff' }};
     --rf-button-bg: {{ section.settings.button_color | default: '#2d5e45' }};
     --rf-button-color: {{ section.settings.button_text_color | default: '#ffffff' }};
+    --rf-choice-bg: {{ section.settings.choice_bg | default: '#ffffff' }};
+    --rf-choice-color: {{ section.settings.choice_color | default: '#2d5e45' }};
+    --rf-choice-bg-active: {{ section.settings.choice_bg_active | default: '#2d5e45' }};
+    --rf-choice-color-active: {{ section.settings.choice_color_active | default: '#ffffff' }};
+    --rf-choice-border: {{ section.settings.choice_border | default: '#ffffff' }};
   "
 >
   <div
@@ -74,7 +80,95 @@
         <p class="reservation-form__subtitle">{{ section.settings.subtitle }}</p>
       {% endif %}
 
-      {%- comment -%} Form {%- endcomment -%}
+      {%- comment -%} Method chooser (Phone vs Form) {%- endcomment -%}
+      <div class="reservation-form__chooser" data-rf-chooser>
+        {% if section.settings.chooser_title != blank %}
+          <p class="reservation-form__chooser-title">{{ section.settings.chooser_title }}</p>
+        {% endif %}
+
+        <div class="reservation-form__choices" role="tablist">
+          <button
+            type="button"
+            class="reservation-form__choice"
+            data-rf-method="phone"
+            role="tab"
+            aria-selected="false"
+            aria-controls="rf-panel-phone-{{ section.id }}"
+          >
+            <span class="reservation-form__choice-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
+                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.37 1.9.72 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0122 16.92z"/>
+              </svg>
+            </span>
+            <span class="reservation-form__choice-label">
+              {{ section.settings.choice_phone_label | default: 'Обади се' }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="reservation-form__choice"
+            data-rf-method="form"
+            role="tab"
+            aria-selected="false"
+            aria-controls="rf-panel-form-{{ section.id }}"
+          >
+            <span class="reservation-form__choice-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="8" y1="13" x2="16" y2="13"/>
+                <line x1="8" y1="17" x2="13" y2="17"/>
+              </svg>
+            </span>
+            <span class="reservation-form__choice-label">
+              {{ section.settings.choice_form_label | default: 'Попълни форма' }}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {%- comment -%} Phone panel {%- endcomment -%}
+      <div
+        class="reservation-form__panel reservation-form__panel--phone"
+        id="rf-panel-phone-{{ section.id }}"
+        data-rf-panel="phone"
+        role="tabpanel"
+        hidden
+      >
+        {% if section.settings.phone_intro != blank %}
+          <p class="reservation-form__phone-intro">{{ section.settings.phone_intro }}</p>
+        {% endif %}
+
+        {% if section.settings.phone_number != blank %}
+          <a
+            class="reservation-form__phone-cta"
+            href="tel:{{ section.settings.phone_number | replace: ' ', '' | replace: '-', '' }}"
+          >
+            <span class="reservation-form__phone-cta-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.37 1.9.72 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0122 16.92z"/>
+              </svg>
+            </span>
+            <span class="reservation-form__phone-cta-text">
+              {{ section.settings.phone_cta_label | default: section.settings.phone_number }}
+            </span>
+          </a>
+        {% endif %}
+
+        {% if section.settings.phone_hours != blank %}
+          <p class="reservation-form__phone-hours">{{ section.settings.phone_hours }}</p>
+        {% endif %}
+      </div>
+
+      {%- comment -%} Form panel {%- endcomment -%}
+      <div
+        class="reservation-form__panel reservation-form__panel--form"
+        id="rf-panel-form-{{ section.id }}"
+        data-rf-panel="form"
+        role="tabpanel"
+        hidden
+      >
       <form class="reservation-form__form" action="{{ section.settings.form_action }}" method="POST">
         <div class="reservation-form__fields">
           {%- comment -%} Row 1: Name + Phone {%- endcomment -%}
@@ -192,9 +286,48 @@
           </button>
         </div>
       </form>
+      </div>
     </div>
   </div>
 </div>
+
+<script>
+  (function () {
+    var root = document.getElementById('ReservationForm-{{ section.id }}');
+    if (!root) return;
+
+    var chooser = root.querySelector('[data-rf-chooser]');
+    var choices = root.querySelectorAll('[data-rf-method]');
+    var panels = root.querySelectorAll('[data-rf-panel]');
+    var defaultMethod = root.getAttribute('data-default-method') || 'chooser';
+
+    function show(method) {
+      choices.forEach(function (btn) {
+        var active = btn.getAttribute('data-rf-method') === method;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      panels.forEach(function (panel) {
+        var match = panel.getAttribute('data-rf-panel') === method;
+        if (match) {
+          panel.removeAttribute('hidden');
+        } else {
+          panel.setAttribute('hidden', '');
+        }
+      });
+    }
+
+    choices.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        show(btn.getAttribute('data-rf-method'));
+      });
+    });
+
+    if (defaultMethod === 'phone' || defaultMethod === 'form') {
+      show(defaultMethod);
+    }
+  })();
+</script>
 
 {% stylesheet %}
   /*
@@ -293,6 +426,137 @@
     font-size: clamp(0.875rem, 1.1vw, 1rem);
     line-height: 1.6;
     opacity: 0.85;
+  }
+
+  /* ─── Method chooser ─── */
+  .reservation-form__chooser {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-block-start: 4px;
+  }
+
+  .reservation-form__chooser-title {
+    margin: 0;
+    color: var(--rf-text-color, #fff);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .reservation-form__choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .reservation-form__choice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 22px 14px;
+    background: var(--rf-choice-bg, #fff);
+    color: var(--rf-choice-color, #2d5e45);
+    border: 2px solid var(--rf-choice-border, #fff);
+    border-radius: var(--rf-input-radius, 8px);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-align: center;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .reservation-form__choice:hover {
+    transform: translateY(-1px);
+  }
+
+  .reservation-form__choice.is-active {
+    background: var(--rf-choice-bg-active, #2d5e45);
+    color: var(--rf-choice-color-active, #fff);
+    border-color: var(--rf-choice-color-active, #fff);
+  }
+
+  .reservation-form__choice-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.04);
+    color: inherit;
+  }
+
+  .reservation-form__choice.is-active .reservation-form__choice-icon {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .reservation-form__choice-label {
+    line-height: 1.2;
+  }
+
+  /* ─── Panels ─── */
+  .reservation-form__panel[hidden] {
+    display: none;
+  }
+
+  .reservation-form__panel {
+    margin-block-start: 4px;
+  }
+
+  /* Phone panel */
+  .reservation-form__panel--phone {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  .reservation-form__phone-intro {
+    margin: 0;
+    color: var(--rf-text-color, #fff);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    opacity: 0.92;
+  }
+
+  .reservation-form__phone-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 22px;
+    background: var(--rf-button-bg, #2d5e45);
+    color: var(--rf-button-color, #fff);
+    border-radius: var(--rf-input-radius, 8px);
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+    align-self: flex-start;
+  }
+
+  .reservation-form__phone-cta:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+
+  .reservation-form__phone-cta-icon {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .reservation-form__phone-hours {
+    margin: 0;
+    color: var(--rf-text-color, #fff);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    opacity: 0.8;
   }
 
   /* Form */
@@ -453,6 +717,35 @@
     .reservation-form__row--half {
       grid-template-columns: 1fr;
     }
+
+    .reservation-form__choices {
+      gap: 10px;
+    }
+
+    .reservation-form__choice {
+      padding: 18px 10px;
+      font-size: 0.875rem;
+    }
+
+    .reservation-form__choice-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .reservation-form__choice-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .reservation-form__phone-cta {
+      align-self: stretch;
+      width: 100%;
+    }
+
+    .reservation-form__phone-intro,
+    .reservation-form__phone-hours {
+      text-align: center;
+    }
   }
 {% endstylesheet %}
 
@@ -513,6 +806,111 @@
       "id": "subtitle",
       "label": "Subtitle",
       "default": "Book your table and enjoy the experience"
+    },
+    {
+      "type": "header",
+      "content": "Reservation method"
+    },
+    {
+      "type": "select",
+      "id": "default_method",
+      "label": "Default option",
+      "options": [
+        {
+          "value": "chooser",
+          "label": "Show chooser (no preselect)"
+        },
+        {
+          "value": "phone",
+          "label": "Phone preselected"
+        },
+        {
+          "value": "form",
+          "label": "Form preselected"
+        }
+      ],
+      "default": "chooser"
+    },
+    {
+      "type": "text",
+      "id": "chooser_title",
+      "label": "Chooser title",
+      "default": "Как искате да направите резервация?"
+    },
+    {
+      "type": "text",
+      "id": "choice_phone_label",
+      "label": "Phone option label",
+      "default": "Обади се"
+    },
+    {
+      "type": "text",
+      "id": "choice_form_label",
+      "label": "Form option label",
+      "default": "Попълни форма"
+    },
+    {
+      "type": "header",
+      "content": "Phone option"
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "Phone number",
+      "info": "Used as the tel: link target. Spaces and dashes are removed automatically.",
+      "default": "+359 88 888 8888"
+    },
+    {
+      "type": "text",
+      "id": "phone_cta_label",
+      "label": "Phone button label",
+      "info": "Defaults to the number itself when blank."
+    },
+    {
+      "type": "textarea",
+      "id": "phone_intro",
+      "label": "Intro text",
+      "default": "Обадете се за директна резервация — ще ви потвърдим веднага."
+    },
+    {
+      "type": "text",
+      "id": "phone_hours",
+      "label": "Working hours",
+      "default": "Понеделник – Неделя · 10:00 – 23:00"
+    },
+    {
+      "type": "header",
+      "content": "Choice button colors"
+    },
+    {
+      "type": "color",
+      "id": "choice_bg",
+      "label": "Inactive background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "choice_color",
+      "label": "Inactive icon & text",
+      "default": "#2d5e45"
+    },
+    {
+      "type": "color",
+      "id": "choice_border",
+      "label": "Inactive border",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "choice_bg_active",
+      "label": "Selected background",
+      "default": "#2d5e45"
+    },
+    {
+      "type": "color",
+      "id": "choice_color_active",
+      "label": "Selected icon & text",
+      "default": "#ffffff"
     },
     {
       "type": "header",
