@@ -79,7 +79,7 @@
                 "text": "<h2>Запиши се за нашият имейл лист.</h2>",
                 "width": "100%",
                 "max_width": "normal",
-                "alignment": "left",
+                "alignment": "right",
                 "type_preset": "h4",
                 "font": "var(--font-body--family)",
                 "font_size": "1rem",
