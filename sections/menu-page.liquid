@@ -83,7 +83,7 @@
           {% endif %}
         </button>
       {% endif %}
-      {% if col_drinks %}
+      {% if col_drinks and section.settings.hide_drinks != true %}
         <button
           type="button"
           class="mp-badge"
@@ -210,7 +210,7 @@
     </div>
   {% endif %}
 
-  {% if col_drinks and col_drinks.products.size > 0 %}
+  {% if col_drinks and col_drinks.products.size > 0 and section.settings.hide_drinks != true %}
     <div class="mp-collection" data-collection="drinks" style="display:none;">
       <h2 class="mp-collection__title">{{ col_drinks.title }}</h2>
       <div class="mp-grid">
@@ -480,8 +480,8 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: 400px;
-    max-width: 90vw;
+    width: 460px;
+    max-width: 95vw;
     z-index: 99991;
     background: #fff;
     transform: translateX(100%);
@@ -528,9 +528,10 @@
   }
 
   .mp-drawer__body {
-    flex: 1;
+    flex: 1 1 auto;
     overflow-y: auto;
     padding: 16px 24px;
+    min-height: 80px;
   }
 
   .mp-drawer__empty {
@@ -548,6 +549,9 @@
   .mp-drawer__footer {
     padding: 16px 24px 24px;
     border-top: 1px solid #eee;
+    flex-shrink: 0;
+    max-height: 60vh;
+    overflow-y: auto;
   }
 
   .mp-drawer__subtotal {
@@ -667,6 +671,27 @@
 
   .mp-delivery-info__col--zip {
     flex: 1 1 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .mp-delivery-info {
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .mp-delivery-info__title {
+      font-size: 0.75rem;
+    }
+
+    .mp-delivery-info__input {
+      padding: 10px 12px;
+      font-size: 0.9375rem;
+      border-radius: 10px;
+    }
+
+    .mp-delivery-info__hint {
+      font-size: 0.625rem;
+    }
   }
 
   @media screen and (max-width: 380px) {
@@ -814,7 +839,8 @@
       z-index: 99991;
       background: #fff;
       border-radius: 24px 24px 0 0;
-      max-height: 55vh;
+      height: 90dvh;
+      max-height: 90vh;
       transform: translateY(100%);
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
@@ -862,9 +888,10 @@
     }
 
     .mp-sheet__body {
-      flex: 1;
+      flex: 1 1 auto;
       overflow-y: auto;
       padding: 0 20px 12px;
+      min-height: 80px;
     }
 
     .mp-sheet__empty {
@@ -876,12 +903,16 @@
     .mp-sheet__items {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
 
     .mp-sheet__footer {
       padding: 12px 20px 24px;
       border-top: 1px solid #eee;
+      flex-shrink: 0;
+      max-height: 60vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .mp-sheet__subtotal {
@@ -1673,12 +1704,12 @@
   .mp-cart-item {
     display: flex;
     gap: 12px;
-    align-items: center;
+    align-items: flex-start;
   }
 
   .mp-cart-item__img {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
     border-radius: 10px;
     object-fit: cover;
     flex-shrink: 0;
@@ -1687,21 +1718,26 @@
   .mp-cart-item__info {
     flex: 1;
     min-width: 0;
+    padding-block-start: 2px;
   }
 
   .mp-cart-item__name {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: #1a1a1a;
-    margin: 0 0 2px;
-    white-space: nowrap;
+    margin: 0 0 4px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .mp-cart-item__price {
-    font-size: 0.75rem;
-    color: #888;
+    font-size: 0.8125rem;
+    color: #555;
   }
 
   .mp-cart-item__qty {
@@ -1709,6 +1745,7 @@
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+    margin-block-start: 2px;
   }
 
   .mp-cart-item__qty-btn {
@@ -2612,6 +2649,13 @@
       "type": "collection",
       "id": "collection_drinks",
       "label": "Drinks collection"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_drinks",
+      "label": "Hide drinks category",
+      "default": false,
+      "info": "Hides the Drinks badge in the nav and the Drinks grid below."
     },
     {
       "type": "collection",
