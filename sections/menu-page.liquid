@@ -2316,7 +2316,35 @@
       }
 
       Promise.all(saves).then(function () {
-        window.location.href = cta.getAttribute('href') || '/checkout';
+        // Prefill Shopify Checkout's shipping address so the customer
+        // doesn't re-type what they already entered in the cart drawer.
+        // Cart attributes still flow to Wolt unchanged — this only adds
+        // query params to the checkout URL.
+        var baseHref = cta.getAttribute('href') || '/checkout';
+        var url;
+        try {
+          url = new URL(baseHref, window.location.origin);
+        } catch (err) {
+          url = new URL('/checkout', window.location.origin);
+        }
+
+        if (addrResult.address) {
+          url.searchParams.set('checkout[shipping_address][address1]', addrResult.address);
+        }
+        if (addrResult.city) {
+          url.searchParams.set('checkout[shipping_address][city]', addrResult.city);
+        }
+        if (addrResult.zip) {
+          url.searchParams.set('checkout[shipping_address][zip]', addrResult.zip);
+        }
+        // Default country for the Bulgarian storefront. If you ever
+        // ship beyond BG, swap this for a section setting.
+        url.searchParams.set('checkout[shipping_address][country]', 'Bulgaria');
+        if (phoneInput && phoneResult.normalized) {
+          url.searchParams.set('checkout[shipping_address][phone]', phoneResult.normalized);
+        }
+
+        window.location.href = url.toString();
       });
     }, true);
   }
