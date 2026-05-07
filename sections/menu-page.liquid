@@ -2716,6 +2716,14 @@
     // Per-product opt-out: fit cards always skip; product-card products
     // skip when their custom.skip_upsell metafield is true (e.g. desserts).
     var skipUpsell = card.dataset.skipUpsell === 'true';
+    console.log('[Habits] card click', {
+      title: card.dataset.productTitle,
+      variantId: variantId,
+      hasAddons: !!hasAddons,
+      skipUpsellAttr: card.dataset.skipUpsell,
+      skipUpsell: skipUpsell,
+      willOpenUpsell: !!(hasAddons && !skipUpsell)
+    });
 
     if (hasAddons && !skipUpsell) {
       openUpsell(variantId, card);
