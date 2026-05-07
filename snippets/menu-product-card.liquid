@@ -11,6 +11,10 @@
 {%- liquid
   assign variant = product.selected_or_first_available_variant | default: product.first_available_variant
   assign image = product.featured_image
+  assign skip_upsell = false
+  if product.metafields.custom.skip_upsell == true
+    assign skip_upsell = true
+  endif
 -%}
 
 <div
@@ -20,6 +24,7 @@
   data-product-title="{{ product.title | escape }}"
   data-product-price="{{ variant.price | money }}"
   data-product-image="{{ image | image_url: width: 200 }}"
+  {% if skip_upsell %}data-skip-upsell="true"{% endif %}
   style="
     --mp-card-bg: {{ card_bg | default: '#1a1a1a' }};
     --mp-card-radius: {{ card_radius | default: 16 }}px;
