@@ -157,6 +157,7 @@
             "icon": "price_tag",
             "image_upload": "shopify://shop_images/Group_10.png",
             "width": 24,
+            "corner_radius": 0,
             "link": "",
             "open_in_new_tab": false
           },
@@ -512,6 +513,7 @@
                 "icon": "price_tag",
                 "image_upload": "shopify://shop_images/Group_11.png",
                 "width": 200,
+                "corner_radius": 0,
                 "link": "",
                 "open_in_new_tab": false
               },
@@ -662,6 +664,8 @@
         "checkbox_2_label": "Желая обаждане по телефона за потвърждение на резервацията.",
         "button_label": "Изпрати запитване",
         "form_action": "",
+        "cf7_endpoint_url": "https://habits.bg/wp-json/contact-form-7/v1/contact-forms/<form_id>/feedback",
+        "success_redirect_url": "",
         "background_color": "#024b40",
         "text_color": "#ffffff",
         "label_color": "#ffffff",
