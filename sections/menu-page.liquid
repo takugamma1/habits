@@ -2067,6 +2067,24 @@
     return String(s).replace(/(["\\\]\[])/g, '\\$1');
   }
 
+  function bumpCountBadges(delta) {
+    [cartCountDesktop, cartCountMobile].forEach(function (el) {
+      if (!el) return;
+      var n = parseInt(el.textContent, 10);
+      if (isNaN(n)) n = 0;
+      var next = Math.max(0, n + delta);
+      el.textContent = next;
+      if (el.dataset) el.dataset.count = next;
+    });
+    [drawerCount, sheetCount].forEach(function (el) {
+      if (!el) return;
+      var match = (el.textContent || '').match(/(-?\d+)/);
+      var n = match ? parseInt(match[1], 10) : 0;
+      var next = Math.max(0, n + delta);
+      el.textContent = '(' + next + ')';
+    });
+  }
+
   function handleQtyClick(btn) {
     var key = btn.dataset.key;
     if (!key) {
@@ -2086,17 +2104,23 @@
     if (isNaN(current)) current = 0;
 
     var newQty = Math.max(0, current + direction);
+    var actualDelta = newQty - current;
+    if (actualDelta === 0) return; // Nothing to do (e.g. clicking − on qty 0)
+
     pendingQty[key] = newQty;
     var myToken = (qtyToken[key] || 0) + 1;
     qtyToken[key] = myToken;
 
-    // Optimistic UI on both drawer and sheet copies of this item
+    // Optimistic UI: update qty number on both drawer and sheet copies,
+    // and bump the count badges immediately so the user sees instant
+    // feedback. The server response will reconcile any drift later.
     $$('.mp-cart-item[data-key="' + cssEscape(key) + '"] .mp-cart-item__qty-num').forEach(function (el) {
       el.textContent = newQty;
     });
+    bumpCountBadges(actualDelta);
+    bounceCartBadge();
 
     changeQuantity(key, newQty).then(function () {
-      // Only the latest request for this key is allowed to clear pending
       if (qtyToken[key] === myToken) {
         delete pendingQty[key];
       }
@@ -2652,7 +2676,13 @@
     if (hasAddons && !skipUpsell) {
       openUpsell(variantId, card);
     } else {
-      addToCart([{ id: parseInt(variantId, 10), quantity: 1 }]).then(bounceCartBadge);
+      // Instant UI feedback: bump the cart badge and bounce now so the
+      // user sees the cart update immediately, without waiting for the
+      // /cart/add.js round-trip. The full cart re-renders when the
+      // server responds.
+      bumpCountBadges(1);
+      bounceCartBadge();
+      addToCart([{ id: parseInt(variantId, 10), quantity: 1 }]);
     }
   });
 
