@@ -36,7 +36,7 @@
   data-product-title="{{ product.title | escape }}"
   data-product-price="{{ variant.price | money }}"
   data-product-image="{{ image | image_url: width: 200 }}"
-  {% if skip_upsell %}data-skip-upsell="true"{% endif %}
+  data-skip-upsell="{% if skip_upsell %}true{% else %}false{% endif %}"
   style="
     --mp-card-bg: {{ card_bg | default: '#1a1a1a' }};
     --mp-card-radius: {{ card_radius | default: 16 }}px;

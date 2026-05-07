@@ -2067,6 +2067,50 @@
     return String(s).replace(/(["\\\]\[])/g, '\\$1');
   }
 
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function optimisticAddLine(card) {
+    if (!card) return;
+    var title = card.dataset.productTitle || '';
+    var priceStr = card.dataset.productPrice || '';
+    var image = card.dataset.productImage || '';
+    var variantId = card.dataset.variantId || '';
+
+    // If a placeholder for this variant already exists, just bump its qty
+    var existing = $('.mp-cart-item[data-optimistic-variant="' + variantId + '"] .mp-cart-item__qty-num');
+    if (existing) {
+      var cur = parseInt(existing.textContent, 10) || 0;
+      $$('.mp-cart-item[data-optimistic-variant="' + variantId + '"] .mp-cart-item__qty-num').forEach(function (el) {
+        el.textContent = cur + 1;
+      });
+      return;
+    }
+
+    var html = ''
+      + '<div class="mp-cart-item" data-optimistic="1" data-optimistic-variant="' + escapeHtml(variantId) + '" style="opacity:0.7;">'
+      +   '<img class="mp-cart-item__img" src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" width="56" height="56">'
+      +   '<div class="mp-cart-item__info">'
+      +     '<p class="mp-cart-item__name">' + escapeHtml(title) + '</p>'
+      +     '<span class="mp-cart-item__price">' + escapeHtml(priceStr) + '</span>'
+      +   '</div>'
+      +   '<div class="mp-cart-item__qty">'
+      +     '<span class="mp-cart-item__qty-num">1</span>'
+      +   '</div>'
+      + '</div>';
+
+    if (drawerItems) drawerItems.insertAdjacentHTML('beforeend', html);
+    if (sheetItems) sheetItems.insertAdjacentHTML('beforeend', html);
+    if (drawerEmpty) drawerEmpty.style.display = 'none';
+    if (sheetEmpty) sheetEmpty.style.display = 'none';
+  }
+
   function bumpCountBadges(delta) {
     [cartCountDesktop, cartCountMobile].forEach(function (el) {
       if (!el) return;
@@ -2676,12 +2720,13 @@
     if (hasAddons && !skipUpsell) {
       openUpsell(variantId, card);
     } else {
-      // Instant UI feedback: bump the cart badge and bounce now so the
-      // user sees the cart update immediately, without waiting for the
-      // /cart/add.js round-trip. The full cart re-renders when the
-      // server responds.
+      // Instant UI feedback: bump the cart badge, bounce, and insert an
+      // optimistic cart line so the user sees the item appear immediately.
+      // The renderCart from the server response replaces the full list
+      // (including the placeholder) when /cart.js returns.
       bumpCountBadges(1);
       bounceCartBadge();
+      optimisticAddLine(card);
       addToCart([{ id: parseInt(variantId, 10), quantity: 1 }]);
     }
   });
