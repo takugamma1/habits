@@ -12,7 +12,8 @@
   assign variant = product.selected_or_first_available_variant | default: product.first_available_variant
   assign image = product.featured_image
   assign skip_upsell = false
-  if product.metafields.custom.skip_upsell == true
+  assign skip_upsell_meta = product.metafields.custom.skip_upsell
+  if skip_upsell_meta.value == true or skip_upsell_meta == true
     assign skip_upsell = true
   endif
 -%}
