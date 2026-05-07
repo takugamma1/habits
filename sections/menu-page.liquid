@@ -1814,8 +1814,30 @@ try {
     return parseFloat(parts[0]) + parseFloat(parts[1]) / 60;
   }
 
-  function formatMoney(cents) {
-    return (cents / 100).toFixed(2).replace('.', ',') + ' лв.';
+  // Currency formatting reads the cart's currency code (e.g. "EUR", "BGN")
+  // dynamically. The store currency is exposed by Shopify on
+  // window.Shopify.currency; we also accept an explicit code from the
+  // cart object so /cart.js responses are rendered in the right currency
+  // even after a future store-currency change.
+  function formatMoney(cents, currency) {
+    var code = currency
+      || (window.Shopify && window.Shopify.currency && window.Shopify.currency.active)
+      || 'EUR';
+    var amount = (cents || 0) / 100;
+    try {
+      return new Intl.NumberFormat('bg-BG', {
+        style: 'currency',
+        currency: code,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(amount);
+    } catch (e) {
+      // Fallback: symbol prefix or code suffix
+      var symbols = { EUR: '€', BGN: 'лв.', USD: '$', GBP: '£' };
+      var sym = symbols[code] || code;
+      var formatted = amount.toFixed(2).replace('.', ',');
+      return code === 'BGN' ? formatted + ' ' + sym : sym + formatted;
+    }
   }
 
   function $(sel, ctx) { return (ctx || document).querySelector(sel); }
@@ -2005,7 +2027,8 @@ try {
   /* ─────────── Render cart ─────────── */
   function renderCart(cart) {
     var count = cart.item_count;
-    var total = formatMoney(cart.total_price);
+    var currency = cart.currency || (window.Shopify && window.Shopify.currency && window.Shopify.currency.active);
+    var total = formatMoney(cart.total_price, currency);
 
     // Update all counts
     if (cartCountDesktop) {
@@ -2028,7 +2051,7 @@ try {
         '<img class="mp-cart-item__img" src="' + (item.image ? item.image.replace(/(\.[^.]+)$/, '_100x100$1') : '') + '" alt="' + item.title + '" width="52" height="52">' +
         '<div class="mp-cart-item__info">' +
           '<p class="mp-cart-item__name">' + item.product_title + '</p>' +
-          '<span class="mp-cart-item__price">' + formatMoney(item.final_line_price) + '</span>' +
+          '<span class="mp-cart-item__price">' + formatMoney(item.final_line_price, currency) + '</span>' +
         '</div>' +
         '<div class="mp-cart-item__qty">' +
           '<button type="button" class="mp-cart-item__qty-btn" data-action="minus" data-key="' + item.key + '">−</button>' +
