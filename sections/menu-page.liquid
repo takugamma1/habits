@@ -135,6 +135,10 @@
 <div
   class="mp-content"
   id="mp-content"
+  data-day-start="{{ section.settings.day_start_hour | default: 9.75 }}"
+  data-day-end="{{ section.settings.day_end_hour | default: 17 }}"
+  data-night-start="{{ section.settings.night_start_hour | default: 17 }}"
+  data-night-end="{{ section.settings.night_end_hour | default: 22.25 }}"
   style="
     --mp-page-bg: {{ section.settings.page_bg | default: '#f5f3ef' }};
     --mp-margin: {{ section.settings.section_margin | default: 12 }}px;
@@ -1849,8 +1853,21 @@
   /* ─────────── Time-based logic ─────────── */
   function initTimeLogic() {
     var t = getEETTime();
-    var isDay = t >= 9.75 && t < 17.25;    // 9:45 - 17:15
-    var isNight = t >= 16.75 && t < 22.25;  // 16:45 - 22:15
+    // Hours configured per section (defaults defined in the data-* attributes
+    // on #mp-content). Day and night windows must NOT overlap, otherwise both
+    // badges show during the overlap period.
+    var content = $('#mp-content');
+    var dayStart = content ? parseFloat(content.dataset.dayStart) : 9.75;
+    var dayEnd = content ? parseFloat(content.dataset.dayEnd) : 17;
+    var nightStart = content ? parseFloat(content.dataset.nightStart) : 17;
+    var nightEnd = content ? parseFloat(content.dataset.nightEnd) : 22.25;
+    if (isNaN(dayStart)) dayStart = 9.75;
+    if (isNaN(dayEnd)) dayEnd = 17;
+    if (isNaN(nightStart)) nightStart = 17;
+    if (isNaN(nightEnd)) nightEnd = 22.25;
+
+    var isDay = t >= dayStart && t < dayEnd;
+    var isNight = t >= nightStart && t < nightEnd;
     var isClosed = !isDay && !isNight;
 
     // Show/hide time-based badges
@@ -1998,17 +2015,75 @@
     if (sheetItems) sheetItems.innerHTML = html;
     if (sheetEmpty) sheetEmpty.style.display = count === 0 ? '' : 'none';
 
-    // Wire quantity buttons
-    $$('.mp-cart-item__qty-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var key = btn.dataset.key;
-        var numEl = btn.parentElement.querySelector('.mp-cart-item__qty-num');
-        var currentQty = parseInt(numEl.textContent, 10);
-        var newQty = btn.dataset.action === 'plus' ? currentQty + 1 : currentQty - 1;
-        changeQuantity(key, Math.max(0, newQty));
+    // Quantity buttons are wired once via delegation (see wireCartDelegation
+    // below). Pending qty values flush back into the DOM here so optimistic
+    // updates survive a re-render race.
+    Object.keys(pendingQty).forEach(function (key) {
+      $$('.mp-cart-item[data-key="' + cssEscape(key) + '"] .mp-cart-item__qty-num').forEach(function (el) {
+        el.textContent = pendingQty[key];
       });
     });
   }
+
+  // Pending qty per item key — guards against rapid-click race conditions
+  // where DOM hasn't repainted before the next click reads textContent.
+  var pendingQty = {};
+  // Per-key in-flight token; only the latest request's response is allowed
+  // to clear the pending state.
+  var qtyToken = {};
+
+  function cssEscape(s) {
+    return String(s).replace(/(["\\\]\[])/g, '\\$1');
+  }
+
+  function handleQtyClick(btn) {
+    var key = btn.dataset.key;
+    if (!key) return;
+    var direction = btn.dataset.action === 'plus' ? 1 : -1;
+
+    var current;
+    if (Object.prototype.hasOwnProperty.call(pendingQty, key)) {
+      current = pendingQty[key];
+    } else {
+      var numEl = btn.parentElement.querySelector('.mp-cart-item__qty-num');
+      current = numEl ? parseInt(numEl.textContent, 10) : 0;
+    }
+    if (isNaN(current)) current = 0;
+
+    var newQty = Math.max(0, current + direction);
+    pendingQty[key] = newQty;
+    var myToken = (qtyToken[key] || 0) + 1;
+    qtyToken[key] = myToken;
+
+    // Optimistic UI on both drawer and sheet copies of this item
+    $$('.mp-cart-item[data-key="' + cssEscape(key) + '"] .mp-cart-item__qty-num').forEach(function (el) {
+      el.textContent = newQty;
+    });
+
+    changeQuantity(key, newQty).then(function () {
+      // Only the latest request for this key is allowed to clear pending
+      if (qtyToken[key] === myToken) {
+        delete pendingQty[key];
+      }
+    }).catch(function (err) {
+      console.error('[Habits] qty change failed:', err);
+      if (qtyToken[key] === myToken) {
+        delete pendingQty[key];
+      }
+    });
+  }
+
+  function wireCartDelegation() {
+    [drawerItems, sheetItems].forEach(function (container) {
+      if (!container || container.dataset.qtyDelegated) return;
+      container.dataset.qtyDelegated = '1';
+      container.addEventListener('click', function (e) {
+        var btn = e.target.closest('.mp-cart-item__qty-btn');
+        if (btn && container.contains(btn)) handleQtyClick(btn);
+      });
+    });
+  }
+  wireCartDelegation();
 
   function bounceCartBadge() {
     if (cartCountDesktop) {
@@ -2535,8 +2610,11 @@
     if (!variantId) return;
 
     var hasAddons = $('#mp-upsell-list-1 .mp-addon-tile');
+    // Per-product opt-out: fit cards always skip; product-card products
+    // skip when their custom.skip_upsell metafield is true (e.g. desserts).
+    var skipUpsell = card.dataset.skipUpsell === 'true';
 
-    if (hasAddons) {
+    if (hasAddons && !skipUpsell) {
       openUpsell(variantId, card);
     } else {
       addToCart([{ id: parseInt(variantId, 10), quantity: 1 }]).then(bounceCartBadge);
@@ -2684,6 +2762,50 @@
       "label": "Hide drinks category",
       "default": false,
       "info": "Hides the Drinks badge in the nav and the Drinks grid below."
+    },
+    {
+      "type": "header",
+      "content": "Day & night menu hours"
+    },
+    {
+      "type": "paragraph",
+      "content": "Use 24-hour format with quarter-hour steps (e.g. 9.75 = 9:45, 17.5 = 17:30). Times are evaluated in Europe/Sofia. Day and night windows should NOT overlap."
+    },
+    {
+      "type": "range",
+      "id": "day_start_hour",
+      "label": "Day menu starts",
+      "min": 0,
+      "max": 24,
+      "step": 0.25,
+      "default": 9.75
+    },
+    {
+      "type": "range",
+      "id": "day_end_hour",
+      "label": "Day menu ends",
+      "min": 0,
+      "max": 24,
+      "step": 0.25,
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "night_start_hour",
+      "label": "Night menu starts",
+      "min": 0,
+      "max": 24,
+      "step": 0.25,
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "night_end_hour",
+      "label": "Night menu ends",
+      "min": 0,
+      "max": 24,
+      "step": 0.25,
+      "default": 22.25
     },
     {
       "type": "collection",

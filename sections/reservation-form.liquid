@@ -169,7 +169,15 @@
         role="tabpanel"
         hidden
       >
-      <form class="reservation-form__form" action="{{ section.settings.form_action }}" method="POST">
+      <form
+        class="reservation-form__form"
+        action="{{ section.settings.cf7_endpoint_url | default: section.settings.form_action }}"
+        method="POST"
+        enctype="multipart/form-data"
+        data-rf-form
+        data-rf-success-url="{{ section.settings.success_redirect_url }}"
+      >
+        <div class="reservation-form__status" data-rf-status role="status" aria-live="polite" hidden></div>
         <div class="reservation-form__fields">
           {%- comment -%} Row 1: Name + Phone {%- endcomment -%}
           <div class="reservation-form__row reservation-form__row--half">
@@ -180,7 +188,7 @@
               <input
                 type="text"
                 id="rf-name-{{ section.id }}"
-                name="name"
+                name="yourname"
                 class="reservation-form__input"
                 placeholder="{{ section.settings.name_placeholder | default: 'Your name' }}"
                 required
@@ -193,7 +201,7 @@
               <input
                 type="tel"
                 id="rf-phone-{{ section.id }}"
-                name="phone"
+                name="Phone"
                 class="reservation-form__input"
                 placeholder="{{ section.settings.phone_placeholder | default: '+359' }}"
                 required
@@ -209,8 +217,9 @@
               </label>
               <select
                 id="rf-guests-{{ section.id }}"
-                name="guests"
+                name="Guests"
                 class="reservation-form__input reservation-form__select"
+                required
               >
                 {% for i in (1..20) %}
                   <option value="{{ i }}">{{ i }}</option>
@@ -224,7 +233,7 @@
               <input
                 type="date"
                 id="rf-date-{{ section.id }}"
-                name="date"
+                name="date-83"
                 class="reservation-form__input"
                 required
               >
@@ -240,7 +249,7 @@
               <input
                 type="time"
                 id="rf-time-{{ section.id }}"
-                name="time"
+                name="Time"
                 class="reservation-form__input"
                 required
               >
@@ -255,7 +264,7 @@
               </label>
               <textarea
                 id="rf-comment-{{ section.id }}"
-                name="comment"
+                name="textarea-857"
                 class="reservation-form__input reservation-form__textarea"
                 rows="3"
                 placeholder="{{ section.settings.comment_placeholder | default: 'Additional notes...' }}"
@@ -263,25 +272,25 @@
             </div>
           </div>
 
-          {%- comment -%} Checkboxes {%- endcomment -%}
+          {%- comment -%} Checkboxes — names match the WordPress CF7 form so submissions land in the same inbox {%- endcomment -%}
           <div class="reservation-form__checkboxes">
             {% if section.settings.checkbox_1_label != blank %}
               <label class="reservation-form__checkbox-label">
-                <input type="checkbox" name="consent_data" class="reservation-form__checkbox" required>
+                <input type="checkbox" name="acceptance-112" value="1" class="reservation-form__checkbox" required>
                 <span class="reservation-form__checkbox-text">{{ section.settings.checkbox_1_label }}</span>
               </label>
             {% endif %}
 
             {% if section.settings.checkbox_2_label != blank %}
               <label class="reservation-form__checkbox-label">
-                <input type="checkbox" name="consent_phone" class="reservation-form__checkbox">
+                <input type="checkbox" name="consent_check[]" value="{{ section.settings.checkbox_2_label | escape }}" class="reservation-form__checkbox">
                 <span class="reservation-form__checkbox-text">{{ section.settings.checkbox_2_label }}</span>
               </label>
             {% endif %}
           </div>
 
           {%- comment -%} Submit {%- endcomment -%}
-          <button type="submit" class="reservation-form__submit button">
+          <button type="submit" class="reservation-form__submit button" data-rf-submit>
             {{ section.settings.button_label | default: 'Reserve' }}
           </button>
         </div>
@@ -296,10 +305,9 @@
     var root = document.getElementById('ReservationForm-{{ section.id }}');
     if (!root) return;
 
-    var chooser = root.querySelector('[data-rf-chooser]');
     var choices = root.querySelectorAll('[data-rf-method]');
     var panels = root.querySelectorAll('[data-rf-panel]');
-    var defaultMethod = root.getAttribute('data-default-method') || 'chooser';
+    var defaultMethod = root.getAttribute('data-default-method') || 'form';
 
     function show(method) {
       choices.forEach(function (btn) {
@@ -323,9 +331,106 @@
       });
     });
 
+    // Default panel: chooser (no preselect), phone, or form
     if (defaultMethod === 'phone' || defaultMethod === 'form') {
       show(defaultMethod);
     }
+
+    // ─── AJAX submit to Contact Form 7 REST endpoint ───
+    // Only intercepts when the form's action looks like a CF7 REST URL.
+    // Falls back to a normal form post otherwise (e.g. blank action).
+    var form = root.querySelector('[data-rf-form]');
+    if (!form) return;
+
+    var action = form.getAttribute('action') || '';
+    var isCF7 = /\/wp-json\/contact-form-7\/v1\/contact-forms\/[^/]+\/feedback/.test(action);
+    if (!isCF7) return;
+
+    var status = form.querySelector('[data-rf-status]');
+    var submitBtn = form.querySelector('[data-rf-submit]');
+    var submitLabel = submitBtn ? submitBtn.textContent.trim() : '';
+
+    function setStatus(message, kind) {
+      if (!status) return;
+      if (!message) {
+        status.hidden = true;
+        status.textContent = '';
+        status.classList.remove('reservation-form__status--success', 'reservation-form__status--error');
+        return;
+      }
+      status.hidden = false;
+      status.textContent = message;
+      status.classList.toggle('reservation-form__status--success', kind === 'success');
+      status.classList.toggle('reservation-form__status--error', kind === 'error');
+    }
+
+    function clearFieldErrors() {
+      form.querySelectorAll('.reservation-form__input.is-invalid').forEach(function (el) {
+        el.classList.remove('is-invalid');
+      });
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      clearFieldErrors();
+      setStatus('', null);
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = (submitBtn.dataset.rfLoading || 'Изпращане...');
+      }
+
+      var data = new FormData(form);
+
+      fetch(action, {
+        method: 'POST',
+        body: data,
+        // CF7 returns JSON; no extra headers needed (browser sets multipart boundary).
+        credentials: 'omit'
+      })
+        .then(function (r) {
+          return r.json().catch(function () { return null; });
+        })
+        .then(function (json) {
+          if (!json) {
+            throw new Error('Empty response');
+          }
+
+          if (json.status === 'mail_sent') {
+            setStatus(json.message || 'Заявката е изпратена.', 'success');
+            form.reset();
+            var redirect = form.getAttribute('data-rf-success-url');
+            if (redirect) {
+              window.location.href = redirect;
+            }
+            return;
+          }
+
+          if (json.status === 'validation_failed' && Array.isArray(json.invalid_fields)) {
+            json.invalid_fields.forEach(function (f) {
+              // CF7 returns names like "yourname"; the form input has a matching name attribute
+              var name = (f.field || '').replace(/^wpcf7-form-control-wrap\s+/, '').trim();
+              var input = form.querySelector('[name="' + name + '"]');
+              if (input) input.classList.add('is-invalid');
+            });
+            setStatus(json.message || 'Моля, проверете попълнените полета.', 'error');
+            return;
+          }
+
+          // mail_failed, spam, or unknown
+          setStatus(json.message || 'Възникна грешка. Моля, опитайте отново.', 'error');
+        })
+        .catch(function (err) {
+          console.error('[Habits] reservation submit failed:', err);
+          setStatus('Не успяхме да изпратим заявката. Моля, опитайте по-късно.', 'error');
+        })
+        .finally(function () {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            if (submitLabel) submitBtn.textContent = submitLabel;
+          }
+        });
+    });
   })();
 </script>
 
@@ -562,6 +667,32 @@
   /* Form */
   .reservation-form__form {
     width: 100%;
+  }
+
+  /* Submit status banner (success / validation / error) */
+  .reservation-form__status {
+    margin-block-end: 12px;
+    padding: 10px 14px;
+    border-radius: var(--rf-input-radius, 8px);
+    font-size: 0.875rem;
+    line-height: 1.45;
+    background: rgba(255, 255, 255, 0.16);
+    color: var(--rf-text-color, #fff);
+  }
+
+  .reservation-form__status--success {
+    background: rgba(34, 139, 90, 0.95);
+    color: #fff;
+  }
+
+  .reservation-form__status--error {
+    background: rgba(192, 57, 43, 0.95);
+    color: #fff;
+  }
+
+  .reservation-form__input.is-invalid {
+    border-color: #c0392b;
+    box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.2);
   }
 
   .reservation-form__fields {
@@ -829,7 +960,7 @@
           "label": "Form preselected"
         }
       ],
-      "default": "chooser"
+      "default": "form"
     },
     {
       "type": "text",
@@ -999,8 +1130,28 @@
     {
       "type": "url",
       "id": "form_action",
-      "label": "Form action URL",
-      "info": "Where the form submits to. Leave blank for default."
+      "label": "Form action URL (legacy fallback)",
+      "info": "Used only if the CF7 endpoint below is empty. Leave blank for default."
+    },
+    {
+      "type": "header",
+      "content": "Contact Form 7 connection"
+    },
+    {
+      "type": "paragraph",
+      "content": "Submits the reservation to your existing WordPress CF7 form so emails go through the same pipeline. Field names already match the CF7 fields (yourname, Phone, Guests, date-83, Time, textarea-857, acceptance-112, consent_check)."
+    },
+    {
+      "type": "url",
+      "id": "cf7_endpoint_url",
+      "label": "CF7 REST endpoint",
+      "info": "Format: https://habits.bg/wp-json/contact-form-7/v1/contact-forms/FORM_ID/feedback. Find FORM_ID in WP admin under Contact > Forms (the number column)."
+    },
+    {
+      "type": "url",
+      "id": "success_redirect_url",
+      "label": "Thank-you page URL",
+      "info": "Where to redirect after a successful submission. Leave blank to show an inline success message instead."
     },
     {
       "type": "header",
