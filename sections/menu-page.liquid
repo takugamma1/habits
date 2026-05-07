@@ -2023,6 +2023,20 @@
         el.textContent = pendingQty[key];
       });
     });
+
+    // Belt-and-braces: also wire each button directly. If delegation fires
+    // first, this is a no-op (handler dedupe via .qtyWired flag). If
+    // delegation somehow doesn't fire (e.g., container reference lost),
+    // these per-button listeners pick up the click.
+    $$('.mp-cart-item__qty-btn').forEach(function (btn) {
+      if (btn.dataset.qtyWired) return;
+      btn.dataset.qtyWired = '1';
+      btn.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        handleQtyClick(btn);
+      });
+    });
   }
 
   // Pending qty per item key — guards against rapid-click race conditions
@@ -2038,8 +2052,12 @@
 
   function handleQtyClick(btn) {
     var key = btn.dataset.key;
-    if (!key) return;
+    if (!key) {
+      console.warn('[Habits] qty button missing data-key', btn);
+      return;
+    }
     var direction = btn.dataset.action === 'plus' ? 1 : -1;
+    console.debug('[Habits] qty click', { key: key, action: btn.dataset.action });
 
     var current;
     if (Object.prototype.hasOwnProperty.call(pendingQty, key)) {
