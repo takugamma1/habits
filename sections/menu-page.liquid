@@ -1940,6 +1940,9 @@
   }
 
   function addToCart(items) {
+    // /cart/add.js returns only the added line items, so we still need
+    // /cart.js for the full cart — but we kick the second fetch off as
+    // soon as add.js resolves and pipe the result straight into render.
     return fetch('/cart/add.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1962,13 +1965,27 @@
   }
 
   function changeQuantity(key, qty) {
+    // /cart/change.js returns the FULL cart — use it directly instead of
+    // doing a second /cart.js round-trip. This roughly halves the latency
+    // between clicking +/- and seeing the new state.
     return fetch('/cart/change.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: key, quantity: qty })
     })
-    .then(function (r) { return r.json(); })
-    .then(function () { return fetchCart(); });
+    .then(function (r) {
+      if (!r.ok) {
+        return r.json().then(function (err) {
+          throw new Error(err.description || err.message || 'Cart change failed');
+        });
+      }
+      return r.json();
+    })
+    .then(function (cart) {
+      state.cart = cart;
+      renderCart(cart);
+      return cart;
+    });
   }
 
   /* ─────────── Render cart ─────────── */
@@ -2024,13 +2041,13 @@
       });
     });
 
-    // Belt-and-braces: also wire each button directly. If delegation fires
-    // first, this is a no-op (handler dedupe via .qtyWired flag). If
-    // delegation somehow doesn't fire (e.g., container reference lost),
-    // these per-button listeners pick up the click.
-    $$('.mp-cart-item__qty-btn').forEach(function (btn) {
-      if (btn.dataset.qtyWired) return;
-      btn.dataset.qtyWired = '1';
+    // Wire every freshly rendered button. innerHTML replacement above
+    // destroyed the previous nodes, so each new button has no listener
+    // attached yet — we don't bother with a "wired" guard because every
+    // button here is a brand new node.
+    var allBtns = $$('.mp-cart-item__qty-btn');
+    console.log('[Habits] cart rendered, qty buttons:', allBtns.length);
+    allBtns.forEach(function (btn) {
       btn.addEventListener('click', function (ev) {
         ev.preventDefault();
         ev.stopPropagation();
