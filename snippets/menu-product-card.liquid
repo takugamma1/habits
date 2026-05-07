@@ -11,9 +11,20 @@
 {%- liquid
   assign variant = product.selected_or_first_available_variant | default: product.first_available_variant
   assign image = product.featured_image
+
+  comment
+    Skip the upsell modal when EITHER:
+      a) the product has a custom.skip_upsell boolean metafield set to true,
+      b) the product has the `skip-upsell` tag.
+    The tag fallback exists so it's still possible to flag products
+    quickly without setting up the metafield definition.
+  endcomment
   assign skip_upsell = false
   assign skip_upsell_meta = product.metafields.custom.skip_upsell
-  if skip_upsell_meta.value == true or skip_upsell_meta == true
+  if skip_upsell_meta.value == true or skip_upsell_meta == true or skip_upsell_meta.value == 'true' or skip_upsell_meta == 'true'
+    assign skip_upsell = true
+  endif
+  if product.tags contains 'skip-upsell'
     assign skip_upsell = true
   endif
 -%}

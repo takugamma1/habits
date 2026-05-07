@@ -1940,6 +1940,9 @@
   }
 
   function addToCart(items) {
+    // /cart/add.js returns only the added line items, so we still need
+    // /cart.js for the full cart — but we kick the second fetch off as
+    // soon as add.js resolves and pipe the result straight into render.
     return fetch('/cart/add.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1962,13 +1965,27 @@
   }
 
   function changeQuantity(key, qty) {
+    // /cart/change.js returns the FULL cart — use it directly instead of
+    // doing a second /cart.js round-trip. This roughly halves the latency
+    // between clicking +/- and seeing the new state.
     return fetch('/cart/change.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: key, quantity: qty })
     })
-    .then(function (r) { return r.json(); })
-    .then(function () { return fetchCart(); });
+    .then(function (r) {
+      if (!r.ok) {
+        return r.json().then(function (err) {
+          throw new Error(err.description || err.message || 'Cart change failed');
+        });
+      }
+      return r.json();
+    })
+    .then(function (cart) {
+      state.cart = cart;
+      renderCart(cart);
+      return cart;
+    });
   }
 
   /* ─────────── Render cart ─────────── */
@@ -2024,13 +2041,13 @@
       });
     });
 
-    // Belt-and-braces: also wire each button directly. If delegation fires
-    // first, this is a no-op (handler dedupe via .qtyWired flag). If
-    // delegation somehow doesn't fire (e.g., container reference lost),
-    // these per-button listeners pick up the click.
-    $$('.mp-cart-item__qty-btn').forEach(function (btn) {
-      if (btn.dataset.qtyWired) return;
-      btn.dataset.qtyWired = '1';
+    // Wire every freshly rendered button. innerHTML replacement above
+    // destroyed the previous nodes, so each new button has no listener
+    // attached yet — we don't bother with a "wired" guard because every
+    // button here is a brand new node.
+    var allBtns = $$('.mp-cart-item__qty-btn');
+    console.log('[Habits] cart rendered, qty buttons:', allBtns.length);
+    allBtns.forEach(function (btn) {
       btn.addEventListener('click', function (ev) {
         ev.preventDefault();
         ev.stopPropagation();
@@ -2048,6 +2065,24 @@
 
   function cssEscape(s) {
     return String(s).replace(/(["\\\]\[])/g, '\\$1');
+  }
+
+  function bumpCountBadges(delta) {
+    [cartCountDesktop, cartCountMobile].forEach(function (el) {
+      if (!el) return;
+      var n = parseInt(el.textContent, 10);
+      if (isNaN(n)) n = 0;
+      var next = Math.max(0, n + delta);
+      el.textContent = next;
+      if (el.dataset) el.dataset.count = next;
+    });
+    [drawerCount, sheetCount].forEach(function (el) {
+      if (!el) return;
+      var match = (el.textContent || '').match(/(-?\d+)/);
+      var n = match ? parseInt(match[1], 10) : 0;
+      var next = Math.max(0, n + delta);
+      el.textContent = '(' + next + ')';
+    });
   }
 
   function handleQtyClick(btn) {
@@ -2069,17 +2104,23 @@
     if (isNaN(current)) current = 0;
 
     var newQty = Math.max(0, current + direction);
+    var actualDelta = newQty - current;
+    if (actualDelta === 0) return; // Nothing to do (e.g. clicking − on qty 0)
+
     pendingQty[key] = newQty;
     var myToken = (qtyToken[key] || 0) + 1;
     qtyToken[key] = myToken;
 
-    // Optimistic UI on both drawer and sheet copies of this item
+    // Optimistic UI: update qty number on both drawer and sheet copies,
+    // and bump the count badges immediately so the user sees instant
+    // feedback. The server response will reconcile any drift later.
     $$('.mp-cart-item[data-key="' + cssEscape(key) + '"] .mp-cart-item__qty-num').forEach(function (el) {
       el.textContent = newQty;
     });
+    bumpCountBadges(actualDelta);
+    bounceCartBadge();
 
     changeQuantity(key, newQty).then(function () {
-      // Only the latest request for this key is allowed to clear pending
       if (qtyToken[key] === myToken) {
         delete pendingQty[key];
       }
@@ -2635,7 +2676,13 @@
     if (hasAddons && !skipUpsell) {
       openUpsell(variantId, card);
     } else {
-      addToCart([{ id: parseInt(variantId, 10), quantity: 1 }]).then(bounceCartBadge);
+      // Instant UI feedback: bump the cart badge and bounce now so the
+      // user sees the cart update immediately, without waiting for the
+      // /cart/add.js round-trip. The full cart re-renders when the
+      // server responds.
+      bumpCountBadges(1);
+      bounceCartBadge();
+      addToCart([{ id: parseInt(variantId, 10), quantity: 1 }]);
     }
   });
 
