@@ -153,6 +153,7 @@
             "icon": "price_tag",
             "image_upload": "shopify://shop_images/Group_11.png",
             "width": 200,
+            "corner_radius": 0,
             "link": "",
             "open_in_new_tab": false
           },
@@ -326,6 +327,7 @@
                 "icon": "price_tag",
                 "image_upload": "shopify://shop_images/DSC07488.jpg",
                 "width": 166,
+                "corner_radius": 20,
                 "link": "",
                 "open_in_new_tab": false
               },
@@ -338,6 +340,7 @@
                 "icon": "price_tag",
                 "image_upload": "shopify://shop_images/DVP01202.jpg",
                 "width": 166,
+                "corner_radius": 20,
                 "link": "",
                 "open_in_new_tab": false
               },
@@ -350,6 +353,7 @@
                 "icon": "price_tag",
                 "image_upload": "shopify://shop_images/DSC07508.jpg",
                 "width": 166,
+                "corner_radius": 20,
                 "link": "",
                 "open_in_new_tab": false
               },
@@ -362,6 +366,7 @@
                 "icon": "price_tag",
                 "image_upload": "shopify://shop_images/DSC09708.jpg",
                 "width": 166,
+                "corner_radius": 20,
                 "link": "",
                 "open_in_new_tab": false
               },
