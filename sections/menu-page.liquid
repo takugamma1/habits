@@ -1784,8 +1784,22 @@
   JAVASCRIPT
 ═══════════════════════════════════ {%- endcomment -%}
 <script>
+console.log('[Habits] menu-page script loaded at', new Date().toISOString());
+window.__habitsCartVersion = '{{ "now" | date: "%s" }}';
+
+// Catch any uncaught errors anywhere on this page so we can see why an
+// IIFE failed silently. Filter to only Habits-related stacks to avoid noise.
+window.addEventListener('error', function (e) {
+  if (!e || !e.filename) return;
+  if (e.filename.indexOf('menu-page') !== -1 || (e.message || '').indexOf('Habits') !== -1) {
+    console.error('[Habits] uncaught error:', e.message, '@', e.filename, ':', e.lineno);
+  }
+});
+
+try {
 (function () {
   'use strict';
+  console.log('[Habits] IIFE start');
 
   /* ─────────── Utility ─────────── */
   function getEETTime() {
@@ -1881,7 +1895,7 @@
     });
 
     // Show kitchen closed if no food menu is available
-    if (isClosed) {
+    if (isClosed && closedMsg) {
       closedMsg.style.display = '';
       // Find next opening time
       var nextTime = t >= 22.25 ? '10:00' : '10:00';
@@ -2756,7 +2770,11 @@
   } else {
     init();
   }
+  console.log('[Habits] IIFE end (registration complete)');
 })();
+} catch (e) {
+  console.error('[Habits] IIFE crashed:', e && e.message, e && e.stack);
+}
 </script>
 
 {% schema %}
