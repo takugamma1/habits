@@ -1988,7 +1988,10 @@ try {
       });
   }
 
+  // Track adds in flight per variant so we can revert the optimistic
+  // count bump if the server rejects the add (422, out of stock, etc.)
   function addToCart(items) {
+    var addedQty = items.reduce(function (n, i) { return n + (i.quantity || 1); }, 0);
     // /cart/add.js returns only the added line items, so we still need
     // /cart.js for the full cart — but we kick the second fetch off as
     // soon as add.js resolves and pipe the result straight into render.
@@ -2000,8 +2003,10 @@ try {
     .then(function (r) {
       if (!r.ok) {
         return r.json().then(function (err) {
-          console.error('[Habits] Cart add failed:', err);
-          throw new Error(err.description || err.message || 'Cart add failed');
+          console.error('[Habits] Cart add failed (' + r.status + '):', err);
+          var msg = err.description || err.message || ('HTTP ' + r.status);
+          showCartError(msg);
+          throw new Error(msg);
         });
       }
       return r.json();
@@ -2009,8 +2014,31 @@ try {
     .then(function () { return fetchCart(); })
     .catch(function (err) {
       console.error('[Habits] addToCart error:', err);
+      // Revert the optimistic count bump that fired before this call.
+      bumpCountBadges(-addedQty);
       return fetchCart();
     });
+  }
+
+  // Inline toast for cart errors. Auto-dismisses after 4s.
+  var cartErrorTimer = null;
+  function showCartError(msg) {
+    var existing = $('#mp-cart-error');
+    if (!existing) {
+      existing = document.createElement('div');
+      existing.id = 'mp-cart-error';
+      existing.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);'
+        + 'z-index:99999;background:#c0392b;color:#fff;padding:12px 18px;border-radius:10px;'
+        + 'box-shadow:0 6px 24px rgba(0,0,0,0.2);max-width:90vw;font-size:0.9rem;'
+        + 'font-family:inherit;text-align:center;';
+      document.body.appendChild(existing);
+    }
+    existing.textContent = msg;
+    existing.style.display = 'block';
+    if (cartErrorTimer) clearTimeout(cartErrorTimer);
+    cartErrorTimer = setTimeout(function () {
+      if (existing) existing.style.display = 'none';
+    }, 4000);
   }
 
   function changeQuantity(key, qty) {
