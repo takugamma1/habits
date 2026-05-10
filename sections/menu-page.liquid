@@ -1916,27 +1916,29 @@ try {
       }
     });
 
-    // Show kitchen closed if no food menu is available
-    if (isClosed && closedMsg) {
-      closedMsg.style.display = '';
-      // Find next opening time
-      var nextTime = t >= 22.25 ? '10:00' : '10:00';
-      var el = $('#mp-closed-time');
-      if (el) el.textContent = nextTime;
-    }
-
     // Auto-select the time-appropriate category
     if (isDay) {
       selectCollection('day');
+      if (closedMsg) closedMsg.style.display = 'none';
     } else if (isNight) {
       selectCollection('night');
+      if (closedMsg) closedMsg.style.display = 'none';
     } else {
-      // During closed hours, show Fit or Drinks by default
+      // Day/night menus are closed. Look for a fallback orderable
+      // category (Fit, Drinks, Add-ons). If one exists, just show it —
+      // the kitchen is still functional for those items, so the big
+      // "Kitchen closed" banner would be misleading.
       var firstAvail = badges.find(function (b) {
         return !b.classList.contains('is-hidden') && !b.classList.contains('mp-badge--time');
       });
       if (firstAvail) {
         selectCollection(firstAvail.dataset.collection);
+        if (closedMsg) closedMsg.style.display = 'none';
+      } else if (closedMsg) {
+        // Truly nothing orderable — show the closed banner
+        closedMsg.style.display = '';
+        var el = $('#mp-closed-time');
+        if (el) el.textContent = '10:00';
       }
     }
   }
@@ -1965,10 +1967,21 @@ try {
   });
 
   /* ─────────── Cart AJAX ─────────── */
+  // Monotonic token: every fetchCart bumps this. When a response arrives,
+  // we only render if it's still the latest in-flight request. Prevents
+  // a slow initial /cart.js from clobbering the post-add render with a
+  // pre-add stale cart (the "items added then removed extremely fast" bug).
+  var fetchToken = 0;
+
   function fetchCart() {
+    var myToken = ++fetchToken;
     return fetch('/cart.js')
       .then(function (r) { return r.json(); })
       .then(function (cart) {
+        if (myToken !== fetchToken) {
+          console.debug('[Habits] stale fetchCart response discarded (token', myToken, '< latest', fetchToken + ')');
+          return cart;
+        }
         state.cart = cart;
         renderCart(cart);
         return cart;
@@ -2004,6 +2017,7 @@ try {
     // /cart/change.js returns the FULL cart — use it directly instead of
     // doing a second /cart.js round-trip. This roughly halves the latency
     // between clicking +/- and seeing the new state.
+    var myToken = ++fetchToken;
     return fetch('/cart/change.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -2018,6 +2032,10 @@ try {
       return r.json();
     })
     .then(function (cart) {
+      if (myToken !== fetchToken) {
+        console.debug('[Habits] stale changeQuantity response discarded');
+        return cart;
+      }
       state.cart = cart;
       renderCart(cart);
       return cart;
