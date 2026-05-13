@@ -742,9 +742,30 @@
     -webkit-appearance: none;
   }
 
-  .reservation-form__input:focus {
+  .reservation-form__input:focus,
+  .reservation-form__input:focus-visible,
+  .reservation-form__input:active,
+  .reservation-form__textarea:focus {
+    /* Lock background + text color so theme-level focus styles can't
+       repaint the field with the section's green background. */
+    background-color: var(--rf-input-bg, #fff);
+    color: var(--rf-input-color, #1a1a1a);
     border-color: var(--rf-bg, #4a8f6d);
     box-shadow: 0 0 0 2px rgba(74, 143, 109, 0.15);
+  }
+
+  .reservation-form__input::placeholder {
+    color: #9a9a94;
+    opacity: 1;
+  }
+
+  /* Defensive: prevent browser autofill from re-tinting the field */
+  .reservation-form__input:-webkit-autofill,
+  .reservation-form__input:-webkit-autofill:hover,
+  .reservation-form__input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--rf-input-bg, #fff) inset;
+    -webkit-text-fill-color: var(--rf-input-color, #1a1a1a);
+    caret-color: var(--rf-input-color, #1a1a1a);
   }
 
   .reservation-form__select {
@@ -1099,7 +1120,7 @@
       "type": "text",
       "id": "comment_placeholder",
       "label": "Comment placeholder",
-      "default": "Additional notes..."
+      "default": "Допълнителни бележки..."
     },
     {
       "type": "header",
