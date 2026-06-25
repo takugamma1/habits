@@ -316,7 +316,7 @@
     var panels = root.querySelectorAll('[data-rf-panel]');
     var defaultMethod = root.getAttribute('data-default-method') || 'form';
     var slackUrl = root.getAttribute('data-rf-slack-url') || '';
-    var shopName = {{ shop.name | json }};
+    var callbackLabel = {{ section.settings.checkbox_2_label | json }};
 
     function show(method) {
       choices.forEach(function (btn) {
@@ -383,23 +383,25 @@
     function postToSlack(fd) {
       if (!slackUrl) return;
       var g = function (k) { return (fd.get(k) || '').toString().trim(); };
-      var callback = g('contact[Желае обаждане за потвърждение]') ? 'Да' : '—';
-      var title = '🍽️ Нова резервация — ' + shopName;
+      // Mirrors the old WordPress CF7 email body, line for line.
       var lines = [
-        '*Име:* ' + (g('contact[Име]') || '—'),
-        '*Телефон:* ' + (g('contact[Телефон]') || '—'),
-        '*Брой гости:* ' + (g('contact[Брой гости]') || '—'),
-        '*Дата:* ' + (g('contact[Дата]') || '—') + '   *Час:* ' + (g('contact[Час]') || '—'),
-        '*Коментар:* ' + (g('contact[body]') || '—'),
-        '*Обаждане за потвърждение:* ' + callback
+        'Резервация за -  ' + g('contact[Име]'),
+        'Телефон - ' + g('contact[Телефон]'),
+        'Брой гости - ' + g('contact[Брой гости]'),
+        'Дата - ' + g('contact[Дата]'),
+        'Час - ' + g('contact[Час]')
       ];
-      var payload = {
-        text: title,
-        blocks: [
-          { type: 'header', text: { type: 'plain_text', text: title, emoji: true } },
-          { type: 'section', text: { type: 'mrkdwn', text: lines.join('\n') } }
-        ]
-      };
+      if (g('contact[Желае обаждане за потвърждение]')) {
+        lines.push(callbackLabel);
+      }
+      lines.push('');
+      var comment = g('contact[body]');
+      if (comment) {
+        lines.push(comment);
+      }
+      lines.push('Тази резервация е получена от сайта на Habits.bg');
+
+      var payload = { text: lines.join('\n') };
       fetch(slackUrl, {
         method: 'POST',
         mode: 'no-cors',
@@ -425,47 +427,47 @@
 
       var data = new FormData(form);
 
+      // Slack is the primary, real-time channel — fire it first (fire-and-forget).
+      postToSlack(data);
+
+      function showThankYou() {
+        if (successUrl) {
+          window.location.href = successUrl;
+          return;
+        }
+        form.reset();
+        form.hidden = true;
+        var successBox = root.querySelector('[data-rf-success]');
+        if (successBox) {
+          successBox.hidden = false;
+          successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          setStatus('Заявката е изпратена.', 'success');
+        }
+      }
+
+      // Email via Shopify's contact form (a record copy). Best-effort: the
+      // reservation already reached staff via Slack, so we always thank the guest.
       fetch(action, {
         method: 'POST',
         body: data,
         headers: { 'Accept': 'text/html' }
       })
         .then(function (res) {
-          // Shopify redirects to ...?contact_posted=true on success, and
-          // re-renders the page (no redirect) when something is wrong.
           var ok = res.ok && (res.redirected || res.url.indexOf('posted=true') !== -1);
           if (!ok) {
-            throw new Error('Contact form rejected (HTTP ' + res.status + ', ' + res.url + ')');
-          }
-
-          // Email sent by Shopify — also ping Slack (best-effort)
-          postToSlack(data);
-
-          if (successUrl) {
-            window.location.href = successUrl;
-            return;
-          }
-
-          // No redirect: switch the form out for an inline thank-you message
-          form.reset();
-          form.hidden = true;
-          var successBox = root.querySelector('[data-rf-success]');
-          if (successBox) {
-            successBox.hidden = false;
-            successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          } else {
-            setStatus('Заявката е изпратена.', 'success');
+            console.warn('[Habits] Shopify email may have failed (HTTP ' + res.status + ', ' + res.url + ')');
           }
         })
         .catch(function (err) {
-          console.error('[Habits] reservation submit failed:', err);
-          setStatus('Не успяхме да изпратим заявката. Моля, опитайте по-късно.', 'error');
+          console.error('[Habits] Shopify email request failed:', err);
         })
         .finally(function () {
           if (submitBtn) {
             submitBtn.disabled = false;
             if (submitLabel) submitBtn.textContent = submitLabel;
           }
+          showThankYou();
         });
     });
   })();

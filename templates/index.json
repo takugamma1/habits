@@ -664,7 +664,7 @@
         "checkbox_2_label": "Желая обаждане по телефона за потвърждение на резервацията.",
         "button_label": "Изпрати запитване",
         "form_action": "",
-        "cf7_endpoint_url": "https://habits.bg/wp-json/contact-form-7/v1/contact-forms/<form_id>/feedback",
+        "slack_webhook_url": "",
         "success_redirect_url": "",
         "background_color": "#024b40",
         "text_color": "#ffffff",

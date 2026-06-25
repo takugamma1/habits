@@ -79,6 +79,7 @@
         "checkbox_2_label": "Желая обаждане по телефона за потвърждение на резервацията.",
         "button_label": "Ипрати запитване",
         "form_action": "",
+        "slack_webhook_url": "",
         "background_color": "#024b40",
         "text_color": "#ffffff",
         "label_color": "#ffffff",
