@@ -14,6 +14,8 @@
   id="ReservationForm-{{ section.id }}"
   class="reservation-form"
   data-default-method="{{ section.settings.default_method | default: 'chooser' }}"
+  data-rf-slack-url="{{ section.settings.slack_webhook_url | escape }}"
+  data-rf-success-url="{{ section.settings.success_redirect_url }}"
   style="
     --rf-bg: {{ section.settings.background_color | default: '#4a8f6d' }};
     --rf-radius: {{ section.settings.border_radius | default: 24 }}px;
@@ -169,14 +171,15 @@
         role="tabpanel"
         hidden
       >
-      <form
-        class="reservation-form__form"
-        action="{{ section.settings.cf7_endpoint_url | default: section.settings.form_action }}"
-        method="POST"
-        enctype="multipart/form-data"
-        data-rf-form
-        data-rf-success-url="{{ section.settings.success_redirect_url }}"
-      >
+      {%- assign rf_form_id = 'rf-form-' | append: section.id -%}
+      {%- form 'contact', class: 'reservation-form__form', id: rf_form_id -%}
+        {%- comment -%}
+          Shopify's contact form needs a valid email, but reservation guests give a phone,
+          not an email. We send a no-reply fallback (filled in by JS) so delivery always
+          works; every reservation detail is in the message body + the contact[...] fields below.
+        {%- endcomment -%}
+        <input type="hidden" name="contact[email]" value="" data-rf-email>
+
         <div class="reservation-form__status" data-rf-status role="status" aria-live="polite" hidden></div>
         <div class="reservation-form__fields">
           {%- comment -%} Row 1: Name + Phone {%- endcomment -%}
@@ -188,7 +191,7 @@
               <input
                 type="text"
                 id="rf-name-{{ section.id }}"
-                name="yourname"
+                name="contact[Име]"
                 class="reservation-form__input"
                 placeholder="{{ section.settings.name_placeholder | default: 'Your name' }}"
                 required
@@ -201,7 +204,7 @@
               <input
                 type="tel"
                 id="rf-phone-{{ section.id }}"
-                name="Phone"
+                name="contact[Телефон]"
                 class="reservation-form__input"
                 placeholder="{{ section.settings.phone_placeholder | default: '+359' }}"
                 required
@@ -217,7 +220,7 @@
               </label>
               <select
                 id="rf-guests-{{ section.id }}"
-                name="Guests"
+                name="contact[Брой гости]"
                 class="reservation-form__input reservation-form__select"
                 required
               >
@@ -233,7 +236,7 @@
               <input
                 type="date"
                 id="rf-date-{{ section.id }}"
-                name="date-83"
+                name="contact[Дата]"
                 class="reservation-form__input"
                 required
               >
@@ -249,7 +252,7 @@
               <input
                 type="time"
                 id="rf-time-{{ section.id }}"
-                name="Time"
+                name="contact[Час]"
                 class="reservation-form__input"
                 required
               >
@@ -264,7 +267,7 @@
               </label>
               <textarea
                 id="rf-comment-{{ section.id }}"
-                name="textarea-857"
+                name="contact[body]"
                 class="reservation-form__input reservation-form__textarea"
                 rows="3"
                 placeholder="{{ section.settings.comment_placeholder | default: 'Additional notes...' }}"
@@ -272,18 +275,18 @@
             </div>
           </div>
 
-          {%- comment -%} Checkboxes — names match the WordPress CF7 form so submissions land in the same inbox {%- endcomment -%}
+          {%- comment -%} Checkboxes — these become labelled lines in the reservation email {%- endcomment -%}
           <div class="reservation-form__checkboxes">
             {% if section.settings.checkbox_1_label != blank %}
               <label class="reservation-form__checkbox-label">
-                <input type="checkbox" name="acceptance-112" value="1" class="reservation-form__checkbox" required>
+                <input type="checkbox" name="contact[Съгласие за обработка на данни]" value="Да" class="reservation-form__checkbox" required>
                 <span class="reservation-form__checkbox-text">{{ section.settings.checkbox_1_label }}</span>
               </label>
             {% endif %}
 
             {% if section.settings.checkbox_2_label != blank %}
               <label class="reservation-form__checkbox-label">
-                <input type="checkbox" name="consent_check[]" value="{{ section.settings.checkbox_2_label | escape }}" class="reservation-form__checkbox">
+                <input type="checkbox" name="contact[Желае обаждане за потвърждение]" value="Да" class="reservation-form__checkbox">
                 <span class="reservation-form__checkbox-text">{{ section.settings.checkbox_2_label }}</span>
               </label>
             {% endif %}
@@ -294,7 +297,11 @@
             {{ section.settings.button_label | default: 'Reserve' }}
           </button>
         </div>
-      </form>
+      {%- endform -%}
+
+      <div class="reservation-form__success" data-rf-success hidden>
+        {{ section.settings.success_message }}
+      </div>
       </div>
     </div>
   </div>
@@ -308,6 +315,8 @@
     var choices = root.querySelectorAll('[data-rf-method]');
     var panels = root.querySelectorAll('[data-rf-panel]');
     var defaultMethod = root.getAttribute('data-default-method') || 'form';
+    var slackUrl = root.getAttribute('data-rf-slack-url') || '';
+    var shopName = {{ shop.name | json }};
 
     function show(method) {
       choices.forEach(function (btn) {
@@ -336,15 +345,14 @@
       show(defaultMethod);
     }
 
-    // ─── AJAX submit to Contact Form 7 REST endpoint ───
-    // Only intercepts when the form's action looks like a CF7 REST URL.
-    // Falls back to a normal form post otherwise (e.g. blank action).
-    var form = root.querySelector('[data-rf-form]');
+    // ─── AJAX submit to Shopify's native contact form ───
+    var form = root.querySelector('.reservation-form__form');
     if (!form) return;
 
-    var action = form.getAttribute('action') || '';
-    var isCF7 = /\/wp-json\/contact-form-7\/v1\/contact-forms\/[^/]+\/feedback/.test(action);
-    if (!isCF7) return;
+    var action = form.getAttribute('action') || '/contact';
+    var emailField = form.querySelector('[data-rf-email]');
+    var fallbackEmail = 'reservation-noreply@' + window.location.hostname;
+    var successUrl = root.getAttribute('data-rf-success-url') || '';
 
     var status = form.querySelector('[data-rf-status]');
     var submitBtn = form.querySelector('[data-rf-submit]');
@@ -370,10 +378,45 @@
       });
     }
 
+    // Best-effort Slack ping. Fire-and-forget: no-cors + form-encoded "payload="
+    // avoids the CORS preflight that Slack's webhook endpoint rejects from a browser.
+    function postToSlack(fd) {
+      if (!slackUrl) return;
+      var g = function (k) { return (fd.get(k) || '').toString().trim(); };
+      var callback = g('contact[Желае обаждане за потвърждение]') ? 'Да' : '—';
+      var title = '🍽️ Нова резервация — ' + shopName;
+      var lines = [
+        '*Име:* ' + (g('contact[Име]') || '—'),
+        '*Телефон:* ' + (g('contact[Телефон]') || '—'),
+        '*Брой гости:* ' + (g('contact[Брой гости]') || '—'),
+        '*Дата:* ' + (g('contact[Дата]') || '—') + '   *Час:* ' + (g('contact[Час]') || '—'),
+        '*Коментар:* ' + (g('contact[body]') || '—'),
+        '*Обаждане за потвърждение:* ' + callback
+      ];
+      var payload = {
+        text: title,
+        blocks: [
+          { type: 'header', text: { type: 'plain_text', text: title, emoji: true } },
+          { type: 'section', text: { type: 'mrkdwn', text: lines.join('\n') } }
+        ]
+      };
+      fetch(slackUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'payload=' + encodeURIComponent(JSON.stringify(payload))
+      }).catch(function () {});
+    }
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       clearFieldErrors();
       setStatus('', null);
+
+      // Shopify's contact form needs a valid email; supply a no-reply fallback if blank.
+      if (emailField && !emailField.value) {
+        emailField.value = fallbackEmail;
+      }
 
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -385,40 +428,34 @@
       fetch(action, {
         method: 'POST',
         body: data,
-        // CF7 returns JSON; no extra headers needed (browser sets multipart boundary).
-        credentials: 'omit'
+        headers: { 'Accept': 'text/html' }
       })
-        .then(function (r) {
-          return r.json().catch(function () { return null; });
-        })
-        .then(function (json) {
-          if (!json) {
-            throw new Error('Empty response');
+        .then(function (res) {
+          // Shopify redirects to ...?contact_posted=true on success, and
+          // re-renders the page (no redirect) when something is wrong.
+          var ok = res.ok && (res.redirected || res.url.indexOf('posted=true') !== -1);
+          if (!ok) {
+            throw new Error('Contact form rejected (HTTP ' + res.status + ', ' + res.url + ')');
           }
 
-          if (json.status === 'mail_sent') {
-            setStatus(json.message || 'Заявката е изпратена.', 'success');
-            form.reset();
-            var redirect = form.getAttribute('data-rf-success-url');
-            if (redirect) {
-              window.location.href = redirect;
-            }
+          // Email sent by Shopify — also ping Slack (best-effort)
+          postToSlack(data);
+
+          if (successUrl) {
+            window.location.href = successUrl;
             return;
           }
 
-          if (json.status === 'validation_failed' && Array.isArray(json.invalid_fields)) {
-            json.invalid_fields.forEach(function (f) {
-              // CF7 returns names like "yourname"; the form input has a matching name attribute
-              var name = (f.field || '').replace(/^wpcf7-form-control-wrap\s+/, '').trim();
-              var input = form.querySelector('[name="' + name + '"]');
-              if (input) input.classList.add('is-invalid');
-            });
-            setStatus(json.message || 'Моля, проверете попълнените полета.', 'error');
-            return;
+          // No redirect: switch the form out for an inline thank-you message
+          form.reset();
+          form.hidden = true;
+          var successBox = root.querySelector('[data-rf-success]');
+          if (successBox) {
+            successBox.hidden = false;
+            successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            setStatus('Заявката е изпратена.', 'success');
           }
-
-          // mail_failed, spam, or unknown
-          setStatus(json.message || 'Възникна грешка. Моля, опитайте отново.', 'error');
         })
         .catch(function (err) {
           console.error('[Habits] reservation submit failed:', err);
@@ -688,6 +725,21 @@
   .reservation-form__status--error {
     background: rgba(192, 57, 43, 0.95);
     color: #fff;
+  }
+
+  /* Inline thank-you message shown in place of the form after success */
+  .reservation-form__success {
+    padding: 24px;
+    border-radius: var(--rf-input-radius, 8px);
+    background: rgba(255, 255, 255, 0.16);
+    color: var(--rf-text-color, #fff);
+    font-size: 1rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  .reservation-form__success[hidden] {
+    display: none;
   }
 
   .reservation-form__input.is-invalid {
@@ -1149,30 +1201,39 @@
       "default": "Reserve"
     },
     {
-      "type": "url",
-      "id": "form_action",
-      "label": "Form action URL (legacy fallback)",
-      "info": "Used only if the CF7 endpoint below is empty. Leave blank for default."
-    },
-    {
       "type": "header",
-      "content": "Contact Form 7 connection"
+      "content": "Email delivery"
     },
     {
       "type": "paragraph",
-      "content": "Submits the reservation to your existing WordPress CF7 form so emails go through the same pipeline. Field names already match the CF7 fields (yourname, Phone, Guests, date-83, Time, textarea-857, acceptance-112, consent_check)."
-    },
-    {
-      "type": "url",
-      "id": "cf7_endpoint_url",
-      "label": "CF7 REST endpoint",
-      "info": "Format: https://habits.bg/wp-json/contact-form-7/v1/contact-forms/FORM_ID/feedback. Find FORM_ID in WP admin under Contact > Forms (the number column)."
+      "content": "Reservations are emailed via Shopify's built-in contact form. They are sent to your store contact email (Settings > Store details). To route them to a specific inbox, set that address as the store contact email, or forward it there."
     },
     {
       "type": "url",
       "id": "success_redirect_url",
       "label": "Thank-you page URL",
-      "info": "Where to redirect after a successful submission. Leave blank to show an inline success message instead."
+      "info": "Where to redirect after a successful submission. Leave blank to show the inline thank-you message below instead."
+    },
+    {
+      "type": "richtext",
+      "id": "success_message",
+      "label": "Thank-you message",
+      "default": "<p>Благодарим! Вашата резервация е изпратена успешно. Ще се свържем с Вас за потвърждение.</p>",
+      "info": "Shown in place of the form after a successful submission (when no thank-you page URL is set)."
+    },
+    {
+      "type": "header",
+      "content": "Slack notifications"
+    },
+    {
+      "type": "paragraph",
+      "content": "Posts each reservation to a Slack channel via an Incoming Webhook, in addition to the CF7 email. Note: this URL is visible in the page source. Leave blank to disable Slack."
+    },
+    {
+      "type": "url",
+      "id": "slack_webhook_url",
+      "label": "Slack Incoming Webhook URL",
+      "info": "Create one at api.slack.com/apps > Incoming Webhooks. Format: https://hooks.slack.com/services/..."
     },
     {
       "type": "header",
