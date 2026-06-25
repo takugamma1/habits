@@ -1229,13 +1229,13 @@
     },
     {
       "type": "paragraph",
-      "content": "Posts each reservation to a Slack channel via an Incoming Webhook, in addition to the CF7 email. Note: this URL is visible in the page source. Leave blank to disable Slack."
+      "content": "Posts each reservation to Slack on submit (instant). This URL is visible in the page source, so on a public repo paste a proxy URL (e.g. a Cloudflare Worker) that forwards to your Slack webhook — not the raw hooks.slack.com URL. Leave blank to disable Slack."
     },
     {
       "type": "url",
       "id": "slack_webhook_url",
-      "label": "Slack Incoming Webhook URL",
-      "info": "Create one at api.slack.com/apps > Incoming Webhooks. Format: https://hooks.slack.com/services/..."
+      "label": "Slack webhook or proxy URL",
+      "info": "Recommended: a Cloudflare Worker URL that holds the real webhook. A raw Slack Incoming Webhook URL also works but exposes it publicly."
     },
     {
       "type": "header",
