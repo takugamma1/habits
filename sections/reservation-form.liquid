@@ -267,7 +267,7 @@
               </label>
               <textarea
                 id="rf-comment-{{ section.id }}"
-                name="contact[body]"
+                name="comment"
                 class="reservation-form__input reservation-form__textarea"
                 rows="3"
                 placeholder="{{ section.settings.comment_placeholder | default: 'Additional notes...' }}"
@@ -297,6 +297,13 @@
             {{ section.settings.button_label | default: 'Reserve' }}
           </button>
         </div>
+
+        {%- comment -%}
+          Filled by JS with the full reservation in the old WordPress format and
+          sent as the email "Body", so the Gmail → Slack automation can forward it
+          verbatim. Kept last so it is the final field in the email.
+        {%- endcomment -%}
+        <input type="hidden" name="contact[body]" data-rf-message>
       {%- endform -%}
 
       <div class="reservation-form__success" data-rf-success hidden>
@@ -380,10 +387,9 @@
 
     // Best-effort Slack ping. Fire-and-forget: no-cors + form-encoded "payload="
     // avoids the CORS preflight that Slack's webhook endpoint rejects from a browser.
-    function postToSlack(fd) {
-      if (!slackUrl) return;
+    // Builds the reservation text in the exact old-WordPress format.
+    function reservationText(fd) {
       var g = function (k) { return (fd.get(k) || '').toString().trim(); };
-      // Mirrors the old WordPress CF7 email body, line for line.
       var lines = [
         'Резервация за -  ' + g('contact[Име]'),
         'Телефон - ' + g('contact[Телефон]'),
@@ -395,13 +401,18 @@
         lines.push(callbackLabel);
       }
       lines.push('');
-      var comment = g('contact[body]');
+      var comment = g('comment');
       if (comment) {
         lines.push(comment);
       }
       lines.push('Тази резервация е получена от сайта на Habits.bg');
+      return lines.join('\n');
+    }
 
-      var payload = { text: lines.join('\n') };
+    // Optional direct Slack post — only used if a proxy/webhook URL is set.
+    function postToSlack(fd) {
+      if (!slackUrl) return;
+      var payload = { text: reservationText(fd) };
       fetch(slackUrl, {
         method: 'POST',
         mode: 'no-cors',
@@ -427,7 +438,11 @@
 
       var data = new FormData(form);
 
-      // Slack is the primary, real-time channel — fire it first (fire-and-forget).
+      // Pack the full reservation (WordPress format) into the email "Body" so the
+      // Gmail → Slack automation can forward it verbatim.
+      data.set('contact[body]', reservationText(data));
+
+      // Optional: also post straight to Slack if a proxy/webhook URL is set.
       postToSlack(data);
 
       function showThankYou() {
