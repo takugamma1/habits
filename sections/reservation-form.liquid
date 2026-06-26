@@ -191,7 +191,7 @@
               <input
                 type="text"
                 id="rf-name-{{ section.id }}"
-                name="contact[Име]"
+                name="name"
                 class="reservation-form__input"
                 placeholder="{{ section.settings.name_placeholder | default: 'Your name' }}"
                 required
@@ -204,7 +204,7 @@
               <input
                 type="tel"
                 id="rf-phone-{{ section.id }}"
-                name="contact[Телефон]"
+                name="phone"
                 class="reservation-form__input"
                 placeholder="{{ section.settings.phone_placeholder | default: '+359' }}"
                 required
@@ -220,7 +220,7 @@
               </label>
               <select
                 id="rf-guests-{{ section.id }}"
-                name="contact[Брой гости]"
+                name="guests"
                 class="reservation-form__input reservation-form__select"
                 required
               >
@@ -236,7 +236,7 @@
               <input
                 type="date"
                 id="rf-date-{{ section.id }}"
-                name="contact[Дата]"
+                name="date"
                 class="reservation-form__input"
                 required
               >
@@ -252,7 +252,7 @@
               <input
                 type="time"
                 id="rf-time-{{ section.id }}"
-                name="contact[Час]"
+                name="time"
                 class="reservation-form__input"
                 required
               >
@@ -279,14 +279,14 @@
           <div class="reservation-form__checkboxes">
             {% if section.settings.checkbox_1_label != blank %}
               <label class="reservation-form__checkbox-label">
-                <input type="checkbox" name="contact[Съгласие за обработка на данни]" value="Да" class="reservation-form__checkbox" required>
+                <input type="checkbox" name="consent" value="Да" class="reservation-form__checkbox" required>
                 <span class="reservation-form__checkbox-text">{{ section.settings.checkbox_1_label }}</span>
               </label>
             {% endif %}
 
             {% if section.settings.checkbox_2_label != blank %}
               <label class="reservation-form__checkbox-label">
-                <input type="checkbox" name="contact[Желае обаждане за потвърждение]" value="Да" class="reservation-form__checkbox">
+                <input type="checkbox" name="callback" value="Да" class="reservation-form__checkbox">
                 <span class="reservation-form__checkbox-text">{{ section.settings.checkbox_2_label }}</span>
               </label>
             {% endif %}
@@ -303,7 +303,7 @@
           sent as the email "Body", so the Gmail → Slack automation can forward it
           verbatim. Kept last so it is the final field in the email.
         {%- endcomment -%}
-        <input type="hidden" name="contact[Коментар]" data-rf-message>
+        <input type="hidden" name="contact[Comment]" data-rf-message>
       {%- endform -%}
 
       <div class="reservation-form__success" data-rf-success hidden>
@@ -391,13 +391,13 @@
     function reservationText(fd) {
       var g = function (k) { return (fd.get(k) || '').toString().trim(); };
       var lines = [
-        'Резервация за -  ' + g('contact[Име]'),
-        'Телефон - ' + g('contact[Телефон]'),
-        'Брой гости - ' + g('contact[Брой гости]'),
-        'Дата - ' + g('contact[Дата]'),
-        'Час - ' + g('contact[Час]')
+        'Резервация за -  ' + g('name'),
+        'Телефон - ' + g('phone'),
+        'Брой гости - ' + g('guests'),
+        'Дата - ' + g('date'),
+        'Час - ' + g('time')
       ];
-      if (g('contact[Желае обаждане за потвърждение]')) {
+      if (g('callback')) {
         lines.push(callbackLabel);
       }
       lines.push('');
@@ -438,9 +438,9 @@
 
       var data = new FormData(form);
 
-      // Pack the full reservation (WordPress format) into a "Коментар" field so the
-      // Gmail → Slack automation can forward it verbatim (Shopify labels it "Коментар:").
-      data.set('contact[Коментар]', reservationText(data));
+      // Pack the full reservation (WordPress format) into the "Comment" field so the
+      // Gmail → Slack automation can forward it verbatim (Shopify labels it "Comment:").
+      data.set('contact[Comment]', reservationText(data));
 
       // Optional: also post straight to Slack if a proxy/webhook URL is set.
       postToSlack(data);
