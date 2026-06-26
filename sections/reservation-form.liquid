@@ -303,7 +303,7 @@
           sent as the email "Body", so the Gmail → Slack automation can forward it
           verbatim. Kept last so it is the final field in the email.
         {%- endcomment -%}
-        <input type="hidden" name="contact[body]" data-rf-message>
+        <input type="hidden" name="contact[Коментар]" data-rf-message>
       {%- endform -%}
 
       <div class="reservation-form__success" data-rf-success hidden>
@@ -438,9 +438,9 @@
 
       var data = new FormData(form);
 
-      // Pack the full reservation (WordPress format) into the email "Body" so the
-      // Gmail → Slack automation can forward it verbatim.
-      data.set('contact[body]', reservationText(data));
+      // Pack the full reservation (WordPress format) into a "Коментар" field so the
+      // Gmail → Slack automation can forward it verbatim (Shopify labels it "Коментар:").
+      data.set('contact[Коментар]', reservationText(data));
 
       // Optional: also post straight to Slack if a proxy/webhook URL is set.
       postToSlack(data);
