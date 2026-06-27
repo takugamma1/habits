@@ -422,6 +422,17 @@
       }).catch(function () {});
     }
 
+    // Keep the hidden "Comment" field continuously up to date as the guest fills the
+    // form, so the full reservation is carried even if the form submits natively or
+    // before our submit handler runs.
+    function syncMessageField() {
+      if (messageField) {
+        messageField.value = reservationText(new FormData(form));
+      }
+    }
+    form.addEventListener('input', syncMessageField);
+    form.addEventListener('change', syncMessageField);
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       clearFieldErrors();
@@ -432,10 +443,7 @@
       if (emailField && !emailField.value) {
         emailField.value = fallbackEmail;
       }
-      if (messageField) {
-        // Full reservation in the old WordPress format -> becomes the email "Comment:".
-        messageField.value = reservationText(new FormData(form));
-      }
+      syncMessageField();
 
       if (submitBtn) {
         submitBtn.disabled = true;
