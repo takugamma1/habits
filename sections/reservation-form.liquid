@@ -358,6 +358,7 @@
 
     var action = form.getAttribute('action') || '/contact';
     var emailField = form.querySelector('[data-rf-email]');
+    var messageField = form.querySelector('[data-rf-message]');
     var fallbackEmail = 'reservation-noreply@habits.bg';
     var successUrl = root.getAttribute('data-rf-success-url') || '';
 
@@ -426,9 +427,14 @@
       clearFieldErrors();
       setStatus('', null);
 
-      // Shopify's contact form needs a valid email; supply a no-reply fallback if blank.
+      // Fill the hidden fields IN THE DOM (not just in the FormData copy) so they are
+      // carried whether the browser sends the form via our fetch below or natively.
       if (emailField && !emailField.value) {
         emailField.value = fallbackEmail;
+      }
+      if (messageField) {
+        // Full reservation in the old WordPress format -> becomes the email "Comment:".
+        messageField.value = reservationText(new FormData(form));
       }
 
       if (submitBtn) {
@@ -437,10 +443,6 @@
       }
 
       var data = new FormData(form);
-
-      // Pack the full reservation (WordPress format) into the "Comment" field so the
-      // Gmail → Slack automation can forward it verbatim (Shopify labels it "Comment:").
-      data.set('contact[Comment]', reservationText(data));
 
       // Optional: also post straight to Slack if a proxy/webhook URL is set.
       postToSlack(data);
