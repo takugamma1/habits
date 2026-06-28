@@ -157,6 +157,14 @@
   padding-inline: clamp(1.25rem, 5vw, 3rem);
 }
 
+/* Vertically CENTER the main content (logo -> email): an auto top-margin on the
+   first child pairs with the nav's auto top-margin below, so the free space
+   splits evenly above the content and below it — content centered, nav at the
+   bottom. Collapses gracefully on short/mobile cards (auto margins go to 0). */
+.footer-content > :first-child .group-block-content > :first-child {
+  margin-block-start: auto;
+}
+
 /* Constrain the inner blocks so the centered stack stays tidy */
 .footer-content > :first-child .logo-block,
 .footer-content > :first-child .text-block,
