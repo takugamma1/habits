@@ -85,101 +85,107 @@
     }
   }
 
-  /* --- Habits footer polish (image-panel left + newsletter right) --- */
+  /* --- Habits footer polish: single hero-style card (mirrors Image banner / hero) --- */
 
 /* =========================================================
    EASILY ADJUSTABLE KNOBS
-   - Logo watermark opacity: --footer-logo-opacity (around 0.85)
-   - Panel corner radius:    --footer-panel-radius (store ~16-24px)
-   - Panel min-heights:      --footer-panel-minh / --footer-panel-minh-mobile
+   - Card corner radius:  --footer-card-radius (hero uses ~20px)
+   - Outer inset:         --footer-card-inset (green page bg shows around)
+   - Banner heights:      --footer-card-minh / --footer-card-minh-mobile
+   - Content max width:   --footer-card-content-max
+   - Email pill width:    --footer-pill-max
+   - Nav link gap:        --footer-nav-gap
    ========================================================= */
 .footer-content {
-  --footer-logo-opacity: 0.85;   /* watermark logo opacity — tweak here */
-  --footer-panel-radius: 20px;   /* matches store rounded-card aesthetic */
-  --footer-panel-minh: 420px;    /* desktop image-panel height */
-  --footer-panel-minh-mobile: 220px;
+  --footer-card-radius: 20px;            /* matches group border_radius (20) + hero card */
+  --footer-card-inset: 20px;             /* ~hero section_margin inset; green shows around */
+  --footer-card-minh: 560px;             /* desktop reads as a banner (hero "large") */
+  --footer-card-minh-mobile: 440px;
+  --footer-card-content-max: 36rem;      /* keep centered stack from sprawling */
+  --footer-pill-max: 26rem;              /* email pill width when centered */
+  --footer-nav-gap: 28px;                /* horizontal gap between nav links */
 }
 
-/* 2-column band: image-panel left, newsletter right, stretched & roomy */
-@media screen and (min-width: 990px) {
-  .footer-content[style*='--grid-columns: 2'] {
-    /* stretch so the image panel matches the newsletter column height */
-    align-items: stretch;
-    gap: clamp(2.5rem, 6vw, 5rem);
-  }
-  /* keep the newsletter from sprawling; vertically center it next to the panel */
-  .footer-content[style*='--grid-columns: 2'] > :last-child {
-    justify-self: end;
-    align-self: center;
-    max-width: 30rem;
-  }
-}
-
-/* -------- LEFT: rounded image panel (the group with a bg image) -------- */
-/* The left column's group-block IS the first grid child (no wrapper). */
+/* -------- The single hero card = the group-block grid child -------- */
+/* With one top-level block, .group-block IS the direct grid child (no wrapper). */
 .footer-content > :first-child {
-  position: relative;                 /* base.css already sets this; explicit for safety */
+  position: relative;                 /* base.css sets this; explicit for safety */
   width: 100%;
-  min-height: var(--footer-panel-minh);
-  border-radius: var(--footer-panel-radius);
-  overflow: hidden;                   /* clip image + overlay corners */
-  /* subtle branded tint so the panel + logo read well even before an image is set */
-  background-color: #024b40;          /* store green fallback */
+  min-height: var(--footer-card-minh);
+  border-radius: var(--footer-card-radius);
+  overflow: hidden;                   /* clip image + overlay to rounded corners */
+  background-color: #024b40;          /* store green fallback before image loads */
+  /* inset from the page edges so the green band shows around (screen-in-screen) */
+  margin-inline: var(--footer-card-inset);
+  margin-block-end: var(--footer-card-inset);
 }
-/* Background media wrapper fills the panel behind the centered logo */
+
+/* Background media wrapper fills the card behind the centered content */
 .footer-content > :first-child .group-block__media-wrapper {
   position: absolute;
   inset: 0;
 }
 
-/* Background image fills the panel, cover (real Horizon hooks) */
+/* Background image fills the card, cover (real Horizon hooks) */
 .footer-content > :first-child .background-image-container {
-  border-radius: var(--footer-panel-radius);
+  border-radius: var(--footer-card-radius);
 }
 .footer-content > :first-child .background-image-container img {
   object-fit: cover;
+  object-position: center center;
   width: 100%;
   height: 100%;
 }
 
-/* Overlay tint sits behind the logo for contrast; round its corners too */
+/* Dark overlay scrim for legibility; round its corners to match the card */
 .footer-content > :first-child .overlay {
-  border-radius: var(--footer-panel-radius);
+  border-radius: var(--footer-card-radius);
 }
 
-/* Center the logo watermark over the panel */
+/* -------- Centered content stack, nav pushed to the bottom -------- */
 .footer-content > :first-child .group-block-content {
+  position: relative;                 /* sits above media + overlay */
+  z-index: 2;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+  flex-direction: column;
+  align-items: center;                /* horizontal center */
+  justify-content: center;            /* vertical center */
+  text-align: center;
+  min-height: var(--footer-card-minh);
   width: 100%;
-  padding: 1.5rem;
+  padding-block: clamp(2.5rem, 6vw, 4rem);
+  padding-inline: clamp(1.25rem, 5vw, 3rem);
 }
 
-/* The logo block: light/inverse asset, reduced opacity watermark */
-.footer-content > :first-child .logo-block {
-  pointer-events: none;
+/* Constrain the inner blocks so the centered stack stays tidy */
+.footer-content > :first-child .logo-block,
+.footer-content > :first-child .text-block,
+.footer-content > :first-child .email-signup-block {
+  max-width: var(--footer-card-content-max);
+  width: 100%;
 }
+
+/* Logo: prominent, centered, crisp (light/inverse asset over the dark overlay) */
 .footer-content > :first-child .logo-block__image {
-  opacity: var(--footer-logo-opacity);  /* watermark — adjust via --footer-logo-opacity */
-  max-width: 240px;
+  max-width: 260px;
   height: auto;
+  margin-inline: auto;
 }
 
-/* -------- RIGHT: newsletter polish (carried forward) -------- */
+/* White, legible heading + subtext over the photo overlay */
+.footer-content > :first-child .group-block-content :is(h1, h2, h3, h4, h5, h6) {
+  color: #ffffff;
+}
+.footer-content > :first-child .group-block-content p {
+  color: #ffffff;
+  opacity: 0.9;
+}
 
-/* Newsletter group reads as one tidy unit */
-.footer-content .email-signup-block { margin-block-start: 0.25rem; }
-
-/* White-on-green opacity tiers (store signature): headings solid, body softer.
-   Scoped to the right column so the left panel logo opacity is untouched. */
-.footer-content > :last-child p { opacity: 0.85; }
-.footer-content > :last-child h1, .footer-content > :last-child h2,
-.footer-content > :last-child h3, .footer-content > :last-child h4,
-.footer-content > :last-child h5, .footer-content > :last-child h6 { opacity: 1; }
-
-/* Email pill: crisp white field on green, near-black text, calm green focus ring */
+/* -------- Email pill: white field, near-black text, orange button -------- */
+.footer-content .email-signup-block {
+  margin-inline: auto;
+  max-width: var(--footer-pill-max);
+}
 .footer-content .email-signup__input-group--integrated {
   background: #ffffff;
   border-color: #ffffff;
@@ -192,24 +198,53 @@
 .footer-content .email-signup__input-group:focus-within {
   box-shadow: 0 0 0 2px rgba(74, 143, 109, 0.25);
 }
-
 /* Integrated "Запиши се" button keeps the scheme's orange primary, pill-matched */
 .footer-content .email-signup__button.button { border-radius: 100px; }
 .footer-content .email-signup__button.button:hover { opacity: 0.92; }
+
+/* -------- Bottom horizontal nav menu (main-menu links) -------- */
+/* Push the menu to the bottom of the centered column. */
+.footer-content > :first-child .menu {
+  margin-block-start: auto;
+  padding-block-start: clamp(1.5rem, 4vw, 2.5rem);
+}
+/* Turn the vertical list into a centered horizontal row (real menu hooks). */
+.footer-content .menu .list-unstyled {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--footer-nav-gap);
+}
+/* Kill the stacked vertical margin so the row spaces evenly via gap. */
+.footer-content .menu .menu__item + .menu__item {
+  margin-block-start: 0;
+}
+/* White links with a calm hover (the <a> has no class — target via .menu__item a). */
+.footer-content .menu .menu__item a {
+  color: #ffffff;
+  text-decoration: none;
+}
+.footer-content .menu .menu__item a:hover { opacity: 0.8; }
 
 /* Soft, calm interactions (store signature 0.2s) */
 .footer-content a,
 .footer-content .email-signup__button { transition: opacity 0.2s ease; }
 
-/* -------- Mobile: stack (panel on top, newsletter below) -------- */
+/* -------- Mobile: shorter card, comfortable stack, nav wraps -------- */
 @media screen and (max-width: 749px) {
-  .footer-content { gap: 1.75rem; }
-  .footer-content .email-signup-block { width: 100%; }
-
-  /* image panel gets a sensible, shorter height when stacked */
-  .footer-content > :first-child {
-    min-height: var(--footer-panel-minh-mobile);
+  .footer-content {
+    --footer-card-inset: 14px;
+    --footer-nav-gap: 18px;
   }
+  .footer-content > :first-child {
+    min-height: var(--footer-card-minh-mobile);
+  }
+  .footer-content > :first-child .group-block-content {
+    min-height: var(--footer-card-minh-mobile);
+  }
+  .footer-content .email-signup-block { width: 100%; }
+  .footer-content > :first-child .logo-block__image { max-width: 200px; }
 }
 {% endstylesheet %}
 
