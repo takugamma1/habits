@@ -252,6 +252,17 @@
     min-height: var(--footer-card-minh-mobile);
   }
   .footer-content .email-signup-block { width: 100%; }
+  /* Keep the INTEGRATED email pill a single fitting row on mobile. The theme forces
+     input + button to width:100% for its stacked (non-integrated) layout, which makes
+     our integrated pill overflow the card and clip on the right. Revert to a fitting row:
+     button sizes to its text, input flexes to fill the rest. */
+  .footer-content .email-signup__input-group--integrated {
+    max-width: 100%;
+  }
+  .footer-content .email-signup__input-group--integrated .email-signup__input,
+  .footer-content .email-signup__button--integrated {
+    width: auto;
+  }
   .footer-content > :first-child .logo-block__image { max-width: 200px; }
 }
 {% endstylesheet %}
