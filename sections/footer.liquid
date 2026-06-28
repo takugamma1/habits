@@ -84,6 +84,60 @@
       grid-column: 1 / -1;
     }
   }
+
+  /* --- Habits footer polish (2-column band) --- */
+
+  /* 2-column band: logo left, newsletter right, vertically centered & roomy */
+  @media screen and (min-width: 990px) {
+    .footer-content[style*='--grid-columns: 2'] {
+      align-items: center;
+      gap: clamp(2.5rem, 6vw, 5rem);
+    }
+    /* push the newsletter group toward the right edge to balance the logo */
+    .footer-content[style*='--grid-columns: 2'] > :last-child {
+      justify-self: end;
+      max-width: 30rem;
+    }
+  }
+
+  /* Logo: keep it from rendering oversized on the dark band */
+  .footer-content .logo-block__image { max-width: 220px; height: auto; }
+
+  /* Newsletter group reads as one tidy unit */
+  .footer-content .email-signup-block { margin-block-start: 0.25rem; }
+
+  /* White-on-green opacity tiers (store signature): headings solid, body softer */
+  .footer-content p { opacity: 0.85; }
+  .footer-content h1, .footer-content h2, .footer-content h3,
+  .footer-content h4, .footer-content h5, .footer-content h6 { opacity: 1; }
+
+  /* Email pill: crisp white field on green, near-black text, calm green focus ring */
+  .footer-content .email-signup__input-group--integrated {
+    background: #ffffff;
+    border-color: #ffffff;
+  }
+  .footer-content .email-signup__input {
+    color: #1a1a1a;
+    background: transparent;
+  }
+  .footer-content .email-signup__input::placeholder { color: #9a9a94; }
+  .footer-content .email-signup__input-group:focus-within {
+    box-shadow: 0 0 0 2px rgba(74, 143, 109, 0.25);
+  }
+
+  /* Integrated "Запиши се" button keeps the scheme's orange primary, pill-matched */
+  .footer-content .email-signup__button.button { border-radius: 100px; }
+  .footer-content .email-signup__button.button:hover { opacity: 0.92; }
+
+  /* Soft, calm interactions (store signature 0.2s) */
+  .footer-content a,
+  .footer-content .email-signup__button { transition: opacity 0.2s ease; }
+
+  /* Mobile: stack with comfortable rhythm */
+  @media screen and (max-width: 749px) {
+    .footer-content { gap: 1.75rem; }
+    .footer-content .email-signup-block { width: 100%; }
+  }
 {% endstylesheet %}
 
 {% schema %}
