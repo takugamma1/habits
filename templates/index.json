@@ -663,9 +663,9 @@
         "checkbox_1_label": "Съгласен съм данните ми да бъдат обработвани.*",
         "checkbox_2_label": "Желая обаждане по телефона за потвърждение на резервацията.",
         "button_label": "Изпрати запитване",
-        "form_action": "",
-        "slack_webhook_url": "",
         "success_redirect_url": "",
+        "success_message": "<p>Благодарим! Вашата резервация е изпратена успешно. Ще се свържем с Вас за потвърждение.</p>",
+        "slack_webhook_url": "",
         "background_color": "#024b40",
         "text_color": "#ffffff",
         "label_color": "#ffffff",
@@ -683,6 +683,79 @@
         "padding-inline-start": 32,
         "padding-inline-end": 32
       }
+    },
+    "hero_wp8Hf8": {
+      "type": "hero",
+      "blocks": {
+        "marquee_KbjFQK": {
+          "type": "_marquee",
+          "settings": {
+            "movement_direction": "normal",
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "transparent_background": true,
+            "padding-block-start": 24,
+            "padding-block-end": 24,
+            "gap_between_elements": 24
+          },
+          "blocks": {
+            "icon_fVfP9m": {
+              "type": "icon",
+              "name": "t:names.icon",
+              "settings": {
+                "icon": "price_tag",
+                "image_upload": "shopify://shop_images/Group_7_b1a8874c-c5ab-4121-9a5a-539986a8e190.png",
+                "width": 110,
+                "corner_radius": 0,
+                "link": "",
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "icon_fVfP9m"
+          ]
+        }
+      },
+      "block_order": [
+        "marquee_KbjFQK"
+      ],
+      "name": "t:names.hero_marquee",
+      "settings": {
+        "hero_overlay_logo_width": 400,
+        "media_type_1": "image",
+        "media_type_2": "image",
+        "stack_media_on_mobile": false,
+        "custom_mobile_media": false,
+        "media_type_1_mobile": "image",
+        "media_type_2_mobile": "image",
+        "link": "",
+        "open_in_new_tab": false,
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 32,
+        "section_width": "page-width",
+        "section_height": "auto",
+        "section_height_custom": 50,
+        "color_scheme": "scheme-51e46fd2-3761-469a-90a9-9dd6dd243b55",
+        "toggle_overlay": true,
+        "overlay_color": "#024B41",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "blurred_reflection": false,
+        "hide_reflection_desktop": false,
+        "reflection_opacity": 75,
+        "border_radius": 0,
+        "section_margin": 0,
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
     }
   },
   "order": [
@@ -696,6 +769,7 @@
     "featured_card_aTgGdf",
     "hero_NQNriT",
     "instagram_grid_Xg4kP1",
-    "reservation_form_Qk7mN3"
+    "reservation_form_Qk7mN3",
+    "hero_wp8Hf8"
   ]
 }
