@@ -912,6 +912,23 @@
     opacity: 0.9;
   }
 
+  /* ─── Desktop: image matches the form's height so there's no empty space beside it ─── */
+  @media screen and (min-width: 750px) {
+    .reservation-form__container {
+      align-items: stretch;
+    }
+    .reservation-form__media {
+      align-items: stretch;
+    }
+    .reservation-form__card {
+      aspect-ratio: auto;
+      min-height: 420px;
+    }
+    .reservation-form__content {
+      justify-content: center;
+    }
+  }
+
   /* ─── Mobile ─── */
   @media screen and (max-width: 749px) {
     .reservation-form__container {
