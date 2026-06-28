@@ -85,59 +85,132 @@
     }
   }
 
-  /* --- Habits footer polish (2-column band) --- */
+  /* --- Habits footer polish (image-panel left + newsletter right) --- */
 
-  /* 2-column band: logo left, newsletter right, vertically centered & roomy */
-  @media screen and (min-width: 990px) {
-    .footer-content[style*='--grid-columns: 2'] {
-      align-items: center;
-      gap: clamp(2.5rem, 6vw, 5rem);
-    }
-    /* push the newsletter group toward the right edge to balance the logo */
-    .footer-content[style*='--grid-columns: 2'] > :last-child {
-      justify-self: end;
-      max-width: 30rem;
-    }
+/* =========================================================
+   EASILY ADJUSTABLE KNOBS
+   - Logo watermark opacity: --footer-logo-opacity (around 0.85)
+   - Panel corner radius:    --footer-panel-radius (store ~16-24px)
+   - Panel min-heights:      --footer-panel-minh / --footer-panel-minh-mobile
+   ========================================================= */
+.footer-content {
+  --footer-logo-opacity: 0.85;   /* watermark logo opacity — tweak here */
+  --footer-panel-radius: 20px;   /* matches store rounded-card aesthetic */
+  --footer-panel-minh: 420px;    /* desktop image-panel height */
+  --footer-panel-minh-mobile: 220px;
+}
+
+/* 2-column band: image-panel left, newsletter right, stretched & roomy */
+@media screen and (min-width: 990px) {
+  .footer-content[style*='--grid-columns: 2'] {
+    /* stretch so the image panel matches the newsletter column height */
+    align-items: stretch;
+    gap: clamp(2.5rem, 6vw, 5rem);
   }
-
-  /* Logo: keep it from rendering oversized on the dark band */
-  .footer-content .logo-block__image { max-width: 220px; height: auto; }
-
-  /* Newsletter group reads as one tidy unit */
-  .footer-content .email-signup-block { margin-block-start: 0.25rem; }
-
-  /* White-on-green opacity tiers (store signature): headings solid, body softer */
-  .footer-content p { opacity: 0.85; }
-  .footer-content h1, .footer-content h2, .footer-content h3,
-  .footer-content h4, .footer-content h5, .footer-content h6 { opacity: 1; }
-
-  /* Email pill: crisp white field on green, near-black text, calm green focus ring */
-  .footer-content .email-signup__input-group--integrated {
-    background: #ffffff;
-    border-color: #ffffff;
+  /* keep the newsletter from sprawling; vertically center it next to the panel */
+  .footer-content[style*='--grid-columns: 2'] > :last-child {
+    justify-self: end;
+    align-self: center;
+    max-width: 30rem;
   }
-  .footer-content .email-signup__input {
-    color: #1a1a1a;
-    background: transparent;
-  }
-  .footer-content .email-signup__input::placeholder { color: #9a9a94; }
-  .footer-content .email-signup__input-group:focus-within {
-    box-shadow: 0 0 0 2px rgba(74, 143, 109, 0.25);
-  }
+}
 
-  /* Integrated "Запиши се" button keeps the scheme's orange primary, pill-matched */
-  .footer-content .email-signup__button.button { border-radius: 100px; }
-  .footer-content .email-signup__button.button:hover { opacity: 0.92; }
+/* -------- LEFT: rounded image panel (the group with a bg image) -------- */
+/* The left column's group-block IS the first grid child (no wrapper). */
+.footer-content > :first-child {
+  position: relative;                 /* base.css already sets this; explicit for safety */
+  width: 100%;
+  min-height: var(--footer-panel-minh);
+  border-radius: var(--footer-panel-radius);
+  overflow: hidden;                   /* clip image + overlay corners */
+  /* subtle branded tint so the panel + logo read well even before an image is set */
+  background-color: #024b40;          /* store green fallback */
+}
+/* Background media wrapper fills the panel behind the centered logo */
+.footer-content > :first-child .group-block__media-wrapper {
+  position: absolute;
+  inset: 0;
+}
 
-  /* Soft, calm interactions (store signature 0.2s) */
-  .footer-content a,
-  .footer-content .email-signup__button { transition: opacity 0.2s ease; }
+/* Background image fills the panel, cover (real Horizon hooks) */
+.footer-content > :first-child .background-image-container {
+  border-radius: var(--footer-panel-radius);
+}
+.footer-content > :first-child .background-image-container img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
 
-  /* Mobile: stack with comfortable rhythm */
-  @media screen and (max-width: 749px) {
-    .footer-content { gap: 1.75rem; }
-    .footer-content .email-signup-block { width: 100%; }
+/* Overlay tint sits behind the logo for contrast; round its corners too */
+.footer-content > :first-child .overlay {
+  border-radius: var(--footer-panel-radius);
+}
+
+/* Center the logo watermark over the panel */
+.footer-content > :first-child .group-block-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 1.5rem;
+}
+
+/* The logo block: light/inverse asset, reduced opacity watermark */
+.footer-content > :first-child .logo-block {
+  pointer-events: none;
+}
+.footer-content > :first-child .logo-block__image {
+  opacity: var(--footer-logo-opacity);  /* watermark — adjust via --footer-logo-opacity */
+  max-width: 240px;
+  height: auto;
+}
+
+/* -------- RIGHT: newsletter polish (carried forward) -------- */
+
+/* Newsletter group reads as one tidy unit */
+.footer-content .email-signup-block { margin-block-start: 0.25rem; }
+
+/* White-on-green opacity tiers (store signature): headings solid, body softer.
+   Scoped to the right column so the left panel logo opacity is untouched. */
+.footer-content > :last-child p { opacity: 0.85; }
+.footer-content > :last-child h1, .footer-content > :last-child h2,
+.footer-content > :last-child h3, .footer-content > :last-child h4,
+.footer-content > :last-child h5, .footer-content > :last-child h6 { opacity: 1; }
+
+/* Email pill: crisp white field on green, near-black text, calm green focus ring */
+.footer-content .email-signup__input-group--integrated {
+  background: #ffffff;
+  border-color: #ffffff;
+}
+.footer-content .email-signup__input {
+  color: #1a1a1a;
+  background: transparent;
+}
+.footer-content .email-signup__input::placeholder { color: #9a9a94; }
+.footer-content .email-signup__input-group:focus-within {
+  box-shadow: 0 0 0 2px rgba(74, 143, 109, 0.25);
+}
+
+/* Integrated "Запиши се" button keeps the scheme's orange primary, pill-matched */
+.footer-content .email-signup__button.button { border-radius: 100px; }
+.footer-content .email-signup__button.button:hover { opacity: 0.92; }
+
+/* Soft, calm interactions (store signature 0.2s) */
+.footer-content a,
+.footer-content .email-signup__button { transition: opacity 0.2s ease; }
+
+/* -------- Mobile: stack (panel on top, newsletter below) -------- */
+@media screen and (max-width: 749px) {
+  .footer-content { gap: 1.75rem; }
+  .footer-content .email-signup-block { width: 100%; }
+
+  /* image panel gets a sensible, shorter height when stacked */
+  .footer-content > :first-child {
+    min-height: var(--footer-panel-minh-mobile);
   }
+}
 {% endstylesheet %}
 
 {% schema %}
