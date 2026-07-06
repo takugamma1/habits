@@ -299,11 +299,18 @@
         </div>
 
         {%- comment -%}
-          Filled by JS with the full reservation in the old WordPress format and
-          sent as the email "Body", so the Gmail → Slack automation can forward it
-          verbatim. Kept last so it is the final field in the email.
+          Hidden mirrors of the visible fields, kept in sync by JS as the guest
+          types. Only contact[...] fields reach the Shopify email, so these give
+          each value its own labelled line (Име:, Телефон:, ...) in the email.
+          The visible inputs keep ASCII names, which JS reads reliably.
         {%- endcomment -%}
-        <input type="hidden" name="contact[Comment]" data-rf-message>
+        <input type="hidden" name="contact[Име]" data-rf-mirror="name">
+        <input type="hidden" name="contact[Телефон]" data-rf-mirror="phone">
+        <input type="hidden" name="contact[Брой гости]" data-rf-mirror="guests">
+        <input type="hidden" name="contact[Дата]" data-rf-mirror="date">
+        <input type="hidden" name="contact[Час]" data-rf-mirror="time">
+        <input type="hidden" name="contact[Обаждане за потвърждение]" data-rf-mirror="callback">
+        <input type="hidden" name="contact[Коментар]" data-rf-mirror="comment">
       {%- endform -%}
 
       <div class="reservation-form__success" data-rf-success hidden>
@@ -358,7 +365,7 @@
 
     var action = form.getAttribute('action') || '/contact';
     var emailField = form.querySelector('[data-rf-email]');
-    var messageField = form.querySelector('[data-rf-message]');
+    var mirrorFields = form.querySelectorAll('[data-rf-mirror]');
     var fallbackEmail = 'reservation-noreply@habits.bg';
     var successUrl = root.getAttribute('data-rf-success-url') || '';
 
@@ -422,16 +429,23 @@
       }).catch(function () {});
     }
 
-    // Keep the hidden "Comment" field continuously up to date as the guest fills the
-    // form, so the full reservation is carried even if the form submits natively or
-    // before our submit handler runs.
-    function syncMessageField() {
-      if (messageField) {
-        messageField.value = reservationText(new FormData(form));
-      }
+    // Keep the hidden contact[...] mirror fields continuously in sync as the guest
+    // fills the form, so each value gets its own labelled line in the email — even
+    // if the form submits natively or before our submit handler runs.
+    function syncMirrors() {
+      mirrorFields.forEach(function (mirror) {
+        var key = mirror.getAttribute('data-rf-mirror');
+        if (key === 'callback') {
+          var cb = form.querySelector('[name="callback"]');
+          mirror.value = cb && cb.checked ? 'Да' : 'Не';
+          return;
+        }
+        var src = form.querySelector('[name="' + key + '"]');
+        mirror.value = src ? src.value : '';
+      });
     }
-    form.addEventListener('input', syncMessageField);
-    form.addEventListener('change', syncMessageField);
+    form.addEventListener('input', syncMirrors);
+    form.addEventListener('change', syncMirrors);
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -443,7 +457,7 @@
       if (emailField && !emailField.value) {
         emailField.value = fallbackEmail;
       }
-      syncMessageField();
+      syncMirrors();
 
       if (submitBtn) {
         submitBtn.disabled = true;
