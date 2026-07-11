@@ -396,6 +396,18 @@
       transform: scale(1.04);
     }
   }
+
+  /* Round the dish images on ALL breakpoints — the theme only rounds them at
+     >=750px, so mobile stayed square. Scoped to the main gallery (not the
+     recommendation cards, which keep their own radius). */
+  main[data-template^='product'] .product-information .product-media {
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  main[data-template^='product'] .product-information .media-gallery--carousel slideshow-container {
+    border-radius: 20px;
+    overflow: hidden;
+  }
 {% endstylesheet %}
 
 {% schema %}
