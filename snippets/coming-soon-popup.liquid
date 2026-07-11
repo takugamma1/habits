@@ -79,6 +79,14 @@
     width: min(92vw, 30rem);
     max-width: 30rem;
     text-align: center;
+    /* center in the viewport (the theme reset removes the browser's default
+       dialog centering margins) */
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    height: fit-content;
+    max-height: 90dvh;
+    overflow: auto;
   }
 
   /* The theme makes .dialog-modal fullscreen on mobile — keep this one a centered card. */
