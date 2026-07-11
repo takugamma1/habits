@@ -12,7 +12,8 @@
 
 <script src="{{ 'dialog.js' | asset_url }}" type="module"></script>
 
-{%- assign csp_logo = settings.logo_inverse | default: settings.logo -%}
+{%- comment -%} settings.logo is the white brand mark used on dark green site-wide (header, footer card) {%- endcomment -%}
+{%- assign csp_logo = settings.logo | default: settings.logo_inverse -%}
 
 <dialog-component id="coming-soon-dialog">
   <dialog class="coming-soon-modal dialog-modal color-scheme-51e46fd2-3761-469a-90a9-9dd6dd243b55" ref="dialog" scroll-lock>
@@ -52,7 +53,7 @@
             Резервирай маса
           </a>
         {%- endif -%}
-        <button type="button" class="button button-secondary coming-soon-modal__dismiss" data-csp-close>
+        <button type="button" class="button coming-soon-modal__dismiss" data-csp-close>
           Разбрах
         </button>
       </div>
@@ -116,7 +117,7 @@
   }
 
   .coming-soon-modal__logo img {
-    max-width: 180px;
+    max-width: 210px;
     height: auto;
   }
 
@@ -154,9 +155,18 @@
     margin-block-start: 0.5rem;
   }
 
-  .coming-soon-modal__dismiss {
-    color: var(--color-foreground, #ffffff);
-    border-color: var(--color-foreground, #ffffff);
+  /* Popup buttons: brand orange, hover flips to black */
+  .coming-soon-modal__actions .button {
+    background: #dd5934;
+    color: #ffffff;
+    border: none;
+    transition: background 0.2s ease;
+  }
+
+  .coming-soon-modal__actions .button:hover {
+    background: #000000;
+    color: #ffffff;
+    opacity: 1;
   }
 {% endstyle %}
 
