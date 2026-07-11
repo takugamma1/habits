@@ -358,6 +358,44 @@
       white-space: nowrap;
     }
   }
+
+  /* ═══ HABITS product page branding ═══ */
+
+  /* Cream site backdrop behind both product sections — same value as the
+     menu page's --mp-page-bg. No color scheme has this background. */
+  main[data-template^='product'] .section-background {
+    background-color: #f5f3ef;
+  }
+
+  /* The divider inside the dark-green details panel uses var(--color-border),
+     which is near-invisible on #024b40 — use translucent white instead. */
+  main[data-template^='product'] .product-details .divider__line {
+    border-color: rgb(255 255 255 / 0.25);
+  }
+
+  /* The theme zeroes the details panel's inline padding on mobile; with a
+     filled green panel that pins text to the rounded edge — restore it. */
+  @media screen and (max-width: 749px) {
+    main[data-template^='product'] .product-information.section--page-width .product-details > .group-block {
+      padding-inline: 20px;
+    }
+  }
+
+  /* Recommendation cards: hover parity with the menu cards. */
+  @media (prefers-reduced-motion: no-preference) {
+    main[data-template^='product'] .product-recommendations .product-card__content {
+      transition: transform 0.25s ease;
+    }
+    main[data-template^='product'] .product-recommendations .product-card:hover .product-card__content {
+      transform: translateY(-2px);
+    }
+    main[data-template^='product'] .product-recommendations .card-gallery .product-media img {
+      transition: transform 0.4s ease;
+    }
+    main[data-template^='product'] .product-recommendations .product-card:hover .card-gallery .product-media img {
+      transform: scale(1.04);
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
