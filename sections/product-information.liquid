@@ -176,6 +176,29 @@
   additional_blocks: additional_blocks
 %}
 
+
+{%- comment -%} HABITS: robust product-page CTA — inject a "menu" link, hide add-to-cart.
+   Lives in the section file so theme-editor syncs to product.json can't revert it. {%- endcomment -%}
+<script>
+  (function () {
+    var main = document.querySelector('main[data-template^="product"]');
+    if (!main) return;
+    var details = main.querySelector('.product-details');
+    if (!details || details.querySelector('.hb-menu-cta')) return;
+    var menuUrl = {{ pages['меню'].url | json }} || '/pages/меню';
+    var buy = details.querySelector('.buy-buttons-block');
+    var cta = document.createElement('a');
+    cta.href = menuUrl;
+    cta.className = 'button hb-menu-cta';
+    cta.textContent = 'Разгледай менюто';
+    if (buy && buy.parentNode) {
+      buy.parentNode.insertBefore(cta, buy.nextSibling);
+    } else {
+      details.appendChild(cta);
+    }
+  })();
+</script>
+
 {% stylesheet %}
   .sticky-add-to-cart__bar {
     position: fixed;
@@ -406,6 +429,66 @@
   }
   main[data-template^='product'] .product-information .media-gallery--carousel slideshow-container {
     border-radius: 20px;
+    overflow: hidden;
+  }
+
+  /* ═══ HABITS product page — robust brand (section file: survives editor syncs) ═══ */
+
+  /* Details column -> dark-green rounded panel. Reproduce the brand green scheme
+     via its CSS vars so all children (buttons, price, variant pills) recolour. */
+  main[data-template^='product'] .product-information .product-details > .group-block {
+    --color-background: #024b40;
+    --color-foreground: #ffffff;
+    --color-foreground-heading: #ffffff;
+    --color-border: rgb(255 255 255 / 0.22);
+    --color-primary-button-background: #dd5934;
+    --color-primary-button-text: #ffffff;
+    --color-primary-button-border: #dd5934;
+    --color-primary-button-hover-background: #dd5934bf;
+    --color-primary-button-hover-text: #ffffff;
+    --color-primary-button-hover-border: #dd5934bf;
+    --color-variant-background: #ffffff;
+    --color-variant-text: #1a1a1a;
+    --color-variant-border: #ffffff;
+    background-color: #024b40;
+    color: #ffffff;
+    border-radius: 24px;
+    padding: clamp(1.5rem, 4vw, 2rem) clamp(1.25rem, 4vw, 1.75rem);
+  }
+  main[data-template^='product'] .product-information .product-details :is(h1, h2, h3, h4, h5, h6),
+  main[data-template^='product'] .product-information .product-details .price,
+  main[data-template^='product'] .product-information .product-details p {
+    color: #ffffff;
+  }
+
+  /* CTA: hide the native add-to-cart; the JS above injects the menu link. */
+  main[data-template^='product'] .product-details .buy-buttons-block {
+    display: none !important;
+  }
+  main[data-template^='product'] .product-details .hb-menu-cta {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    margin-block: 0.75rem 0.25rem;
+  }
+
+  /* Recommendations -> menu-style green cards */
+  main[data-template^='product'] .product-recommendations .product-card__content {
+    --color-foreground: #ffffff;
+    --color-foreground-heading: #ffffff;
+    background-color: #024b40;
+    color: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    padding: 12px;
+  }
+  main[data-template^='product'] .product-recommendations .product-card__content :is(h1, h2, h3, h4, h5, h6, p, .price) {
+    color: #ffffff;
+  }
+  main[data-template^='product'] .product-recommendations .card-gallery,
+  main[data-template^='product'] .product-recommendations .card-gallery .product-media {
+    border-radius: 10px;
     overflow: hidden;
   }
 {% endstylesheet %}
