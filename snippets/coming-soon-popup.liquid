@@ -12,8 +12,8 @@
 
 <script src="{{ 'dialog.js' | asset_url }}" type="module"></script>
 
-{%- comment -%} settings.logo is the white brand mark used on dark green site-wide (header, footer card) {%- endcomment -%}
-{%- assign csp_logo = settings.logo | default: settings.logo_inverse -%}
+{%- comment -%} logo_inverse is the white HABITS wordmark — right for the dark green card {%- endcomment -%}
+{%- assign csp_logo = settings.logo_inverse | default: settings.logo -%}
 
 <dialog-component id="coming-soon-dialog">
   <dialog class="coming-soon-modal dialog-modal color-scheme-51e46fd2-3761-469a-90a9-9dd6dd243b55" ref="dialog" scroll-lock>
@@ -117,7 +117,7 @@
   }
 
   .coming-soon-modal__logo img {
-    max-width: 210px;
+    max-width: 150px;
     height: auto;
   }
 
