@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "main": {
       "type": "product-information",
@@ -17,17 +18,18 @@
           "settings": {
             "media_presentation": "grid",
             "media_columns": "two",
-            "image_gap": 12,
+            "image_gap": 4,
             "large_first_image": false,
             "icons_style": "none",
             "slideshow_controls_style": "counter",
             "slideshow_mobile_controls_style": "dots",
             "thumbnail_position": "right",
             "thumbnail_width": 44,
+            "thumbnail_radius": 0,
             "aspect_ratio": "adapt",
             "constrain_to_viewport": true,
             "media_fit": "contain",
-            "media_radius": 24,
+            "media_radius": 0,
             "extend_media": false,
             "zoom": true,
             "video_loop": false,
@@ -51,26 +53,25 @@
             "details_position": "flex-start",
             "gap": 28,
             "sticky_details_desktop": true,
-            "inherit_color_scheme": false,
-            "color_scheme": "scheme-51e46fd2-3761-469a-90a9-9dd6dd243b55",
+            "inherit_color_scheme": true,
+            "color_scheme": "scheme-1",
             "background_media": "none",
             "video_position": "cover",
             "background_image_position": "cover",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
-            "border_radius": 24,
-            "padding-block-start": 32,
-            "padding-block-end": 32,
-            "padding-inline-start": 28,
-            "padding-inline-end": 28
+            "border_radius": 0,
+            "padding-block-start": 24,
+            "padding-block-end": 24,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
           },
           "blocks": {
             "group_icgrde": {
               "type": "group",
               "name": "Header",
               "settings": {
-                "open_in_new_tab": false,
                 "content_direction": "column",
                 "vertical_on_mobile": true,
                 "horizontal_alignment": "flex-start",
@@ -98,6 +99,9 @@
                 "overlay_color": "#00000026",
                 "overlay_style": "solid",
                 "gradient_direction": "to top",
+                "link": "",
+                "open_in_new_tab": false,
+                "placeholder": "",
                 "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
@@ -188,6 +192,7 @@
               "settings": {
                 "stacking": true,
                 "show_pickup_availability": false,
+                "gift_card_form": true,
                 "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
@@ -259,7 +264,8 @@
         "equal_columns": false,
         "limit_details_width": false,
         "gap": 48,
-        "color_scheme": "scheme-1",
+        "enable_sticky_add_to_cart": true,
+        "color_scheme": "",
         "padding-block-start": 0,
         "padding-block-end": 0
       }
@@ -271,7 +277,7 @@
           "type": "text",
           "name": "t:names.header",
           "settings": {
-            "text": "<h3>You may also like </h3>",
+            "text": "<h3>Вкусни изкушения</h3>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
@@ -299,27 +305,27 @@
           "static": true,
           "settings": {
             "product_card_gap": 8,
-            "inherit_color_scheme": false,
-            "color_scheme": "scheme-51e46fd2-3761-469a-90a9-9dd6dd243b55",
+            "inherit_color_scheme": true,
+            "color_scheme": "",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
-            "border_radius": 16,
-            "padding-block-start": 10,
-            "padding-block-end": 14,
-            "padding-inline-start": 12,
-            "padding-inline-end": 12
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 8,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
           },
           "blocks": {
             "product_card_gallery_DNizbJ": {
               "type": "_product-card-gallery",
               "name": "t:names.product_card_media",
               "settings": {
-                "image_ratio": "landscape",
+                "image_ratio": "adapt",
                 "border": "none",
                 "border_width": 1,
                 "border_opacity": 100,
-                "border_radius": 10,
+                "border_radius": 0,
                 "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
@@ -394,7 +400,7 @@
         "max_products": 4,
         "columns": 4,
         "mobile_columns": "2",
-        "columns_gap": 16,
+        "columns_gap": 12,
         "rows_gap": 24,
         "icons_style": "arrow",
         "icons_shape": "none",
