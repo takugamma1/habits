@@ -89,6 +89,24 @@
     overflow: auto;
   }
 
+  /* The theme's elementSlideInTop/Out animations pin margin-top to 0 with a
+     "forwards" fill, which permanently defeats margin:auto centering. Use our
+     own fade animations that never touch margins. */
+  @keyframes cspFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes cspFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  dialog.coming-soon-modal[open] {
+    animation: cspFadeIn var(--animation-speed, 0.2s) var(--animation-easing, ease) forwards;
+  }
+  dialog.coming-soon-modal.dialog-closing {
+    animation: cspFadeOut var(--animation-speed, 0.2s) var(--animation-easing, ease) forwards;
+  }
+
   /* The theme makes .dialog-modal fullscreen on mobile — keep this one a centered card. */
   @media screen and (max-width: 749px) {
     dialog.coming-soon-modal {
