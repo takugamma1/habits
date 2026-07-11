@@ -13,11 +13,10 @@
 <script src="{{ 'dialog.js' | asset_url }}" type="module"></script>
 
 {%- comment -%}
-  Group_7.png (Files) is the cream-white HABITS wordmark — the brand asset used in
-  the footer marquee. logo/logo_inverse are the leaf marks (white / dark green),
-  which don't read on the dark green card.
+  Group_11_2.png (Files) is the pure-white HABITS wordmark the merchant chose
+  for this popup. logo/logo_inverse are the leaf marks, which don't read here.
 {%- endcomment -%}
-{%- assign csp_logo_url = 'Group_7.png' | file_img_url: '340x' -%}
+{%- assign csp_logo_url = 'Group_11_2.png' | file_img_url: '340x' -%}
 
 <dialog-component id="coming-soon-dialog">
   <dialog class="coming-soon-modal dialog-modal color-scheme-51e46fd2-3761-469a-90a9-9dd6dd243b55" ref="dialog" scroll-lock>
@@ -32,7 +31,7 @@
 
     <div class="coming-soon-modal__inner">
       <div class="coming-soon-modal__logo">
-        <img src="{{ csp_logo_url }}" alt="{{ shop.name }}" loading="eager" width="533" height="166">
+        <img src="{{ csp_logo_url }}" alt="{{ shop.name }}" loading="eager" width="445" height="135">
       </div>
 
       <h2 class="coming-soon-modal__heading">
