@@ -2284,5 +2284,35 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "Coming soon popup",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "coming_soon_popup_enabled",
+        "label": "Show coming soon popup",
+        "info": "Blocks the whole ordering flow: auto-opens on the menu, cart and product pages, and appears whenever a customer tries to order. Turn off at any moment to enable ordering.",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "coming_soon_heading",
+        "label": "Heading",
+        "default": "Очаквайте скоро"
+      },
+      {
+        "type": "richtext",
+        "id": "coming_soon_text",
+        "label": "Text",
+        "default": "<p>Онлайн поръчките са на път! Съвсем скоро ще можете да поръчвате любимите си ястия директно от сайта.</p>"
+      },
+      {
+        "type": "url",
+        "id": "coming_soon_reservation_link",
+        "label": "Reservation button link",
+        "info": "Pick the reservation page — shows a 'Резервирай маса' button in the popup."
+      }
+    ]
   }
 ]

@@ -133,5 +133,9 @@
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}
     {% endif %}
+
+    {% if settings.coming_soon_popup_enabled %}
+      {% render 'coming-soon-popup' %}
+    {% endif %}
   </body>
 </html>

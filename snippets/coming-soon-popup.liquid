@@ -1,0 +1,240 @@
+{%- doc -%}
+  "Coming soon" ordering gate. Rendered from layout/theme.liquid when
+  settings.coming_soon_popup_enabled is on (Theme settings > Coming soon popup —
+  the merchant can switch it off at any moment).
+
+  - Auto-opens on the menu page, cart page, and product pages.
+  - Intercepts every order action site-wide (menu cards, add-to-cart, quick add,
+    cart drawer/page, checkout CTAs, product links) and shows the popup instead.
+  - Payment buttons that live in iframes (Shop Pay etc.) cannot be click-blocked,
+    so they are hidden with CSS while the gate is enabled.
+{%- enddoc -%}
+
+<script src="{{ 'dialog.js' | asset_url }}" type="module"></script>
+
+{%- assign csp_logo = settings.logo_inverse | default: settings.logo -%}
+
+<dialog-component id="coming-soon-dialog">
+  <dialog class="coming-soon-modal dialog-modal color-scheme-51e46fd2-3761-469a-90a9-9dd6dd243b55" ref="dialog" scroll-lock>
+    <button
+      type="button"
+      class="button button-unstyled coming-soon-modal__close"
+      data-csp-close
+      aria-label="{{ 'accessibility.close_dialog' | t | default: 'Затвори' }}"
+    >
+      {{- 'icon-close.svg' | inline_asset_content -}}
+    </button>
+
+    <div class="coming-soon-modal__inner">
+      {%- if csp_logo -%}
+        <div class="coming-soon-modal__logo">
+          {{ csp_logo | image_url: width: 360 | image_tag: loading: 'eager', alt: shop.name }}
+        </div>
+      {%- else -%}
+        <p class="coming-soon-modal__shop-name">{{ shop.name }}</p>
+      {%- endif -%}
+
+      <h2 class="coming-soon-modal__heading">
+        {{ settings.coming_soon_heading | default: 'Очаквайте скоро' }}
+      </h2>
+
+      <div class="coming-soon-modal__text">
+        {%- if settings.coming_soon_text != blank -%}
+          {{ settings.coming_soon_text }}
+        {%- else -%}
+          <p>Онлайн поръчките са на път! Съвсем скоро ще можете да поръчвате любимите си ястия директно от сайта.</p>
+        {%- endif -%}
+      </div>
+
+      <div class="coming-soon-modal__actions">
+        {%- if settings.coming_soon_reservation_link != blank -%}
+          <a class="button coming-soon-modal__cta" href="{{ settings.coming_soon_reservation_link }}" data-csp-allow>
+            Резервирай маса
+          </a>
+        {%- endif -%}
+        <button type="button" class="button button-secondary coming-soon-modal__dismiss" data-csp-close>
+          Разбрах
+        </button>
+      </div>
+    </div>
+  </dialog>
+</dialog-component>
+
+{% style %}
+  /* While the ordering gate is on, hide payment buttons rendered inside iframes
+     (Shop Pay / accelerated checkout) — clicks inside iframes cannot be blocked. */
+  .accelerated-checkout-block,
+  .shopify-payment-button,
+  additional-checkout-buttons,
+  shopify-accelerated-checkout {
+    display: none !important;
+  }
+
+  .coming-soon-modal {
+    background: var(--color-background, #024b40);
+    color: var(--color-foreground, #ffffff);
+    border: none;
+    border-radius: var(--style-border-radius-popover, 14px);
+    padding: 0;
+    width: min(92vw, 30rem);
+    max-width: 30rem;
+    text-align: center;
+  }
+
+  /* The theme makes .dialog-modal fullscreen on mobile — keep this one a centered card. */
+  @media screen and (max-width: 749px) {
+    dialog.coming-soon-modal {
+      width: min(92vw, 30rem);
+      height: auto;
+      max-width: 92vw;
+      max-height: 90dvh;
+      margin: auto;
+      inset: 0;
+      border-radius: var(--style-border-radius-popover, 14px);
+    }
+  }
+
+  .coming-soon-modal__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: clamp(2rem, 6vw, 3rem) clamp(1.5rem, 5vw, 2.75rem);
+  }
+
+  .coming-soon-modal__close {
+    position: absolute;
+    top: 0.875rem;
+    right: 0.875rem;
+    color: var(--color-foreground, #ffffff);
+    cursor: pointer;
+  }
+
+  .coming-soon-modal__close svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .coming-soon-modal__logo img {
+    max-width: 180px;
+    height: auto;
+  }
+
+  .coming-soon-modal__shop-name {
+    margin: 0;
+    font-family: 'Phenomena', var(--font-heading--family), sans-serif;
+    font-size: 1.75rem;
+    letter-spacing: var(--font-heading--spacing, 0.25em);
+  }
+
+  .coming-soon-modal__heading {
+    margin: 0;
+    color: var(--color-foreground, #ffffff);
+    font-family: 'Phenomena', var(--font-heading--family), sans-serif;
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+    line-height: 1.15;
+  }
+
+  .coming-soon-modal__text {
+    max-width: 24rem;
+  }
+
+  .coming-soon-modal__text p {
+    margin: 0;
+    color: var(--color-foreground, #ffffff);
+    opacity: 0.9;
+    line-height: 1.6;
+  }
+
+  .coming-soon-modal__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-block-start: 0.5rem;
+  }
+
+  .coming-soon-modal__dismiss {
+    color: var(--color-foreground, #ffffff);
+    border-color: var(--color-foreground, #ffffff);
+  }
+{% endstyle %}
+
+{%- unless request.design_mode -%}
+  <script>
+    (function () {
+      var AUTO_OPEN = {% if template.name == 'page' and template.suffix == 'menu' %}true{% elsif template.name == 'cart' or template.name == 'product' %}true{% else %}false{% endif %};
+
+      // Every way an order can start, per theme audit. Document-level CAPTURE
+      // runs before the theme's own handlers (menu cards, quick add, drawers).
+      var BLOCK_SELECTORS = [
+        /* menu page (cards are divs, not links) */
+        '.mp-card', '.mp-card__add',
+        '.mp-upsell__next', '.mp-upsell__skip',
+        '#mp-product-popup-add', '.mp-product-popup__add-btn',
+        '#mp-cart-btn-desktop', '.mp-cart-btn', '#mp-mob-badge', '.mp-mob-badge',
+        '#mp-drawer-cta', '#mp-sheet-cta', '.mp-drawer__cta', '.mp-sheet__cta',
+        /* add-to-cart everywhere */
+        'form[action*="/cart/add"]', 'form[data-type="add-to-cart-form"]',
+        'button[name="add"]', '.add-to-cart-button',
+        'add-to-cart-component', 'product-form-component', 'quick-add-component', 'sticky-add-to-cart',
+        '.quick-add__button--add', '.quick-add__button--choose', '.sticky-add-to-cart__button',
+        /* cart + checkout entry */
+        '[data-testid="cart-drawer-trigger"]', 'cart-drawer-component', 'cart-icon',
+        'a[href^="/cart"]', 'button[name="checkout"]', '#checkout', '.cart__checkout-button',
+        'a[href^="/checkout"]', 'a[href*="/checkout"]',
+        /* product navigation (collections, search, recommendations, hotspots) */
+        'a[href*="/products/"]', 'a.product-card__link', 'a.resource-card__link'
+      ].join(',');
+
+      var component = document.getElementById('coming-soon-dialog');
+      if (!component) return;
+
+      function openPopup() {
+        if (typeof component.showDialog === 'function') {
+          component.showDialog();
+          return;
+        }
+        var dlg = component.querySelector('dialog');
+        if (dlg && !dlg.open) dlg.showModal();
+      }
+
+      function closePopup() {
+        if (typeof component.closeDialog === 'function') {
+          component.closeDialog();
+          return;
+        }
+        var dlg = component.querySelector('dialog');
+        if (dlg && dlg.open) dlg.close();
+      }
+
+      component.querySelectorAll('[data-csp-close]').forEach(function (btn) {
+        btn.addEventListener('click', closePopup);
+      });
+
+      function intercept(e) {
+        // Never block interactions inside the popup itself (incl. the reservation link).
+        if (e.target.closest && e.target.closest('#coming-soon-dialog')) return;
+        var hit = e.target.closest && e.target.closest(BLOCK_SELECTORS);
+        if (!hit) return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+        openPopup();
+      }
+
+      document.addEventListener('click', intercept, true);
+      document.addEventListener('submit', intercept, true);
+
+      if (AUTO_OPEN) {
+        var fallback = setTimeout(openPopup, 500);
+        if (window.customElements && customElements.whenDefined) {
+          customElements.whenDefined('dialog-component').then(function () {
+            clearTimeout(fallback);
+            requestAnimationFrame(openPopup);
+          }).catch(function () {});
+        }
+      }
+    })();
+  </script>
+{%- endunless -%}
