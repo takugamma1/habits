@@ -78,6 +78,8 @@
     "variant_button_border_width": 1,
     "variant_button_radius": 14,
     "variant_button_width": "equal-width-buttons",
+    "maps_button_url": "https://www.google.com/maps/dir/?api=1&destination=Habits+Bar+Food+Shisha+ul.+General+Kiselov+64+Varna",
+    "maps_button_label": "Google maps",
     "content_for_index": [],
     "color_schemes": {
       "scheme-1": {
