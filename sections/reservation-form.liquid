@@ -311,6 +311,14 @@
         <input type="hidden" name="contact[Час]" data-rf-mirror="time">
         <input type="hidden" name="contact[Обаждане за потвърждение]" data-rf-mirror="callback">
         <input type="hidden" name="contact[Коментар]" data-rf-mirror="comment">
+
+        {%- comment -%}
+          Ad-click attribution: filled by JS from the URL or localStorage
+          (captured site-wide in theme.liquid). Disabled on submit when empty
+          so organic reservations don't add blank lines to the email.
+        {%- endcomment -%}
+        <input type="hidden" name="contact[gclid]" data-rf-track="gclid">
+        <input type="hidden" name="contact[fbclid]" data-rf-track="fbclid">
       {%- endform -%}
 
       <div class="reservation-form__success" data-rf-success hidden>
@@ -368,6 +376,17 @@
     var mirrorFields = form.querySelectorAll('[data-rf-mirror]');
     var fallbackEmail = 'reservation-noreply@habits.bg';
     var successUrl = root.getAttribute('data-rf-success-url') || '';
+
+    // Fill gclid/fbclid from the current URL, falling back to values captured
+    // on the landing page (stored by the site-wide script in theme.liquid).
+    try {
+      var urlParams = new URLSearchParams(window.location.search);
+      form.querySelectorAll('[data-rf-track]').forEach(function (input) {
+        var key = input.getAttribute('data-rf-track');
+        var val = urlParams.get(key) || localStorage.getItem('habits_' + key) || '';
+        input.value = val;
+      });
+    } catch (e) { /* tracking is best-effort */ }
 
     var status = form.querySelector('[data-rf-status]');
     var submitBtn = form.querySelector('[data-rf-submit]');
@@ -463,6 +482,11 @@
         submitBtn.disabled = true;
         submitBtn.textContent = (submitBtn.dataset.rfLoading || 'Изпращане...');
       }
+
+      // Empty tracking fields are excluded from the submission entirely.
+      form.querySelectorAll('[data-rf-track]').forEach(function (input) {
+        input.disabled = !input.value;
+      });
 
       var data = new FormData(form);
 
@@ -1120,7 +1144,7 @@
       "id": "phone_number",
       "label": "Phone number",
       "info": "Used as the tel: link target. Spaces and dashes are removed automatically.",
-      "default": "+359 88 888 8888"
+      "default": "088 393 0090"
     },
     {
       "type": "text",

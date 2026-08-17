@@ -1,0 +1,72 @@
+{%- comment -%}
+  Sticky "navigate to us" button — a floating pill that opens Google Maps
+  directions to the restaurant. Configured under Theme settings → "Sticky
+  navigation button". Renders nothing until a Maps link is set.
+
+  Tip for the link: https://www.google.com/maps/dir/?api=1&destination=<address>
+  opens turn-by-turn navigation straight to the destination on mobile.
+{%- endcomment -%}
+
+{%- if settings.maps_button_enabled and settings.maps_button_url != blank -%}
+  {%- unless settings.maps_button_hide_on_menu and template contains 'page.menu' -%}
+    <a
+      class="sticky-maps-button sticky-maps-button--{{ settings.maps_button_position | default: 'left' }}"
+      href="{{ settings.maps_button_url }}"
+      target="_blank"
+      rel="noopener"
+      aria-label="{{ settings.maps_button_label | default: 'Навигация' }}"
+    >
+      <svg class="sticky-maps-button__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+      </svg>
+      <span class="sticky-maps-button__label">{{ settings.maps_button_label | default: 'Навигация' }}</span>
+    </a>
+
+    {% style %}
+      .sticky-maps-button {
+        position: fixed;
+        bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+        z-index: 900;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 18px;
+        border-radius: 999px;
+        background: {{ settings.maps_button_bg | default: '#024b40' }};
+        color: {{ settings.maps_button_color | default: '#ffffff' }};
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1;
+        text-decoration: none;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .sticky-maps-button--left {
+        left: calc(16px + env(safe-area-inset-left, 0px));
+      }
+
+      .sticky-maps-button--right {
+        right: calc(16px + env(safe-area-inset-right, 0px));
+      }
+
+      .sticky-maps-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        color: {{ settings.maps_button_color | default: '#ffffff' }};
+      }
+
+      .sticky-maps-button__icon {
+        width: 18px;
+        height: 18px;
+        flex: none;
+      }
+
+      @media (max-width: 749px) {
+        .sticky-maps-button {
+          padding: 12px 14px;
+        }
+      }
+    {% endstyle %}
+  {%- endunless -%}
+{%- endif -%}

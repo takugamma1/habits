@@ -2314,5 +2314,58 @@
         "info": "Pick the reservation page — shows a 'Резервирай маса' button in the popup."
       }
     ]
+  },
+  {
+    "name": "Sticky navigation button",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "maps_button_enabled",
+        "label": "Show sticky navigation button",
+        "info": "Floating button that opens Google Maps directions to the restaurant. Nothing shows until a link is set below.",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "maps_button_url",
+        "label": "Google Maps link",
+        "info": "Recommended format: https://www.google.com/maps/dir/?api=1&destination=YOUR+ADDRESS — opens turn-by-turn navigation on mobile. A place share link from Google Maps also works."
+      },
+      {
+        "type": "text",
+        "id": "maps_button_label",
+        "label": "Button label",
+        "default": "Навигация"
+      },
+      {
+        "type": "select",
+        "id": "maps_button_position",
+        "label": "Position",
+        "options": [
+          { "value": "left", "label": "Bottom left" },
+          { "value": "right", "label": "Bottom right" }
+        ],
+        "default": "left"
+      },
+      {
+        "type": "checkbox",
+        "id": "maps_button_hide_on_menu",
+        "label": "Hide on the menu page",
+        "info": "The menu page has its own floating cart controls.",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "maps_button_bg",
+        "label": "Background",
+        "default": "#024b40"
+      },
+      {
+        "type": "color",
+        "id": "maps_button_color",
+        "label": "Text color",
+        "default": "#ffffff"
+      }
+    ]
   }
 ]

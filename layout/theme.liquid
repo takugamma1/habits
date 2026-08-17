@@ -14,6 +14,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-WDQHTLJ5');</script>
 <!-- End Google Tag Manager -->
 
+    <script>
+      // Persist ad-click ids (gclid/fbclid) from the landing URL so the
+      // reservation form can attach them even after in-site navigation.
+      (function () {
+        try {
+          var params = new URLSearchParams(window.location.search);
+          ['gclid', 'fbclid'].forEach(function (key) {
+            var val = params.get(key);
+            if (val) localStorage.setItem('habits_' + key, val);
+          });
+        } catch (e) { /* best-effort */ }
+      })();
+    </script>
+
     {%- if settings.favicon != blank -%}
       <link
         rel="icon"
@@ -146,6 +160,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}
     {% endif %}
+
+    {% render 'sticky-maps-button' %}
 
     {% if settings.coming_soon_popup_enabled %}
       {% render 'coming-soon-popup' %}
