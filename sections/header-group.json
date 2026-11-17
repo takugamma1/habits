@@ -88,9 +88,21 @@
         "bubble_text": "#ffffff",
         "bubble_logo_width": 20
       }
+    },
+    "custom_liquid_FH4B6R": {
+      "type": "custom-liquid",
+      "name": "t:names.custom_liquid",
+      "settings": {
+        "custom_liquid": "{%- assign lang = request.locale.iso_code | slice: 0, 2 -%}\n{%- unless lang == 'bg' or lang == 'en' -%}{%- assign lang = 'bg' -%}{%- endunless -%}\n<div data-pulse-booking=\"habits-jtkf6u\"\n     data-lang=\"{{ lang }}\"\n     data-theme=\"light\"\n     data-accent=\"1a1a1a\"\n     data-privacy=\"{{ shop.url }}/policies/privacy-policy\"></div>\n<script src=\"https://erp.7digit.io/hospitality-booking.js\" async></script>",
+        "color_scheme": "",
+        "section_width": "page-width",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
     }
   },
   "order": [
-    "header_section"
+    "header_section",
+    "custom_liquid_FH4B6R"
   ]
 }
